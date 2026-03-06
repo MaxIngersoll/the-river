@@ -1,4 +1,5 @@
 import { useState, useMemo, useCallback, useRef } from 'react';
+import { PRACTICE_TAGS, getSessionsByDate, today, addDays } from '../utils/storage';
 
 // ─── Music Theory Data ───
 
@@ -549,9 +550,179 @@ function ProgressionStrips({ rootNote, scale, diatonicChords }) {
   );
 }
 
+// ─── Practice Intelligence ───
+
+// Parse session notes for key/scale mentions
+function parseSessionContext(session) {
+  if (!session?.note) return null;
+  const note = session.note.toLowerCase();
+  const foundRoot = NOTES.find(n => note.includes(n.toLowerCase() + ' ') || note.includes(n.toLowerCase() + 'm'));
+  const foundScale = Object.keys(SCALE_NAMES).find(s =>
+    note.includes(SCALE_NAMES[s].toLowerCase())
+  );
+  return { root: foundRoot || null, scale: foundScale || null };
+}
+
+// Analyze which keys/scales have been practiced recently
+function analyzePracticeHistory(sessions) {
+  if (!sessions?.length) return { recentKeys: {}, recentTags: {}, avgMinutes: 15, lastSession: null };
+  const twoWeeksAgo = addDays(today(), -14);
+  const recent = sessions.filter(s => s.date >= twoWeeksAgo && !s.fog);
+  const sorted = [...sessions].filter(s => !s.fog).sort((a, b) => (b.created_at || b.date).localeCompare(a.created_at || a.date));
+
+  const recentKeys = {};
+  const recentTags = {};
+  for (const s of recent) {
+    const ctx = parseSessionContext(s);
+    if (ctx?.root) recentKeys[ctx.root] = (recentKeys[ctx.root] || 0) + 1;
+    if (Array.isArray(s.tags)) {
+      for (const t of s.tags) recentTags[t] = (recentTags[t] || 0) + 1;
+    }
+  }
+
+  const totalMins = recent.reduce((sum, s) => sum + s.duration_minutes, 0);
+  const avgMinutes = recent.length > 0 ? Math.round(totalMins / recent.length) : 15;
+
+  return { recentKeys, recentTags, avgMinutes, lastSession: sorted[0] || null };
+}
+
+// Generate a deterministic "explore" suggestion based on practice gaps
+function getExploreSuggestion(recentKeys) {
+  const allKeys = [...NOTES];
+  // Find keys NOT practiced recently
+  const unpracticed = allKeys.filter(k => !recentKeys[k]);
+  if (unpracticed.length === 0) return { root: 'E', scale: 'dorian' }; // fallback to something interesting
+  // Pick based on day-of-year for determinism
+  const dayOfYear = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0)) / 86400000);
+  const root = unpracticed[dayOfYear % unpracticed.length];
+  // Pick an interesting scale they might not know
+  const scales = ['pentatonic_minor', 'blues', 'dorian', 'mixolydian', 'minor'];
+  const scale = scales[dayOfYear % scales.length];
+  return { root, scale };
+}
+
+// Generate a challenge: random key + higher BPM
+function getChallengeSuggestion(avgMinutes) {
+  const dayOfYear = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0)) / 86400000);
+  const root = NOTES[(dayOfYear * 7) % 12];
+  const progressionSets = [
+    { name: 'Pop/Rock', numerals: ['I', 'V', 'vi', 'IV'] },
+    { name: 'Blues', numerals: ['I', 'IV', 'V', 'I'] },
+    { name: 'Jazz', numerals: ['ii', 'V', 'I'] },
+    { name: 'Minor', numerals: ['i', 'iv', 'VII', 'III'] },
+  ];
+  const prog = progressionSets[(dayOfYear * 3) % progressionSets.length];
+  const bpm = Math.round((80 + (dayOfYear % 40)) * 1.1); // slight push
+  return { root, progression: prog, bpm };
+}
+
+// ─── Quick Start Component ───
+
+function QuickStartCards({ sessions, onSetRoot, onSetScale }) {
+  const analysis = useMemo(() => analyzePracticeHistory(sessions), [sessions]);
+
+  if (!sessions?.length) return null;
+
+  const continueCtx = parseSessionContext(analysis.lastSession);
+  const explore = getExploreSuggestion(analysis.recentKeys);
+  const challenge = getChallengeSuggestion(analysis.avgMinutes);
+
+  const cards = [
+    {
+      id: 'continue',
+      label: 'Continue',
+      sublabel: continueCtx?.root
+        ? `${continueCtx.root} ${continueCtx.scale ? SCALE_NAMES[continueCtx.scale] : 'Major'}`
+        : analysis.lastSession?.tags?.[0] || 'Last session',
+      icon: '→',
+      action: () => {
+        if (continueCtx?.root) onSetRoot(continueCtx.root);
+        if (continueCtx?.scale) onSetScale(continueCtx.scale);
+      },
+    },
+    {
+      id: 'explore',
+      label: 'Explore',
+      sublabel: `${explore.root} ${SCALE_NAMES[explore.scale]}`,
+      icon: '◇',
+      action: () => {
+        onSetRoot(explore.root);
+        onSetScale(explore.scale);
+      },
+    },
+    {
+      id: 'challenge',
+      label: 'Challenge',
+      sublabel: `${challenge.root} · ${challenge.progression.name} · ${challenge.bpm} BPM`,
+      icon: '⚡',
+      action: () => {
+        onSetRoot(challenge.root);
+      },
+    },
+  ];
+
+  return (
+    <div className="flex gap-2 mb-5 overflow-x-auto pb-1 -mx-1 px-1 no-scrollbar">
+      {cards.map(card => (
+        <button
+          key={card.id}
+          onClick={card.action}
+          className="flex-1 min-w-[100px] card px-3 py-2.5 text-left active:scale-95 transition-all group"
+        >
+          <div className="flex items-center gap-1.5 mb-1">
+            <span className="text-water-4 text-xs">{card.icon}</span>
+            <span className="text-[10px] font-semibold text-text-2 uppercase tracking-wide">{card.label}</span>
+          </div>
+          <p className="text-[9px] text-text-3 truncate leading-tight">{card.sublabel}</p>
+        </button>
+      ))}
+    </div>
+  );
+}
+
+// ─── Current Card Component ───
+
+function CurrentCard({ sessions, onSetRoot, onSetScale, onSetIntent }) {
+  const analysis = useMemo(() => analyzePracticeHistory(sessions), [sessions]);
+
+  if (!sessions?.length || sessions.length < 3) return null;
+
+  // Determine suggestion based on practice gaps
+  const explore = getExploreSuggestion(analysis.recentKeys);
+
+  // Find the least-practiced tag
+  const tagCounts = analysis.recentTags;
+  const leastTag = PRACTICE_TAGS.find(t => !tagCounts[t]) ||
+    PRACTICE_TAGS.reduce((min, t) => (tagCounts[t] || 0) < (tagCounts[min] || 0) ? t : min, PRACTICE_TAGS[0]);
+
+  // Build suggestion text
+  const suggestion = `Try ${explore.root} ${SCALE_NAMES[explore.scale]} — focus on ${leastTag}`;
+
+  return (
+    <button
+      onClick={() => {
+        onSetRoot(explore.root);
+        onSetScale(explore.scale);
+        onSetIntent('scale');
+      }}
+      className="w-full card p-4 mb-5 text-left active:scale-[0.98] transition-all group"
+      style={{
+        borderLeft: '3px solid rgba(59,130,246,0.4)',
+      }}
+    >
+      <div className="flex items-center justify-between mb-1">
+        <span className="text-[10px] font-semibold text-water-4 uppercase tracking-widest">The Current</span>
+        <span className="text-[9px] text-text-3 opacity-0 group-hover:opacity-100 transition-opacity">Tap to load</span>
+      </div>
+      <p className="text-sm text-text font-medium">{suggestion}</p>
+      <p className="text-[9px] text-text-3 mt-1">Based on your last {Math.min(sessions.length, 14)} sessions</p>
+    </button>
+  );
+}
+
 // ─── Main Component ───
 
-export default function ShedPage() {
+export default function ShedPage({ sessions = [], onNavigate }) {
   const [rootNote, setRootNote] = useState('C');
   const [scale, setScale] = useState('major');
   const [intent, setIntent] = useState('chords');
@@ -576,6 +747,21 @@ export default function ShedPage() {
         <h1 className="text-xl font-bold text-text">The Dock</h1>
         <p className="text-xs text-text-3 mt-0.5">Your launchpad — reference, tune, play</p>
       </div>
+
+      {/* The Current — smart practice suggestion */}
+      <CurrentCard
+        sessions={sessions}
+        onSetRoot={setRootNote}
+        onSetScale={setScale}
+        onSetIntent={setIntent}
+      />
+
+      {/* Quick Start triptych */}
+      <QuickStartCards
+        sessions={sessions}
+        onSetRoot={setRootNote}
+        onSetScale={setScale}
+      />
 
       {/* Tuning Strip */}
       <TuningStrip />

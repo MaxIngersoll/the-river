@@ -203,7 +203,7 @@ export default function App() {
           />
         )}
         {displayedTab === 'shed' && (
-          <ShedPage />
+          <ShedPage sessions={sessions} onNavigate={handleTabChange} />
         )}
         {displayedTab === 'settings' && (
           <SettingsPage
