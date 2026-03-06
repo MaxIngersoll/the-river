@@ -981,6 +981,430 @@ The river always has a backup plan.
 
 ---
 
-## Results
+## RESULTS
 
-*To be filled during competition execution.*
+### Competition C Evaluation: The Pitch -- Deck Content & Narrative
+
+**Judge's Note:** This competition had no weak entries. Fifteen proposals, three persona tracks, zero coasters. The depth of engagement with the material -- from SVG fret calculations to the emotional architecture of a fictional guitarist named Maya -- was genuinely remarkable. What follows is an honest accounting of what works, what almost works, and what would work if the laws of browser rendering were slightly more forgiving.
+
+**Scoring Rubric (50 points total):**
+- Narrative Power (15 pts): Does the story hook? Does it make someone want to try the app?
+- Visual Coherence (10 pts): Does it work with the app's Liquid Glass / deep blue aesthetic?
+- Completeness (10 pts): Does it cover the full pitch (problem, solution, demo, market, ask)?
+- Authenticity (8 pts): Does it feel genuine, not corporate? Does it honor the guitar practice experience?
+- Innovation (7 pts): Does it bring something new to how apps are pitched?
+
+---
+
+### THE STORYTELLER TRACK
+
+---
+
+#### Storyteller Proposal 1: "The Callus"
+
+| Criterion | Score | Notes |
+|-----------|-------|-------|
+| Narrative Power | 13/15 | The domino structure is superb. Each slide answers the question the previous slide raised, creating an irresistible forward momentum. The "mentor's gifts" framing for Act 2 is thematically perfect -- it makes features feel earned rather than listed. |
+| Visual Coherence | 8/10 | The SVG phone mockup with animated countdown and rain waveform will sit beautifully in the existing ink wash world. The side-by-side river visualization (trickle to full river) is on-brand and emotionally resonant. |
+| Completeness | 9/10 | Covers problem, philosophy, ALL major features (timer, soundscape, fog horn, bottles, Source, Reading), proof, market, model, vision, and ask. The only gap: the Shed/reference tools get no mention. But honestly, you cannot show everything, and The Callus makes the right cuts. |
+| Authenticity | 7/8 | "The features no spreadsheet would build" is a line that lives in my head rent-free. The rename from "Philosophy" to "The Sunday Morning" is a small touch that reveals deep understanding of what makes the app tick. The "1 founder" stat as a flex? Chef's kiss. Only ding: "Guitar is the wedge. Practice is the platform" in the vision slide edges into pitch-speak territory. |
+| Innovation | 5/7 | The domino narrative structure is genuinely clever, but structurally this is still a linear pitch deck with feature slides. It is an excellent *version* of the standard format, not a reinvention. |
+
+**Total: 42/50**
+
+The Callus is the responsible choice. It is what you ship when you need the deck to work on Tuesday. The "Strava is free to run, the money is in the meaning" reframe of freemium is investor-brain gold. The one thing I would steal from other proposals: add a single moment of visual surprise to break the domino rhythm. Dominos are satisfying, but they can become predictable. A single "wait, what?" slide in the middle would elevate this from very good to unforgettable.
+
+**What-if:** What if the river visualization slide (Week 1 / Month 2 / Month 6) animated as a single continuous drawing? Not three side-by-side states, but one river that grows as the viewer watches, with the timeline labels appearing as the tributaries branch. The scroll becomes the growth.
+
+---
+
+#### Storyteller Proposal 2: "The Dropout's Diary"
+
+| Criterion | Score | Notes |
+|-----------|-------|-------|
+| Narrative Power | 15/15 | Full marks. Maya makes me care. The diary format transforms every feature into a *moment in someone's life*, which is infinitely more compelling than "our app has fog horns." "Day 47: I haven't picked it up in two weeks. The case is behind the couch now." That is not a pitch deck slide. That is a gut punch disguised as a pitch deck slide. |
+| Visual Coherence | 7/10 | The diary framing creates a warm, personal tone that complements but slightly diverges from the deck's cinematic deep-blue gravitas. Maya's story is intimate; the ink wash is epic. They can coexist, but there is a tonal negotiation required. Phone mockups in diary-entry slides need careful art direction to avoid feeling like two different presentations stitched together. |
+| Completeness | 9/10 | Covers the complete user journey including timer, fog horn, bottles, Source, Reading, AND the emotional arc of returning after absence. The "Day 180" stats slide doing double duty as character resolution and traction proof is elegant structural engineering. Minor gap: no mention of Shed/reference tools. |
+| Authenticity | 8/8 | Perfect score. Maya IS the user. "I didn't play today but it says that's OK? This is the first app that didn't guilt-trip me." That is a real thought from a real person's internal monologue. The proposal understands that guitar practice is not about features; it is about the relationship between a person and their instrument, mediated by hope and guilt in roughly equal measure. |
+| Innovation | 6/7 | A pitch deck structured as a character diary is genuinely novel. I have seen dozens of pitch decks use "user personas." I have never seen one commit this fully to a single fictional person's emotional arc across every single slide. The dual-purpose "Day 180" slide (character resolution + traction proof) is structurally innovative. |
+
+**Total: 45/50**
+
+The Dropout's Diary is the proposal that made me stop taking notes and start reading. Maya at Day 47 with the guitar behind the couch is the single most effective piece of persuasion in all fifteen proposals. It works because it is true. Every guitarist has a Day 47. Every investor has *been* someone with a Day 47 in something. The risk the proposal correctly identifies -- "some investors might find it too creative" -- is real, but I think it overestimates that risk. The investors who find it "too creative" are not the investors you want. The ones who feel Maya's story will write checks.
+
+**What-if:** What if Maya's diary entries were handwritten? Not literally (please do not ship hand-drawn SVG text), but rendered in a script or handwriting-inspired font that contrasts with the deck's Playfair Display. The tonal shift would signal: "this part is personal." When the font switches back to Playfair for the market/model/vision slides, the viewer unconsciously feels the shift from heart to head. Two fonts. Maximum emotional range.
+
+---
+
+#### Storyteller Proposal 3: "The Graveyard"
+
+| Criterion | Score | Notes |
+|-----------|-------|-------|
+| Narrative Power | 12/15 | The tombstone grid is a phenomenal opening. The "What if..." cadence in Act 2 creates genuine momentum. But the confrontational tone is a double-edged sword -- it risks making the deck feel like it is *against* something rather than *for* something. The River's soul is gentle. The Graveyard is angry. That tension needs resolution. |
+| Visual Coherence | 6/10 | Tombstones and graveyards are a significant tonal departure from Liquid Glass deep blue serenity. The "What if..." slides could work beautifully with the existing aesthetic (each question as glowing text over ink wash), but the opening graveyard grid would need very careful design to avoid looking like a Halloween pitch deck. |
+| Completeness | 9/10 | Excellent coverage. Problem, competitor analysis (pulled forward as "The Autopsy"), all major features via the "What if" structure, proof, market, model, vision, ask. The market slide being moved to Act 1 as contrast is a genuinely smart structural move. |
+| Authenticity | 5/8 | This is where the proposal struggles. The River is an app built on the premise that practice should feel like a river, not a war. The Graveyard positions it as a weapon against failure rather than a companion for growth. "The sticky note on the fridge" tombstone is funny and true. But the overall framing of competitors as corpses and The River as a resurrection feels like it betrays the app's gentle philosophy. |
+| Innovation | 6/7 | Starting a pitch with failure -- showing the graveyard of dead apps -- is genuinely bold. The "What if..." cadence as a structural device is effective and novel. Pulling the competitive analysis forward as narrative ammunition (not just a data slide) is smart. |
+
+**Total: 38/50**
+
+The Graveyard has the single best opening slide of any proposal. That tombstone grid with "New Year's Resolution -- Jan 1 to Jan 14" and "The sticky note on the fridge" is darkly hilarious and immediately establishes credibility. The problem is tonal: the deck's second half needs to feel like The River, not like a prosecutor's closing argument. If the Graveyard's Act 1 could hand off to a gentler Act 2, you would have something extraordinary.
+
+**What-if:** What if the tombstones were not graves but *messages in bottles* that washed ashore? Same content, same dark humor, but framed as things the river carried downstream rather than things buried in the ground. The tonal shift from "graveyard" to "river debris" keeps the emotional punch while staying on-brand. And it sets up the Message in a Bottle feature as a *redemption* of these failed attempts.
+
+---
+
+#### Storyteller Proposal 4: "The Two Rivers"
+
+| Criterion | Score | Notes |
+|-----------|-------|-------|
+| Narrative Power | 12/15 | The split-screen concept is immediately legible and emotionally effective. The left side's progressive decay (enthusiasm to guilt to silence to dust) contrasted with the right side's gentle growth is powerful. The convergence at Month 6 ("the screen merges") is a satisfying structural payoff. Slightly less gripping than Maya's diary because it follows archetypes rather than a named character. |
+| Visual Coherence | 8/10 | The split-screen with desaturated left / blue right maps perfectly onto the app's existing color language. The left side going progressively darker/emptier is a visual metaphor that the ink wash system could support beautifully. The merge at the end could be a stunning visual moment. |
+| Completeness | 8/10 | Covers timer, fog horn, bottles, Source, Reading, and proof through the split-screen narrative. The "Every competitor built for the right-side guitarist" reframe of the market slide is strong. Missing: soundscape/metronome details, Shed/reference tools. The split-screen format naturally crowds out detail. |
+| Authenticity | 7/8 | "The guitar goes behind the couch" on the left side and "Streak protected. Picks up the guitar the next day" on the right side are both deeply true observations. The proposal understands the psychology of quitting vs. continuing. The unnamed guitarists are slightly less authentic than Maya -- archetypes feel one step removed from real experience. |
+| Innovation | 6/7 | Split-screen in a pitch deck is genuinely novel. The proposal correctly identifies that "no one uses this in pitch decks." The visual contrast doing the selling (rather than words) is a sophisticated design insight. The progressive darkening/enrichment across slides is structurally inventive. |
+
+**Total: 41/50**
+
+The Two Rivers is the visual storytelling champion. It solves the demo problem with elegant indirection: by showing the right side of every split, you see the full product without a single bullet point. The left side's progressive emptiness is haunting. The merge moment at Month 6 could be the most visually striking single moment in the entire deck. The main limitation is density -- split-screens halve your real estate, which means each feature gets less room to breathe.
+
+**What-if:** What if the left side was not just progressively darker but progressively *simpler*? First slide: full detail. Second: some elements fade. Third: mostly empty space with one small sad detail. By Month 6, the left side is just a gray rectangle. The right side, meanwhile, gets progressively richer. The visual gap becomes the argument.
+
+---
+
+#### Storyteller Proposal 5: "The Set List"
+
+| Criterion | Score | Notes |
+|-----------|-------|-------|
+| Narrative Power | 11/15 | The concert metaphor is charming and natively resonant for a guitar app. The set structure (opener, deep cuts, encore) provides clear pacing. But the metaphor occasionally fights the content -- calling the business model "Ticket Prices" is fun but might confuse investors who are trying to do mental math on conversion rates. The narrative power is in the frame, not the story. |
+| Visual Coherence | 7/10 | The setlist card in the corner is a lovely touch. The tour poster roadmap could look fantastic. But the concert metaphor introduces visual language (setlist typography, track numbering, venue framing) that does not exist anywhere in the app's design system. It is coherent with itself but slightly divergent from the existing deck. |
+| Completeness | 9/10 | Covers all major features as "tracks," which is a complete and systematic approach. Timer, fog horn, bottles, Source, Reading, proof, market, model, vision, CTA -- all present. The "Track 2: Why They Stopped" slide with quit reasons is a strong addition that other proposals lack. |
+| Authenticity | 7/8 | "11 slides. 3 minutes. No guitar solos." Perfect. "Every great set has a breather" for the fog horn feature is a wonderful reframe. "The soundcheck's over. Let's play." as a closer is earned and warm. The one ding: musicians will know that a set list is a planned sequence, which slightly undermines The River's emphasis on flow and spontaneity. |
+| Innovation | 5/7 | The concert metaphor is creative and well-executed. The track numbering as a structural device is neat. But metaphor-based pitch decks exist (movie-structure decks, journey-structure decks) -- this is an excellent *version* of the format rather than a wholly new approach. |
+
+**Total: 39/50**
+
+The Set List is the crowd-pleaser. It has the most personality per slide of any Storyteller proposal. "General admission is free. VIP is $4.99/mo" is the kind of line that makes an investor smile and remember you. The risk is real -- not every investor speaks musician -- but the warmth and wit compensate. This deck would absolutely crush in a room full of music-tech investors. In a generalist VC meeting, you would need to modulate the metaphor intensity slightly.
+
+**What-if:** What if the Set List framing was a light overlay rather than the dominant structure? Keep the "11 slides, 3 minutes, no guitar solos" opener and the "Encore" closer, but let the middle slides tell their story without the track numbering. Use the concert metaphor as bookends, not scaffolding.
+
+---
+
+### THE SCROLL ENGINEER TRACK
+
+**Prefatory Note:** Scoring scroll engineering proposals on "Narrative Power" and "Authenticity" requires a slight reframing. For this track, Narrative Power = does the technical approach serve the deck's storytelling mission? Authenticity = does it respect the user's experience and the platform's nature?
+
+---
+
+#### Scroll Engineer Proposal 1: "Still Water"
+
+| Criterion | Score | Notes |
+|-----------|-------|-------|
+| Narrative Power | 10/15 | The CSS-only approach is invisible when it works, which means it *enables* narrative without *contributing* to it. That is both its strength and its ceiling. The narrative flows because nothing breaks it, but nothing enhances it either. |
+| Visual Coherence | 9/10 | Perfect integration. Native scroll-snap means the transitions feel like the rest of the web platform. No visual artifacts, no custom easing that clashes with the ink wash animations. The browser does what it does best. |
+| Completeness | 7/10 | Solves the skip bug, the stuck-on-first-try bug, and the touch handler issues. Does not address the keyboard rapid-fire case as robustly (the 400ms cooldown is a workaround, not a fix). Does not add any visual enhancement to transitions. |
+| Authenticity | 8/8 | "The best scroll code is the code you delete." This is a philosophy that respects both the user and the platform. No over-engineering, no clever hacks, just letting the browser do its job. The proposal's honesty about what CSS can and cannot do is itself a form of authenticity. |
+| Innovation | 3/7 | Deliberately anti-innovative, which is both the point and the limitation. "Use the platform's built-in features" is wise advice but not a novel contribution. |
+
+**Total: 37/50**
+
+Still Water is the proposal you want as your safety net. It has the shortest implementation time (1 hour), the highest reliability confidence (99% 60fps), and the lowest risk of introducing new bugs. The tagline -- "Still Water runs deep. And it never skips" -- is better than it has any right to be for a CSS refactoring proposal.
+
+---
+
+#### Scroll Engineer Proposal 2: "The Lock"
+
+| Criterion | Score | Notes |
+|-----------|-------|-------|
+| Narrative Power | 9/15 | The state machine approach gives total control over pacing, which serves narrative well -- you land on each slide exactly as intended. But the "presentation tool" feel sacrifices the organic, flowing quality that a pitch deck called "The River" should have. |
+| Visual Coherence | 7/10 | The custom cubic ease-in-out is smooth and professional. But the lack of any "peek" behavior (you cannot scroll partway to glimpse the next slide) feels rigid in a deck whose entire aesthetic is about fluidity and flow. |
+| Completeness | 9/10 | Solves every diagnosed bug definitively. The state machine is provably correct -- if `state !== IDLE`, nothing happens. Wheel accumulation handles trackpad momentum. Hash-based navigation for browser back/forward. This is thorough engineering. |
+| Authenticity | 5/8 | "The Lock does not negotiate with momentum." Great line. But locking out scroll entirely feels heavy-handed for an app about flowing rivers. There is a mismatch between the app's philosophy of gentle, non-judgmental persistence and a scroll system that says "you move when I say you move." |
+| Innovation | 4/7 | State machines for scroll control are well-established (Reveal.js, Impress.js). The implementation is clean but not novel. The wheel accumulation window is a nice touch. |
+
+**Total: 34/50**
+
+The Lock is the engineering purist's answer. It is correct, predictable, and slightly soulless -- like a metronome with no swing. For a generic pitch deck, this would be the right choice. For a deck called "The River" with ink wash animations and a philosophy of flow, the rigidity costs it points on authenticity.
+
+---
+
+#### Scroll Engineer Proposal 3: "Downstream"
+
+| Criterion | Score | Notes |
+|-----------|-------|-------|
+| Narrative Power | 11/15 | The hybrid approach preserves native scroll feel (which feels "rivery" and organic) while preventing the bugs that break narrative flow. The Snap Sentinel is particularly clever -- it lets the river flow but catches you if you drift. That IS the app's philosophy applied to engineering. |
+| Visual Coherence | 9/10 | Native scroll-snap transitions match the existing deck perfectly. The debounce wrapper prevents visual jank without introducing custom animation curves that might clash. The `scrollend` correction is invisible to the viewer. |
+| Completeness | 9/10 | Three guardrails, three bugs solved. Debounce prevents double-fire, Truth Reconciler prevents drift, Snap Sentinel prevents landing between slides. The `scrollend` fallback for older Safari is good defensive engineering. The only gap: no visual enhancement, but that is not this track's job. |
+| Authenticity | 7/8 | "Downstream: because the best engineering is the kind nobody notices." That is a deeply authentic statement about what good infrastructure should be. The hybrid philosophy -- "let the river flow, but build levees" -- is thematically perfect for this app. |
+| Innovation | 5/7 | The `scrollend` event for snap verification is a modern API choice that most developers have not yet adopted. The three-guardrail architecture (each solving exactly one bug) is a clean decomposition. The Truth Reconciler replacing two conflicting observers with one authoritative one is smart. |
+
+**Total: 41/50**
+
+Downstream is the Goldilocks proposal. Not too much JS, not too little. Not fighting the browser, not blindly trusting it. The three guardrails are named, scoped, and testable -- any one of them could be removed independently if it caused issues, without affecting the others. This is the engineering equivalent of The River's fog horn: a safety system that protects without punishing.
+
+---
+
+#### Scroll Engineer Proposal 4: "Full Moon Tide"
+
+| Criterion | Score | Notes |
+|-----------|-------|-------|
+| Narrative Power | 10/15 | WAAPI transforms give smooth, interruptible transitions that serve the narrative well. The promise-based completion handling allows chaining ink wash transitions off slide changes, which could enhance narrative pacing. But the lack of native scroll means the deck feels like a *presentation* rather than a *page*, which slightly undermines the "scroll down the river" feeling. |
+| Visual Coherence | 8/10 | The custom `cubic-bezier(0.22, 1, 0.36, 1)` easing creates a distinctive deceleration feel -- fast departure, gentle arrival -- that could complement the ink wash beautifully. The compositor-thread rendering means zero visual interference with the existing animations. |
+| Completeness | 8/10 | Solves all diagnosed bugs by eliminating scroll entirely. The `.cancel()` for clean interruption is elegant. The accessibility concerns are honestly flagged and mitigated (ARIA live regions, URL hash updates). Missing: no consideration of Find-on-Page, which is minor but shows the tradeoffs of leaving native scroll behind. |
+| Authenticity | 6/8 | WAAPI is the most modern browser API for this task, and choosing it shows genuine craft. But replacing scroll with transforms means the deck no longer *scrolls*, which means the "Scroll" hint on slide 0 becomes slightly dishonest. Small thing, but it nags. |
+| Innovation | 6/7 | "Nobody uses WAAPI for slide decks" is true and the proposal makes a compelling case for why they should. The promise-based completion chaining is genuinely powerful for orchestrating complex transitions. This is the most forward-looking technical approach. |
+
+**Total: 38/50**
+
+Full Moon Tide is the proposal I would want to study if I were building a slide deck framework from scratch. The WAAPI approach is technically superior to everything else here in terms of raw capability. But capability is not the same as fit. For THIS deck, the loss of native scroll feel is a meaningful cost. The tagline -- "transforms move the earth. Scroll moves a scrollbar" -- is delightful arrogance.
+
+---
+
+#### Scroll Engineer Proposal 5: "The Whirlpool"
+
+| Criterion | Score | Notes |
+|-----------|-------|-------|
+| Narrative Power | 13/15 | The ink vortex transition -- outgoing slide's ink spiraling into a drain while the incoming slide's ink blooms from the center -- would be a narrative experience in itself. Each slide change becomes an event, not just a transition. The flowing-droplet nav timeline is thematically perfect. This is the only scroll proposal that *adds* to the story rather than merely enabling it. |
+| Visual Coherence | 9/10 | The ink vortex is literally an extension of the existing ink wash system. The FLIP-animated portals with blur and scale create a depth-of-field effect that complements the deck's cinematic ambitions. The flowing nav timeline extends the river metaphor to the interface chrome. This is the most visually integrated enhancement of any scroll proposal. |
+| Completeness | 6/10 | Honestly addresses the 75% 60fps confidence. The `feTurbulence` performance concern is real and well-characterized. The fallback from vortex to crossfade on weak hardware is practical. But the proposal is incomplete in the sense that it might not work on the devices that matter most (the VC's 2019 MacBook Air). |
+| Authenticity | 7/8 | "The Whirlpool doesn't scroll. It consumes the current reality and births the next one. (Please test on multiple devices.)" The parenthetical honesty is peak authenticity. This proposal knows exactly what it is: a beautiful risk. |
+| Innovation | 7/7 | Full marks. FLIP-animated slide portals with ink vortex transitions and a flowing-droplet nav timeline. Nobody has done this. Nobody would think to do this. The nav timeline alone -- a horizontal SVG river with a glowing droplet flowing between nodes -- is worth stealing for any project. |
+
+**Total: 42/50**
+
+The Whirlpool is the proposal that should not score this high by any reasonable measure. It has the lowest reliability confidence, the highest implementation time, and the greatest chance of catastrophic failure. And yet. The ink vortex. The flowing nav droplet. The sheer audacity of saying "what if slide transitions were portals." This is the most creative technical proposal I have evaluated in any competition. It earns its score through vision, not practicality.
+
+---
+
+### THE DEMO DESIGNER TRACK
+
+---
+
+#### Demo Designer Proposal 1: "24 Hours on the River"
+
+| Criterion | Score | Notes |
+|-----------|-------|-------|
+| Narrative Power | 12/15 | The three-slide chronological walkthrough (6:47 PM open, 6:48 PM practice, 7:05 PM save) is intuitively compelling. You are living through someone's evening. The timestamps ground the experience in reality -- this is not a feature tour, it is 18 minutes of a real person's life. |
+| Visual Coherence | 9/10 | Every mockup detail is pulled from the actual codebase: the exact greeting logic, the exact default BPM, the exact flow pill color states, the exact tag names. The phone frames reuse the existing `.device-frame` class. The CSS-only animations (flip-clock timer, drifting rain particles, pulsing flow pill) stay within the deck's existing animation vocabulary. |
+| Completeness | 9/10 | Covers the complete core loop: home screen state, timer with soundscape, session logging with tags, stats update on save. The cross-fade from "save" to "updated home" on Slide C is a masterful touch -- it closes the loop visually. Missing: fog horn, bottles, Source, Reading, Shed. But the core loop is the most important thing to demo. |
+| Authenticity | 7/8 | The obsessive fidelity to the real app (checking `new Date().getHours() >= 18` for the greeting, using `DEFAULT_PREFS` for the BPM) is itself a form of authenticity. This proposal cares about getting the details right. The "The app doesn't nag. It notices" caption is quietly devastating. |
+| Innovation | 4/7 | Chronological product walkthroughs exist in many pitch decks. The execution here is exceptional (the codebase-accurate mockups, the CSS-only animations), but the format is established rather than novel. |
+
+**Total: 41/50**
+
+24 Hours on the River is the workhorse. It does exactly what the brief asks for (show what the app does), does it with extraordinary attention to detail, and integrates seamlessly with the existing deck. The Slide C cross-fade from "save" to "updated home" is the single best demo moment across all Demo Designer proposals -- it shows the complete loop in one visual beat. If you build one thing from this competition, build that cross-fade.
+
+---
+
+#### Demo Designer Proposal 2: "The Split Screen"
+
+| Criterion | Score | Notes |
+|-----------|-------|-------|
+| Narrative Power | 14/15 | The four-line checklist dialogue is devastatingly effective. Left: "Should I just stop?" Right: "Day 13." That juxtaposition is worth more than ten slides of feature bullets. The alternating reveal (left line, then right line) creates a rhythm that builds to an emotional climax. The tagline -- "The difference isn't skill. It's scaffolding" -- is the single best one-liner in all fifteen proposals. |
+| Visual Coherence | 8/10 | Desaturated coral left / signature blue right maps perfectly onto the app's existing color language. The center divider line with gradient transparency is an elegant touch. The grayscale phone on the left vs. full-glow phone on the right creates instant visual hierarchy. |
+| Completeness | 5/10 | This is a single slide. It covers timer and soundscape (via the right-panel phone) and streak (via "Day 13"), but it cannot show fog horns, bottles, Source, Reading, or the Shed. It is a complement to a product showcase, not a replacement for one. |
+| Authenticity | 8/8 | Perfect score. The left panel's mental checklist -- "How long have I been playing?" / "Did I practice yesterday?" / "Am I getting better?" / "Should I just stop?" -- is the most authentic piece of writing in all fifteen proposals. Every person who has tried to learn an instrument has had this exact internal monologue. The right panel does not promise miracles; it shows the same person with a little bit of structure. That is honest and true. |
+| Innovation | 6/7 | The alternating-reveal dialogue structure (left question, right answer, building to a climax) is a storytelling technique borrowed from film editing, applied to pitch decks in a way I have not seen before. Using a single diptych slide as the entire product demo is bold and conceptually innovative. |
+
+**Total: 41/50**
+
+The Split Screen is the most emotionally effective single slide in the entire competition. If I had to choose one slide to insert into the existing deck right now, today, no other changes, it would be this one. The left-side despair spiral in four lines is better persuasion than most entire pitch decks achieve. The limitation is that it is one slide covering one moment -- it needs companions.
+
+**What-if:** What if the four-line dialogue was the ONLY text on the slide? No phone mockups, no timer displays. Just the two columns of text, coral on the left, blue on the right, alternating in with long pauses. Let the words do the work. The phones can come on the next slide. This slide is not about the product. It is about the problem and the possibility.
+
+---
+
+#### Demo Designer Proposal 3: "The Toolkit Carousel"
+
+| Criterion | Score | Notes |
+|-----------|-------|-------|
+| Narrative Power | 9/15 | The carousel format is informative but not emotional. It answers "what does the app do?" but not "how does the app feel?" The auto-advance timer creates passive viewing, which is at odds with the deck's philosophy of active engagement. You watch the carousel happen to you rather than being drawn into a story. |
+| Visual Coherence | 7/10 | Five phone mockups with perspective scaling and blur effects create a rich visual field. But the carousel is inherently busy -- multiple phones at varying scales and opacities competing for attention on a single slide. This clashes with the deck's current minimalist elegance. The Liquid Glass aesthetic is about space and stillness; a carousel is about motion and density. |
+| Completeness | 10/10 | Full marks. This is the ONLY proposal across all fifteen that covers all five major feature areas: timer, soundscape, Shed chords, Shed fretboard, AND fog horn. The breadth is unmatched. Each screen is rendered with codebase-accurate detail (CAGED positions, INTERVALS.pentatonic_minor, STRING_THICKNESS values). |
+| Authenticity | 6/8 | The technical fidelity is impressive but the carousel format feels like a SaaS product page rather than a musician's pitch. The auto-advance timer especially -- it says "sit back and be marketed to" rather than "lean in and feel something." |
+| Innovation | 4/7 | Carousels are a well-established UI pattern. The perspective-scaled inactive phone treatment is a nice visual touch, but the overall approach is conventional for product demos. |
+
+**Total: 36/50**
+
+The Toolkit Carousel wins the completeness award hands down. It is the only proposal that would make an investor say "Wait, it has a full fretboard diagram with CAGED positions?" That moment of "more than you expected" is powerful. The limitation is emotional -- carousels inform but they do not move you. The fix might be simpler than expected: slow the auto-advance to 5 seconds, add captions that tell micro-stories rather than describe features, and let each screen breathe.
+
+---
+
+#### Demo Designer Proposal 4: "The Flipbook" (Scroll to Practice)
+
+| Criterion | Score | Notes |
+|-----------|-------|-------|
+| Narrative Power | 14/15 | "That was The River. You just used it." is one of the best punchlines in pitch deck history. The conceit -- tricking the investor into a product demo by replacing the pitch deck with the app -- is audacious, funny, and structurally brilliant. The scroll-as-practice metaphor (you scroll through a session like you practice through a session) is thematically perfect. |
+| Visual Coherence | 8/10 | The full-bleed app recreation against `--bg-deep` would look stunning. The rain particles, the counting timer, the auto-typing note, the tags popping in -- all rendered in the app's native design language. The ink wash dimming to 0.05 opacity during the zone is a thoughtful touch. Slight deduction: the transition in and out of the "app zone" (deck chrome fading away and returning) is the hardest visual seam to get right. |
+| Completeness | 7/10 | Covers the core loop beautifully: home, session with soundscape, save with tags. But the scroll-driven format leaves no room for fog horns, bottles, Source, Reading, or Shed. It is a deep slice of one flow rather than a survey of the full product. |
+| Authenticity | 8/8 | This proposal is authenticity incarnate. Instead of showing the app, it *becomes* the app. The investor is not told the app is immersive; they experience immersion. The deadpan "You just used it" reveal is the humor of someone who trusts their product enough to let it speak. |
+| Innovation | 7/7 | Full marks. I have never seen a pitch deck that replaces itself with the product mid-presentation. The scroll-as-time metaphor (scrolling through a practice session the way you would live through one) is conceptually brilliant. The `--scroll-progress` CSS variable driving all state transitions is technically elegant. This is a new idea. |
+
+**Total: 44/50**
+
+The Flipbook is the second-highest scoring proposal in the competition and the single most innovative idea across all fifteen entries. It has the highest risk ("if scroll performance degrades even slightly, the whole illusion collapses into an unusable mess") and the highest reward ("no investor forgets this deck for months"). The "You just used it" punchline is the moment that turns a pitch meeting into a story the investor tells at dinner.
+
+**What-if:** What if the Flipbook zone ended not with text but with a sound? If the pitch is presented live with audio, the rain soundscape could fade in during the session section and fade out when the deck chrome returns. The investor does not just see and scroll through a practice session -- they *hear* it. The punchline becomes multisensory.
+
+---
+
+#### Demo Designer Proposal 5: "The Negative Space"
+
+| Criterion | Score | Notes |
+|-----------|-------|-------|
+| Narrative Power | 12/15 | The restraint is itself a narrative statement: "Our product is so clear in concept that we can show you one detail and you get it." The ticking timer (17:23 becoming 17:24) is quietly hypnotic. The raindrop slide is a meditation disguised as a product demo. But restraint risks being read as avoidance -- some investors will wonder what you are hiding behind the negative space. |
+| Visual Coherence | 10/10 | Perfect score. This is the only proposal that does not just match the existing aesthetic but amplifies it to its logical extreme. The deck is already about space, stillness, and the beauty of minimal elements on dark backgrounds. The Negative Space slides are what the deck has been building toward. The full-width fretboard diagram floating in darkness is the single most beautiful proposed visual in all fifteen proposals. |
+| Completeness | 5/10 | Three features shown (timer, fretboard/Shed, soundscape), each in extreme isolation. No fog horn, no bottles, no Source, no Reading, no session logging, no stats. The proposal deliberately withholds. This is a choice, not an oversight, but it leaves significant gaps in product understanding. |
+| Authenticity | 8/8 | "Small, quiet things done with intention can hold attention far longer than anyone expects. If that is not a pitch for The River, nothing is." The raindrop slide IS the app's thesis compressed into a visual. The ticking timer IS the practice experience. The fretboard in negative space IS the feeling of looking at your guitar neck and seeing patterns for the first time. This proposal understands the soul of the app. |
+| Innovation | 7/7 | Full marks. Anti-demo as demo. Showing almost nothing to create desire. The ticking timer that you cannot help but watch. The raindrop that falls for eight seconds in empty space. The full-width fretboard with no phone frame, no labels, just the neck floating in darkness. Every choice here is a subversion of pitch deck conventions. |
+
+**Total: 42/50**
+
+The Negative Space is the artist's proposal. It makes you feel something you cannot name. The raindrop slide -- a single blue dot falling for eight seconds in empty space -- should not work. It is absurd. It is the least amount of content possible on a pitch deck slide. And it is profoundly effective, because the viewer's reaction to watching that dot fall IS the app's thesis: you do not need much to hold someone's attention if what you give them is intentional.
+
+The limitation is real: investors need to know what the app does, and this does not fully tell them. But paired with a more comprehensive demo (like 24 Hours on the River), the Negative Space slides become the emotional punctuation that elevates the whole deck.
+
+**What-if:** What if the raindrop slide came AFTER the product demo slides rather than during them? You have shown the full app. Now you breathe. One raindrop. Silence. Then: market slide. The raindrop becomes a palate cleanser, a moment of stillness between showing and selling. It resets the room.
+
+---
+
+### FINAL RANKINGS
+
+| Rank | Proposal | Track | Score | Headline |
+|------|----------|-------|-------|----------|
+| 1 | The Dropout's Diary | Storyteller | 45/50 | Maya makes you care. That is everything. |
+| 2 | The Flipbook | Demo Designer | 44/50 | The most innovative pitch deck idea I have ever evaluated. |
+| 3 | The Callus | Storyteller | 42/50 | The domino structure is irresistible forward motion. |
+| 3 | The Whirlpool | Scroll Engineer | 42/50 | Vision so bold it bends the scoring rubric. |
+| 3 | The Negative Space | Demo Designer | 42/50 | Restraint as radicalism. The raindrop is art. |
+| 6 | The Two Rivers | Storyteller | 41/50 | Split-screen is the most elegant visual argument. |
+| 6 | Downstream | Scroll Engineer | 41/50 | The Goldilocks engineering proposal. |
+| 6 | 24 Hours on the River | Demo Designer | 41/50 | The workhorse. Does exactly what is needed. |
+| 6 | The Split Screen | Demo Designer | 41/50 | Best single slide. "Should I just stop?" / "Day 13." |
+| 10 | The Set List | Storyteller | 39/50 | "No guitar solos." Crowd-pleaser energy. |
+| 11 | Full Moon Tide | Scroll Engineer | 38/50 | The future of slide transitions, slightly ahead of its time. |
+| 11 | The Graveyard | Storyteller | 38/50 | Best opening slide. Tone needs calibration. |
+| 13 | Still Water | Scroll Engineer | 37/50 | Delete code. Trust the browser. Ship it. |
+| 14 | The Toolkit Carousel | Demo Designer | 36/50 | Only proposal showing all five feature areas. |
+| 15 | The Lock | Scroll Engineer | 34/50 | Correct, predictable, slightly soulless. |
+
+---
+
+### TOP 3
+
+**GOLD: The Dropout's Diary (Storyteller Proposal 2) -- 45/50**
+Maya is the best thing that happened to this pitch deck. The diary format turns features into lived experiences. The dual-purpose "Day 180" slide (character resolution + traction proof) is structural genius. The investors who feel Maya's story will write checks. The ones who do not are not your investors.
+
+**SILVER: The Flipbook (Demo Designer Proposal 4) -- 44/50**
+"That was The River. You just used it." is the kind of moment that turns a pitch meeting into a founding story. The highest-risk, highest-reward idea in the competition. If the scroll performance holds, this becomes legend. If it does not, you learn a lot about browser limits and have a great story.
+
+**BRONZE: The Callus (Storyteller Proposal 1) -- 42/50** (tiebreak: most shippable among the 42-point proposals)
+The domino structure is the most reliable narrative engine in the competition. Each slide creates the question the next slide answers. "The features no spreadsheet would build" is the differentiator line. This is what you ship when you need it to work.
+
+---
+
+### SPECIAL AWARDS
+
+#### The Wildcard Award -- Most Creative Idea
+**WINNER: The Flipbook (Demo Designer Proposal 4)**
+
+The idea of replacing the pitch deck with the actual product mid-presentation, then revealing the trick with a deadpan "That was The River. You just used it" is the most creative pitch deck concept I have encountered. It is not just a novel format; it is a philosophical statement about what demos should be. The `--scroll-progress` CSS variable mapping scroll position to app state transitions is technically beautiful. The risk profile is terrifying. I love it.
+
+**Honorable Mention: The Whirlpool (Scroll Engineer Proposal 5)**
+
+An ink vortex transition where outgoing slides spiral into a drain while incoming slides bloom from the center. A nav timeline that is a literal flowing river with a glowing droplet. The proposal that answered "fix the scrolling" with "what if navigation was a portal between realities." Magnificent lunacy.
+
+#### The Comedy Award -- Funniest Moment
+**WINNER: The Set List (Storyteller Proposal 5) -- "11 slides. 3 minutes. No guitar solos."**
+
+This is the line that makes a room of VCs laugh out loud. It is self-aware ("we know you are tired of pitch decks"), respectful ("we will not waste your time"), and genuinely funny ("no guitar solos" in a guitar app pitch). It also serves a strategic purpose: it lowers the investor's guard with humor, which makes everything that follows land harder.
+
+**Runner-up: The Graveyard (Storyteller Proposal 3) -- "The sticky note on the fridge" tombstone**
+
+Every guitarist has written a practice schedule on a sticky note. Every sticky note ended up under a magnet, behind a coupon, and eventually in the trash. Putting it on a tombstone is dark, specific, and true.
+
+**Runner-up: The Negative Space (Demo Designer Proposal 5) -- The raindrop slide**
+
+The comedy is not a joke. It is the absurdist commitment to showing a single dot falling for eight seconds as a product demo. The viewer cannot help but watch. They cannot help but feel slightly ridiculous for watching. And then they realize: that is the thesis. The dot held their attention with nothing but intention. That is the app. The laugh, when it comes, is the laugh of recognition.
+
+---
+
+### BUILD THIS: The River Pitch Deck -- Synthesized Recommendation
+
+If I could reach into all fifteen proposals and pull out the best parts, here is the deck I would build. I am calling it **"Maya's River."**
+
+**Structural Spine: The Dropout's Diary (Storyteller 2)**
+Maya is the narrative engine. Her diary entries frame the entire deck. But we do not go fully diary-format for every slide -- we use Maya as the connective tissue and let the product speak for itself when it needs to.
+
+**The Deck (14 slides):**
+
+**Slide 0 -- "The River" (KEEP).**
+Existing hook. Add one thing from The Set List: a tiny card in the corner reading "14 slides. 4 minutes. No guitar solos." It costs nothing and buys goodwill.
+
+**Slide 1 -- "Day 1" (from Dropout's Diary).**
+"Day 1. Maya buys an acoustic. She is going to learn Blackbird." Then: "90% of beginners quit within a year." Stat hits harder because it threatens someone we care about.
+
+**Slide 2 -- "Day 47" (from Dropout's Diary).**
+Maya's diary: "I haven't picked it up in two weeks. The case is behind the couch now." Below: "This is where 90% of the story ends." Rename slide from "Philosophy" to "Day 47." The Source quote stays, recontextualized as research.
+
+**Slide 3 -- The Split Screen (from Demo Designer 2).**
+The diptych. Left: four-line despair spiral in coral. Right: four-line calm in blue. "The difference isn't skill. It's scaffolding." This is the bridge between the problem (slides 1-2) and the solution (slides 4-6). One slide, maximum emotional impact.
+
+**Slides 4-6 -- 24 Hours on the River (from Demo Designer 1).**
+The three-slide chronological walkthrough: 6:47 PM open, 6:48 PM session, 7:05 PM save. Pixel-perfect mockups from the real codebase. The Slide C cross-fade from "save" to "updated home" is mandatory. Maya's timestamps.
+
+**Slide 7 -- "Fog Horns and Bottles" (from The Callus).**
+"Day 52: Maya misses a day." Split screen: fog horn on the left (rest days that protect your streak), message in a bottle on the right (a note to future-Maya). Headline from The Callus: "The features no spreadsheet would build."
+
+**Slide 8 -- "The Reading" (from Dropout's Diary + The Callus).**
+Hour 25. The app reflects Maya's journey back to her. Show the Reading UI. "You started because of Blackbird. Twenty-five hours in, the song is becoming yours." The Callus's three-card progressive reveal.
+
+**Slide 9 -- The Fretboard (from The Negative Space).**
+Full-width A Minor Pentatonic fretboard diagram floating in negative space. No phone frame. Just the neck in darkness. Below: "Every scale. Every position. In your pocket." The reveal animation (left-to-right clip-path). This is the "wait, there's more?" moment.
+
+**Slide 10 -- "Day 180" (from Dropout's Diary).**
+Maya's river is wide. Her stats are the app's real usage data. Retitle from "Proof" to "Day 180." Add from The Callus: "0 servers needed / 100% offline" as the lead stat. Add "1 founder."
+
+**Slide 11 -- Market (KEEP, modify from The Callus).**
+Same competitor landscape. Add from The Graveyard's reframe: "Everyone's teaching Maya the chords. Nobody's making sure she practices."
+
+**Slide 12 -- Model (KEEP, modify from The Callus).**
+Add the one-liner: "Strava is free to run. The money is in the meaning."
+
+**Slide 13 -- Vision (from The Callus + Dropout's Diary).**
+"Maya plays guitar. But this isn't a guitar app. It's a practice app. Guitar is the wedge. Then piano. Then every skill that dies in silence."
+
+**Slide 14 -- "Fund the River" (KEEP, add from The Set List).**
+Add email, PWA link, and the closer from The Set List: "The soundcheck's over. Let's play."
+
+**Scroll System: Downstream (Scroll Engineer 3).**
+Ship the hybrid approach with three guardrails. Prototype The Whirlpool behind `?mode=whirlpool`. If the ink vortex runs at 60fps on the presenter's machine, flip the switch. If not, Downstream catches you.
+
+**Secret Weapon: The Flipbook.**
+Build the scroll-to-practice zone behind `?mode=flipbook`. If the team has a live pitch with a screen, this is the closer that wins the room. The investment in building it pays dividends in memorability even if you only use it once.
+
+**Total implementation priority:**
+1. Downstream scroll fix (2 hours, fixes critical bugs)
+2. Split Screen slide (medium effort, maximum emotional ROI)
+3. 24 Hours on the River three-slide walkthrough (high effort, essential product demo)
+4. Maya narrative rewrite across existing slides (medium effort, transforms the story)
+5. Negative Space fretboard slide (low effort, high "wow" moment)
+6. Fog Horns & Bottles + Reading slides (medium effort, key differentiators)
+7. Whirlpool prototype behind feature flag (4+ hours, optional but unforgettable)
+8. Flipbook prototype behind feature flag (very high effort, optional but legendary)
+
+---
+
+### STATUS
+
+| Field | Value |
+|-------|-------|
+| Competition | C: The Pitch -- Deck Content & Narrative |
+| Status | COMPLETE |
+| Winner | The Dropout's Diary (Storyteller Proposal 2) -- 45/50 |
+| Silver | The Flipbook (Demo Designer Proposal 4) -- 44/50 |
+| Bronze | The Callus (Storyteller Proposal 1) -- 42/50 |
+| Wildcard Award | The Flipbook -- "That was The River. You just used it." |
+| Comedy Award | The Set List -- "11 slides. 3 minutes. No guitar solos." |
+| Synthesis | "Maya's River" -- 14-slide deck combining Maya narrative spine, Split Screen emotional bridge, 24 Hours product demo, Negative Space fretboard surprise, Downstream scroll system |
+| Build Priority | Downstream scroll fix > Split Screen slide > 24 Hours walkthrough > Maya narrative > Fretboard slide > Feature slides > Whirlpool/Flipbook prototypes |
