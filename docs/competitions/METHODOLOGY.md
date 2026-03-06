@@ -80,6 +80,29 @@ After every code change:
 
 ---
 
+## Competition Tiers (added Session 8 audit)
+
+Not every feature needs a full 15-proposal bracket. Match the process to the problem:
+
+| Tier | When to Use | Format | Example |
+|------|-------------|--------|---------|
+| **Tier 1 (Full)** | Major features, visual redesigns, architecture | 3 personas x 5 proposals, 5-round bracket | Living River, The Dock, Season System |
+| **Tier 2 (Quick)** | Medium features, refinements | 3 personas x 1 proposal, 2 rounds (score + synthesize) | Milestone PDF styling, specific UI tweaks |
+| **Tier 3 (Flash)** | Small fixes, clear requirements | No competition. Just build it. | Bug fixes, copy changes, small additions |
+
+**Rule of thumb:** If you're not sure, start with Tier 2. Upgrade to Tier 1 if the first round reveals the problem is bigger than expected.
+
+---
+
+## Token Discipline (added Session 8 audit)
+
+- Proposals: 150 words max. Pitch the idea, don't write an essay.
+- Quick-reject: if a proposal doesn't address the core problem, score 0 and move on. Don't write paragraph feedback for obvious rejects.
+- Build architecture first — competition fills in design details, not component structure or data flow.
+- Score in batches of 5 (per persona), not all 15 at once.
+
+---
+
 ## Culture Reminders
 
 > "I want a lot of love being sent between agents and to yourself as well." — Max
@@ -92,4 +115,4 @@ After every code change:
 
 ---
 
-*Updated: Session 7 (March 6, 2026)*
+*Updated: Session 8 (March 6, 2026) — added Competition Tiers + Token Discipline from Competition H audit*
