@@ -105,6 +105,7 @@ It's not a dashboard. It's a *place*. The river metaphor isn't decorative — it
 - *"Dive into all three of the fingering diagrams, timer integration, and river everywhere."*
 - *"Take it to another level in efficiency and quality."*
 - Strategy: build while competitions run, reflect on methodology first
+- *"I just used the app to practice and logged it. I enjoyed my use of it."* — Max, celebrating the first real usage milestone! 67:52 logged.
 
 ---
 
@@ -158,15 +159,14 @@ It's not a dashboard. It's a *place*. The river metaphor isn't decorative — it
 - The Dock: "Practice This" flow — play buttons on progressions + Flow button on CurrentCard
 - Season ambient system: SeasonContext + data-season CSS + 4-season ambient gradients
 - Living River: soul line, seasonal particles, season engine (RiverSVG.jsx)
+- Onboarding flow: The Witness (3 screens — not a productivity app, a witness, river birth)
+- River Archive: merge-based import with preview, vault health indicator, _meta export header
 - River Glass light theme (cool-tinted glass, WCAG AA)
 - Petrichor audio engine (3-layer brown noise rain with LFO)
 - Breathing FAB animation
 - Ink Wash pitch deck (pitch.html)
 
 ### What's Next
-- Competition F results (atmosphere, onboarding, data export) — pending
-- Onboarding flow for first-time users
-- Data export/import in Settings (localStorage safety net)
 - Refine chord diagrams based on Competition E synthesis ("The Luthier's Current")
 - Competition C implementation: Maya's River pitch deck narrative
 
@@ -176,7 +176,7 @@ It's not a dashboard. It's a *place*. The river metaphor isn't decorative — it
 - **Competition C: Pitch Deck** — WINNER: "Maya's River" synthesis. **AWAITING IMPLEMENTATION.**
 - **Competition D: Living River** — WINNER: 3-layer synthesis. **IMPLEMENTED (Phase 1).** Soul line, seasonal particles, season engine.
 - **Competition E: Fingers & Flow** — WINNER: B6 "Luthier's Blueprint" (42/50). Synthesis: "The Luthier's Current". **IMPLEMENTED (Phase 1).** Chord diagrams, timer integration, interval colors, barre support.
-- **Competition F: Atmosphere** — Brief written (river everywhere, onboarding, data safety). **RESULTS PENDING.**
+- **Competition F: Atmosphere** — WINNER: "Thermal Drift" by Interior Designer. Synthesis: Thermal Drift (season CSS vars) + The Witness (onboarding) + River Archive (merge-based export/import). Wildcard: The Shared River (URL-encoded shareable rivers). Comedy: The Witness roasting every productivity app. **IMPLEMENTED.** Enhanced SeasonProvider, OnboardingFlow, River Archive merge import.
 
 ---
 
