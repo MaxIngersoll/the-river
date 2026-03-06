@@ -110,9 +110,10 @@ export default function TimerFAB({ onSaveSession, showTabBar = true }) {
     };
   }, [timerState, startedAt, pausedElapsed]);
 
-  const handleStart = useCallback(() => {
+  const handleStart = useCallback((prefillNote = '') => {
     if (timerState !== 'idle') return;
     const now = Date.now();
+    if (prefillNote) setNote(prefillNote);
     setTimerState('running');
     setStartedAt(now);
     setPausedElapsed(0);
@@ -120,6 +121,17 @@ export default function TimerFAB({ onSaveSession, showTabBar = true }) {
     setExpanded(true);
     persistTimer({ timerState: 'running', startedAt: now, pausedElapsed: 0 });
   }, [timerState]);
+
+  // Listen for external timer-start events (from The Dock, etc.)
+  useEffect(() => {
+    const handler = (e) => {
+      if (timerState === 'idle') {
+        handleStart(e.detail?.note || '');
+      }
+    };
+    window.addEventListener('river-start-timer', handler);
+    return () => window.removeEventListener('river-start-timer', handler);
+  }, [timerState, handleStart]);
 
   const handlePause = useCallback(() => {
     const currentElapsed = pausedElapsed + (Date.now() - startedAt);
