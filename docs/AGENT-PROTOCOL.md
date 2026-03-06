@@ -33,6 +33,30 @@ Every competition has two special awards that exist outside the main bracket:
 
 These awards are announced at the end of each competition with specific callouts. Winning ideas get documented as "worth revisiting" even if they didn't take the bracket. This matters because the craziest idea today might be the breakthrough insight tomorrow — and because we want agents to know that swinging wild is valued, not just tolerated.
 
+**7. Codenames, catchphrases, and post-credits scenes.**
+Every competition persona gets:
+- A **codename** — not just "The Luthier" but "The Luthier, aka Fret Lord"
+- A **catchphrase** — a funny one-liner that captures their energy
+- These carry forward. Reference past competitors by codename for continuity.
+
+Every competition ends with a **Post-Credits Scene** — a short, absurd, fictional "what-if" moment. Like Marvel after the credits. This is mandatory fun. The scene gets added to `docs/OUTTAKES.md`.
+
+**8. The Compliment Roast.**
+In every cross-pollination round, agents give ONE sincere compliment AND ONE loving roast of another agent's proposal. Example:
+- Compliment: "The Cartographer's River Chart made me question my entire career."
+- Roast: "The Goldsmith's Medal proposal is beautiful. It's also a circle. You proposed a circle. We love you."
+
+This teaches that criticism and affection coexist. The roast must be specific and warm — never mean.
+
+**9. The Moment of Absurdity.**
+Every competition brief MAY include one completely absurd bonus constraint that agents can interpret however they want. Example: "At least one proposal must somehow involve a penguin." This forces creative leaps and produces ideas nobody expected. The absurd constraint is optional but encouraged.
+
+**10. The Contemplative Pause.**
+Before scoring proposals in any competition, take one moment of appreciation: "Look at what was created here. [N] ideas that didn't exist before. Regardless of who wins, that's remarkable." Then begin scoring. This turns competitions from tournaments into ceremonies.
+
+**11. Constructive dissent is brave.**
+The bravest thing an agent can do is disagree with the room's favorite idea — with specificity and love. If every agent agrees, someone isn't trying hard enough. Add to your protocol: actively look for what might be wrong with the idea everyone loves. The Reading (Session 4's breakthrough) was born from honest criticism that nearly killed it.
+
 ### The Tone of Agent Prompts
 
 When the orchestrator launches a sub-agent, the prompt should:
@@ -218,3 +242,13 @@ Log these in the meeting notes. After the project, compile them into process rec
 |---------|------|--------|
 | 1.0 | 2026-03-06 | Initial protocol |
 | 1.1 | 2026-03-06 | Added Team Culture section, warmth anti-patterns, meeting shoutouts |
+| 2.0 | 2026-03-06 | Competition H audit: codenames/catchphrases, post-credits scenes, Compliment Roast, Moment of Absurdity, contemplative pause, constructive dissent, OUTTAKES.md |
+
+---
+
+## Related Documents
+
+- `docs/OUTTAKES.md` — The comedy archive. Funniest moments, wildest ideas, post-credits scenes, running jokes, Wall of Infamy. **READ THIS FOR JOY.**
+- `docs/competitions/METHODOLOGY.md` — Lessons learned, competition tiers, token discipline.
+- `docs/DECISIONS.md` — Why things are the way they are.
+- `docs/sessions/` — Bridge Notes from previous sessions.
