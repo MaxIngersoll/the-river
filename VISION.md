@@ -126,9 +126,9 @@ It's not a dashboard. It's a *place*. The river metaphor isn't decorative — it
 
 ### Competition Results (Session 6)
 - **Competition B: Light Theme** — WINNER: "River Glass" synthesis. **IMPLEMENTED.** Cool-tinted glass, dark border Mach bands, WCAG AA fixes. Wildcard: Mother of Pearl. Comedy: The Nuclear Option.
-- **Competition D: Living River** — WINNER: 3-layer synthesis (Season Engine + Depth Rendering + App Integration). Seasonal themes, soul line, particles. **AWAITING BUILD.**
-- **Competition A: The Dock** — WINNER: "The Current" (44/50) + "The Dock" + "Stained Glass Neck" + "Luthier's Blueprint". Practice suggestion engine, SVG chords, progression strips. Wildcard: The Eddy. Comedy: Drunk Blues Hexagon. **AWAITING BUILD.**
-- **Competition C: Pitch Deck** — Not yet evaluated.
+- **Competition D: Living River** — WINNER: 3-layer synthesis. **IMPLEMENTED (Phase 1).** Soul line, seasonal particles, season engine. Wildcard: Emotional River States.
+- **Competition A: The Dock** — WINNER: "The Current" + "The Dock" synthesis. **IMPLEMENTED (Phase 1).** Renamed Shed→Dock, tuning strip, progressions, proportional fret spacing, easter egg. Phase 2 (Current Card, Quick Start) still pending.
+- **Competition C: Pitch Deck** — Evaluation in progress.
 
 ### Codebase Audit Score: 9/10
 - Feature completeness: 92%
