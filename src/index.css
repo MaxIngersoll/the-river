@@ -108,6 +108,73 @@ html.dark #root::before {
 }
 
 /* ========================================
+   SEASON AMBIENT SYSTEM
+   The river's season tints the whole app.
+   Subtle enough to feel, not see.
+   ======================================== */
+
+/* Spring — fresh greens, renewal energy */
+html[data-season="spring"] #root::before {
+  background:
+    radial-gradient(ellipse 55% 45% at 25% 15%, rgba(147, 197, 153, 0.14) 0%, transparent 55%),
+    radial-gradient(ellipse 45% 35% at 75% 75%, rgba(167, 243, 208, 0.08) 0%, transparent 45%),
+    radial-gradient(ellipse 65% 55% at 50% 50%, rgba(245, 235, 220, 0.15) 0%, transparent 55%);
+}
+html.dark[data-season="spring"] #root::before {
+  background:
+    radial-gradient(ellipse 60% 50% at 30% 15%, rgba(74, 222, 128, 0.07) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 40% at 75% 75%, rgba(34, 197, 94, 0.05) 0%, transparent 50%),
+    radial-gradient(ellipse 40% 30% at 50% 45%, rgba(147, 197, 253, 0.04) 0%, transparent 40%);
+}
+
+/* Summer — warm golds, abundance (default-ish, slightly warmer) */
+html[data-season="summer"] #root::before {
+  background:
+    radial-gradient(ellipse 55% 45% at 25% 15%, rgba(191, 219, 254, 0.16) 0%, transparent 55%),
+    radial-gradient(ellipse 45% 35% at 75% 75%, rgba(251, 191, 36, 0.06) 0%, transparent 45%),
+    radial-gradient(ellipse 65% 55% at 50% 50%, rgba(245, 235, 220, 0.18) 0%, transparent 55%);
+}
+html.dark[data-season="summer"] #root::before {
+  background:
+    radial-gradient(ellipse 60% 50% at 30% 15%, rgba(59, 130, 246, 0.10) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 40% at 75% 75%, rgba(251, 191, 36, 0.04) 0%, transparent 50%),
+    radial-gradient(ellipse 40% 30% at 50% 45%, rgba(96, 165, 250, 0.05) 0%, transparent 40%);
+}
+
+/* Autumn — amber warmth, harvest glow */
+html[data-season="autumn"] #root::before {
+  background:
+    radial-gradient(ellipse 55% 45% at 25% 15%, rgba(251, 191, 36, 0.12) 0%, transparent 55%),
+    radial-gradient(ellipse 45% 35% at 75% 75%, rgba(234, 88, 12, 0.06) 0%, transparent 45%),
+    radial-gradient(ellipse 65% 55% at 50% 50%, rgba(245, 235, 220, 0.14) 0%, transparent 55%);
+}
+html.dark[data-season="autumn"] #root::before {
+  background:
+    radial-gradient(ellipse 60% 50% at 30% 15%, rgba(251, 191, 36, 0.06) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 40% at 75% 75%, rgba(234, 88, 12, 0.04) 0%, transparent 50%),
+    radial-gradient(ellipse 40% 30% at 50% 45%, rgba(180, 83, 9, 0.04) 0%, transparent 40%);
+}
+
+/* Winter — cool silvers, stillness */
+html[data-season="winter"] #root::before {
+  background:
+    radial-gradient(ellipse 55% 45% at 25% 15%, rgba(203, 213, 225, 0.14) 0%, transparent 55%),
+    radial-gradient(ellipse 45% 35% at 75% 75%, rgba(148, 163, 184, 0.08) 0%, transparent 45%),
+    radial-gradient(ellipse 65% 55% at 50% 50%, rgba(226, 232, 240, 0.12) 0%, transparent 55%);
+}
+html.dark[data-season="winter"] #root::before {
+  background:
+    radial-gradient(ellipse 60% 50% at 30% 15%, rgba(148, 163, 184, 0.05) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 40% at 75% 75%, rgba(100, 116, 139, 0.04) 0%, transparent 50%),
+    radial-gradient(ellipse 40% 30% at 50% 45%, rgba(203, 213, 225, 0.03) 0%, transparent 40%);
+}
+
+/* Season-tinted hero glow */
+html[data-season="spring"] .hero-glow::before { background: radial-gradient(ellipse 80% 60% at 50% 40%, rgba(74, 222, 128, 0.06) 0%, transparent 70%) !important; }
+html[data-season="autumn"] .hero-glow::before { background: radial-gradient(ellipse 80% 60% at 50% 40%, rgba(251, 191, 36, 0.06) 0%, transparent 70%) !important; }
+html[data-season="winter"] .hero-glow::before { background: radial-gradient(ellipse 80% 60% at 50% 40%, rgba(148, 163, 184, 0.06) 0%, transparent 70%) !important; }
+
+/* ========================================
    LIQUID GLASS CARD SYSTEM
    ======================================== */
 .card {

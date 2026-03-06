@@ -13,6 +13,7 @@ import CelebrationOverlay from './components/CelebrationOverlay';
 import ReadingCeremony from './components/ReadingCeremony';
 import ShedPage from './components/ShedPage';
 import TimerFAB from './components/TimerFAB';
+import { SeasonProvider } from './contexts/SeasonContext';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('home');
@@ -174,8 +175,9 @@ export default function App() {
   const showTabBar = displayedTab !== 'settings';
 
   return (
-    <div className="min-h-screen bg-bg pb-16">
-      <div className={`page-wrapper ${pageClass}`}>
+    <SeasonProvider sessions={sessions}>
+      <div className="min-h-screen bg-bg pb-16">
+        <div className={`page-wrapper ${pageClass}`}>
         {displayedTab === 'home' && (
           <HomePage
             sessions={sessions}
@@ -205,35 +207,36 @@ export default function App() {
         {displayedTab === 'shed' && (
           <ShedPage sessions={sessions} onNavigate={handleTabChange} />
         )}
-        {displayedTab === 'settings' && (
-          <SettingsPage
-            sessions={sessions}
-            onBack={() => handleTabChange('home')}
-            onDataCleared={handleDataCleared}
+          {displayedTab === 'settings' && (
+            <SettingsPage
+              sessions={sessions}
+              onBack={() => handleTabChange('home')}
+              onDataCleared={handleDataCleared}
+            />
+          )}
+        </div>
+
+        {showTabBar && <TabBar active={activeTab} onChange={handleTabChange} />}
+
+        <TimerFAB onSaveSession={handleTimerSave} showTabBar={showTabBar} />
+
+        {celebrations.length > 0 && (
+          <CelebrationOverlay
+            milestone={celebrations[0]}
+            onDismiss={dismissCelebration}
+            queuePosition={1}
+            queueTotal={celebrations.length}
+          />
+        )}
+
+        {pendingReading && celebrations.length === 0 && (
+          <ReadingCeremony
+            reading={pendingReading}
+            answer={getSource().answer}
+            onComplete={handleReadingComplete}
           />
         )}
       </div>
-
-      {showTabBar && <TabBar active={activeTab} onChange={handleTabChange} />}
-
-      <TimerFAB onSaveSession={handleTimerSave} showTabBar={showTabBar} />
-
-      {celebrations.length > 0 && (
-        <CelebrationOverlay
-          milestone={celebrations[0]}
-          onDismiss={dismissCelebration}
-          queuePosition={1}
-          queueTotal={celebrations.length}
-        />
-      )}
-
-      {pendingReading && celebrations.length === 0 && (
-        <ReadingCeremony
-          reading={pendingReading}
-          answer={getSource().answer}
-          onComplete={handleReadingComplete}
-        />
-      )}
-    </div>
+    </SeasonProvider>
   );
 }
