@@ -386,3 +386,66 @@ export function getPersonalBests(sessions) {
 
   return { longestSession, longestStreak, bestWeek };
 }
+
+// ========================================
+// River Archive — Export / Import
+// Competition F synthesis implementation
+// ========================================
+
+export function exportRiverData() {
+  const data = getData();
+  const sessions = [...data.sessions].sort((a, b) => a.date.localeCompare(b.date));
+  const totalMins = getTotalMinutes(sessions);
+  const dates = sessions.map(s => s.date).sort();
+
+  return {
+    _meta: {
+      app: 'The River',
+      version: '2.1',
+      exported_at: new Date().toISOString(),
+      total_hours: Math.round(totalMins / 60 * 10) / 10,
+      sessions_count: sessions.length,
+      date_range: dates.length > 0
+        ? { first: dates[0], last: dates[dates.length - 1] }
+        : null,
+    },
+    sessions,
+    settings: data.settings,
+    milestones: data.milestones || [],
+    source: data.source || null,
+  };
+}
+
+export function previewImport(incoming) {
+  if (!incoming || !Array.isArray(incoming.sessions)) {
+    return { valid: false, error: 'No sessions found in file' };
+  }
+
+  const validSessions = incoming.sessions.filter(s => isValidSession(s) || isFogSession(s));
+  const existing = getData();
+  const existingIds = new Set(existing.sessions.map(s => s.id));
+
+  const newSessions = validSessions.filter(s => !existingIds.has(s.id));
+  const duplicates = validSessions.length - newSessions.length;
+  const totalNewMins = newSessions.reduce((sum, s) => sum + s.duration_minutes, 0);
+
+  return {
+    valid: true,
+    newSessions,
+    duplicateCount: duplicates,
+    totalNewMinutes: totalNewMins,
+    droppedCount: incoming.sessions.length - validSessions.length,
+  };
+}
+
+export function mergeImport(newSessions) {
+  const data = getData();
+  data.sessions = [...data.sessions, ...newSessions];
+  // Recalculate first_session_date
+  const allDates = data.sessions.map(s => s.date).sort();
+  if (allDates.length > 0) {
+    data.settings.first_session_date = allDates[0];
+  }
+  setData(data);
+  return data;
+}

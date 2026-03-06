@@ -9,6 +9,9 @@ import {
   formatHours,
   formatDuration,
   isValidSession,
+  exportRiverData,
+  previewImport,
+  mergeImport,
 } from '../utils/storage';
 import { useTheme } from '../contexts/ThemeContext';
 
@@ -38,11 +41,15 @@ export default function SettingsPage({ sessions, onBack, onDataCleared }) {
   const [saved, setSaved] = useState(false);
   const { theme, setTheme } = useTheme();
 
-  const [importStatus, setImportStatus] = useState(null); // null | 'success' | 'error'
+  const [importStatus, setImportStatus] = useState(null); // null | 'success' | 'error' | 'preview'
+  const [importPreview, setImportPreview] = useState(null);
   const totalMinutes = getTotalMinutes(sessions);
+  const lastExport = useMemo(() => {
+    try { return localStorage.getItem('river-last-export'); } catch { return null; }
+  }, []);
 
   const handleExport = useCallback(() => {
-    const data = getData();
+    const data = exportRiverData();
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -50,9 +57,10 @@ export default function SettingsPage({ sessions, onBack, onDataCleared }) {
     a.download = `the-river-backup-${new Date().toISOString().slice(0, 10)}.json`;
     a.click();
     URL.revokeObjectURL(url);
+    try { localStorage.setItem('river-last-export', new Date().toISOString().slice(0, 10)); } catch {}
   }, []);
 
-  const handleImport = useCallback(() => {
+  const handleImportSelect = useCallback(() => {
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = '.json';
@@ -63,27 +71,14 @@ export default function SettingsPage({ sessions, onBack, onDataCleared }) {
       reader.onload = (evt) => {
         try {
           const data = JSON.parse(evt.target.result);
-          // Basic validation: must have sessions array
-          if (!data.sessions || !Array.isArray(data.sessions)) {
+          const preview = previewImport(data);
+          if (!preview.valid) {
             setImportStatus('error');
             setTimeout(() => setImportStatus(null), 2500);
             return;
           }
-          // Validate each session, drop corrupt ones
-          data.sessions = data.sessions.filter(isValidSession);
-          if (!data.settings || typeof data.settings !== 'object') {
-            data.settings = { weekly_goal_minutes: 300, first_session_date: null };
-          }
-          if (!Array.isArray(data.milestones)) {
-            data.milestones = [];
-          }
-          setData(data);
-          setSettings(data.settings || getSettings());
-          setImportStatus('success');
-          setTimeout(() => {
-            setImportStatus(null);
-            window.location.reload();
-          }, 1500);
+          setImportPreview(preview);
+          setImportStatus('preview');
         } catch {
           setImportStatus('error');
           setTimeout(() => setImportStatus(null), 2500);
@@ -92,6 +87,22 @@ export default function SettingsPage({ sessions, onBack, onDataCleared }) {
       reader.readAsText(file);
     };
     input.click();
+  }, []);
+
+  const handleMergeConfirm = useCallback(() => {
+    if (!importPreview || !importPreview.newSessions) return;
+    mergeImport(importPreview.newSessions);
+    setImportPreview(null);
+    setImportStatus('success');
+    setTimeout(() => {
+      setImportStatus(null);
+      window.location.reload();
+    }, 1500);
+  }, [importPreview]);
+
+  const handleMergeCancel = useCallback(() => {
+    setImportPreview(null);
+    setImportStatus(null);
   }, []);
 
   const handleGoalPreset = (mins) => {
@@ -253,13 +264,22 @@ export default function SettingsPage({ sessions, onBack, onDataCleared }) {
         </div>
       </div>
 
-      {/* Export / Import */}
+      {/* Export / Import — The River Archive */}
       <div className="card p-5 mb-4">
-        <h3 className="text-text-2 text-xs font-medium uppercase tracking-wider mb-1">
-          Backup
-        </h3>
+        <div className="flex items-center gap-2 mb-1">
+          <h3 className="text-text-2 text-xs font-medium uppercase tracking-wider">
+            The River Archive
+          </h3>
+          {lastExport && (
+            <span className="w-2 h-2 rounded-full bg-green-500/60" title={`Last exported: ${lastExport}`} />
+          )}
+          {!lastExport && sessions.length > 0 && (
+            <span className="w-2 h-2 rounded-full bg-amber-500/60" title="Never exported — back up your river!" />
+          )}
+        </div>
         <p className="text-text-3 text-xs mb-4">
-          Export your data as JSON, or restore from a backup.
+          Download your river or restore from a backup.
+          {lastExport && <span className="text-text-3/50"> Last backup: {lastExport}</span>}
         </p>
         <div className="flex gap-2">
           <button
@@ -271,10 +291,10 @@ export default function SettingsPage({ sessions, onBack, onDataCleared }) {
               <polyline points="7 10 12 15 17 10" />
               <line x1="12" y1="15" x2="12" y2="3" />
             </svg>
-            Export
+            Download Your River
           </button>
           <button
-            onClick={handleImport}
+            onClick={handleImportSelect}
             className="flex-1 flex items-center justify-center gap-2 py-3 rounded-2xl text-sm font-semibold card text-text-2 active:scale-[0.97] transition-all"
           >
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -282,12 +302,51 @@ export default function SettingsPage({ sessions, onBack, onDataCleared }) {
               <polyline points="17 8 12 3 7 8" />
               <line x1="12" y1="3" x2="12" y2="15" />
             </svg>
-            Import
+            Restore
           </button>
         </div>
+
+        {/* Import preview — merge confirmation */}
+        {importStatus === 'preview' && importPreview && (
+          <div className="mt-4 p-4 rounded-xl animate-fade-in" style={{ background: 'rgba(59, 130, 246, 0.08)', border: '1px solid rgba(59, 130, 246, 0.15)' }}>
+            <p className="text-text text-sm font-medium mb-2">Import Preview</p>
+            <div className="space-y-1 mb-3">
+              <p className="text-text-2 text-xs">
+                {importPreview.newSessions.length} new session{importPreview.newSessions.length !== 1 ? 's' : ''}{' '}
+                ({formatDuration(importPreview.totalNewMinutes)} of practice)
+              </p>
+              {importPreview.duplicateCount > 0 && (
+                <p className="text-text-3 text-xs">{importPreview.duplicateCount} duplicate{importPreview.duplicateCount !== 1 ? 's' : ''} skipped</p>
+              )}
+              {importPreview.droppedCount > 0 && (
+                <p className="text-text-3 text-xs">{importPreview.droppedCount} invalid session{importPreview.droppedCount !== 1 ? 's' : ''} dropped</p>
+              )}
+            </div>
+            <div className="flex gap-2">
+              <button
+                onClick={handleMergeCancel}
+                className="flex-1 py-2.5 rounded-xl text-sm font-semibold card text-text-2 active:scale-[0.97] transition-all"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleMergeConfirm}
+                disabled={importPreview.newSessions.length === 0}
+                className="flex-1 py-2.5 rounded-xl text-sm font-semibold text-white active:scale-[0.97] transition-all disabled:opacity-40"
+                style={{
+                  background: 'linear-gradient(135deg, rgba(59,130,246,0.9), rgba(30,64,175,0.95))',
+                  boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.2)',
+                }}
+              >
+                {importPreview.newSessions.length > 0 ? 'Merge Rivers' : 'Nothing New'}
+              </button>
+            </div>
+          </div>
+        )}
+
         {importStatus === 'success' && (
           <p className="text-water-4 text-xs font-medium text-center mt-3 animate-fade-in">
-            Data restored! Reloading...
+            Your rivers are one now. Reloading...
           </p>
         )}
         {importStatus === 'error' && (
