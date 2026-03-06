@@ -13,6 +13,7 @@ import CelebrationOverlay from './components/CelebrationOverlay';
 import ReadingCeremony from './components/ReadingCeremony';
 import ShedPage from './components/ShedPage';
 import TimerFAB from './components/TimerFAB';
+import OnboardingFlow from './components/OnboardingFlow';
 import { SeasonProvider } from './contexts/SeasonContext';
 
 export default function App() {
@@ -21,6 +22,9 @@ export default function App() {
   const [celebrations, setCelebrations] = useState([]);
   const [pendingReading, setPendingReading] = useState(null);
   const [signalFireNote, setSignalFireNote] = useState(null);
+  const [showOnboarding, setShowOnboarding] = useState(() =>
+    sessions.length === 0 && !localStorage.getItem('river-onboarding-complete')
+  );
 
   // Page transition state
   const [displayedTab, setDisplayedTab] = useState('home');
@@ -174,8 +178,16 @@ export default function App() {
 
   const showTabBar = displayedTab !== 'settings';
 
+  const handleOnboardingComplete = useCallback(() => {
+    localStorage.setItem('river-onboarding-complete', 'true');
+    localStorage.setItem('river-onboarding-date', new Date().toISOString());
+    setShowOnboarding(false);
+    handleTabChange('home');
+  }, [handleTabChange]);
+
   return (
     <SeasonProvider sessions={sessions}>
+      {showOnboarding && <OnboardingFlow onComplete={handleOnboardingComplete} />}
       <div className="min-h-screen bg-bg pb-16">
         <div className={`page-wrapper ${pageClass}`}>
         {displayedTab === 'home' && (
