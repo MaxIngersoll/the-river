@@ -74,66 +74,35 @@ It's not a dashboard. It's a *place*. The river metaphor isn't decorative — it
 - Built QuickStartCards: triptych of practice modes
 - Added `sessions` + `onNavigate` props from App.jsx to ShedPage
 
-### Session 8 (Current): Three Features + Two Competitions
-- **Methodology Reflection:** Created `docs/competitions/METHODOLOGY.md` — captured lessons from past competitions. Key innovation: "Build While Competing" (implement foundations while competitions run in background).
-- **Competition E: "The Fingers & The Flow"** — Chord diagrams + timer integration. Winner: B6 "Luthier's Blueprint" (42/50). Synthesis: "The Luthier's Current".
-- **Competition F: "The Atmosphere"** — River everywhere + onboarding + data safety. 3 personas: Interior Designer, Storyteller, Archivist. Results pending.
-
-#### Feature 1: Dynamic Chord Fingering Diagrams
-- Added comprehensive `OPEN_VOICINGS` database (35+ chord voicings)
-- Added algorithmic `getBarreVoicing()` for E-form + A-form barre computation
-- Enhanced `ChordDiagram` SVG: interval-colored dots, barre indicators, string gauge variation
-- Replaced ChordCard to render real fingering positions, not just note names
-- Added Barre/Colors toggle buttons in chord view
-- Interval color system: root=blue, 3rd=amber, 5th=slate, 7th=purple
-
-#### Feature 2: Timer Integration ("Practice This" Flow)
-- Created `CustomEvent` bridge: `river-start-timer` event
-- Added `dispatchTimerStart()` helper in ShedPage
-- Modified TimerFAB to listen for external start events with `prefillNote`
-- Added play buttons to ProgressionStrips (auto-generates session note from key + progression)
-- Added "Flow" button on CurrentCard (start timer with practice context)
-
-#### Feature 3: Season Ambient System ("River Everywhere")
-- Created `src/contexts/SeasonContext.jsx` — season detection + `data-season` CSS attribute
-- Season engine: analyzes 2-week/4-week practice windows → spring/summer/autumn/winter
-- Added 8 CSS ambient gradient rules (4 seasons × light/dark mode)
-- Added season-tinted hero glow overrides (spring, autumn, winter)
-- Wrapped app root with SeasonProvider in App.jsx
-
-#### Max's Feedback
-- *"Dive into all three of the fingering diagrams, timer integration, and river everywhere."*
-- *"Take it to another level in efficiency and quality."*
-- Strategy: build while competitions run, reflect on methodology first
-- *"I just used the app to practice and logged it. I enjoyed my use of it."* — Max, celebrating the first real usage milestone! 67:52 logged.
+### Session 8: Three Features + Four Competitions + Internal Audit
+- **Competition E:** Chord diagrams + timer integration. Winner: "Luthier's Blueprint". **IMPLEMENTED.**
+- **Competition F:** Atmosphere + onboarding + data safety. Winner: "Thermal Drift" synthesis. **IMPLEMENTED.**
+- **Competition G:** Milestone PDF ("The River Medal"). Trophy/diploma style. **IMPLEMENTED.**
+- **Competition H:** Internal audit of workflow. Expert panel review (7 experts). **IMPLEMENTED.**
+- **Features:** Chord diagrams, timer integration, season CSS vars, onboarding flow, River Archive, milestone PDF
+- **Process upgrades:** Competition tiers, Bridge Notes, DECISIONS.md, Outtakes Reel, fun protocols
+- **Max's milestone:** First real practice session — 67:52 logged. "I enjoyed my use of it."
+- **Stale docs cleaned:** Deleted HANDOFF.md, PLAN.md, EXECUTION-PLAN.md, OVERNIGHT-PLAN/REPORT.md
 
 ---
 
 ## Design Competition Protocol
 
-### How It Works
-1. **3 constraint-based personas** each produce 5 proposals (15 total)
-2. **5-round bracket** — Score all 15, top 8 iterate with feedback, top 4 with cross-pollination + devil's advocate, final winner
-3. **Structured feedback** — Lead with strengths, frame weaknesses as opportunities, include "What-if"
-4. **Special awards** — Wildcard (most creative) + Comedy (funniest) — regardless of bracket results
-5. **Culture** — Radical encouragement, bring personality, try things that scare you, send love, celebrate milestones
-6. **Synthesis over winner-takes-all** — Best result often combines ideas across personas
+### Competition Tiers (choose the right size)
+- **Tier 1 (Full):** 3 personas x 5 proposals, 5-round bracket. For major features.
+- **Tier 2 (Quick):** 3 personas x 1 proposal, 2 rounds. For medium features.
+- **Tier 3 (Flash):** No competition. Just build it. For small fixes.
 
-### Key Insight
-> "Give agents a *constraint*, not a *personality*. The constraint forces creative divergence." — Design Process Journal
-
-### Max's Culture Mandate
-> "I want a lot of love being sent between agents and to yourself as well. We really want to create a team culture of support. I know this can seem like it slows things down, but trust me, it's really gonna go a long way in executing the vision."
-
-> "Continue the spirit of friendliness, creativity, silliness, and joking around with the Agents. Figure out new creative ways to bring out more of their personality and create a safe space for you guys to do your best work and come up with your best ideas." — Max, Session 6
-
-### Agent Culture Ideas (evolving)
-- **Give agents creative codenames** — not just "Generator 1" but a name that fits their persona's energy
-- **Include a "mood board" prompt** — ask agents to describe the vibe of their proposal in 3 words
-- **Cross-agent fan mail** — when evaluating, include "a note from the Hydrologist to the Ambient Artist" style appreciation
-- **The Outtakes Reel** — collect the funniest moments and wildest ideas in a running doc
-- **Agent sign-offs** — each agent ends their output with a personal sign-off (joke, quote, or encouragement)
-- **"What would you build if there were no rules?"** — one bonus prompt per competition, no constraints at all
+### Culture Protocol
+See `docs/AGENT-PROTOCOL.md` for the full protocol. Key elements:
+- Constraint-based personas (not attitude-based)
+- Wildcard Award (most creative) + Comedy Award (funniest)
+- **Codenames & catchphrases** for every persona
+- **Post-credits scenes** after every competition (added to `docs/OUTTAKES.md`)
+- **Compliment Roast** in cross-pollination (1 compliment + 1 loving roast)
+- **Contemplative pause** before scoring ("Look at what was created here")
+- **Constructive dissent** is brave and encouraged
+- Synthesis over winner-takes-all
 
 ---
 
@@ -176,7 +145,9 @@ It's not a dashboard. It's a *place*. The river metaphor isn't decorative — it
 - **Competition C: Pitch Deck** — WINNER: "Maya's River" synthesis. **AWAITING IMPLEMENTATION.**
 - **Competition D: Living River** — WINNER: 3-layer synthesis. **IMPLEMENTED (Phase 1).** Soul line, seasonal particles, season engine.
 - **Competition E: Fingers & Flow** — WINNER: B6 "Luthier's Blueprint" (42/50). Synthesis: "The Luthier's Current". **IMPLEMENTED (Phase 1).** Chord diagrams, timer integration, interval colors, barre support.
-- **Competition F: Atmosphere** — WINNER: "Thermal Drift" by Interior Designer. Synthesis: Thermal Drift (season CSS vars) + The Witness (onboarding) + River Archive (merge-based export/import). Wildcard: The Shared River (URL-encoded shareable rivers). Comedy: The Witness roasting every productivity app. **IMPLEMENTED.** Enhanced SeasonProvider, OnboardingFlow, River Archive merge import.
+- **Competition F: Atmosphere** — WINNER: "Thermal Drift" synthesis. **IMPLEMENTED.** Season CSS vars, OnboardingFlow, River Archive.
+- **Competition G: Milestone PDF** — WINNER: "The River Medal" (Goldsmith synthesis). **IMPLEMENTED.** Trophy/diploma style celebration PDF.
+- **Competition H: Internal Audit** — WINNER: Synthesis of 6 improvements + 7-expert panel review. **IMPLEMENTED.** Competition tiers, Bridge Notes, DECISIONS.md, Outtakes Reel, fun protocols, stale doc cleanup.
 
 ---
 
@@ -201,6 +172,11 @@ It's not a dashboard. It's a *place*. The river metaphor isn't decorative — it
 
 > "Invisible to 90% of users. The literary fiction of feature design." — Sara (virtual judge), before C4 invented The Reading
 
+> "Running a Tier 1 competition for a PDF is like hiring an orchestra to play happy birthday." — The Team Captain, Competition H
+
+> "A river doesn't stop to report its progress. It flows, and you check in at the bends." — Dr. Maya Chen, Expert Panel
+
 ---
 
 *This document is the first thing any new session should read. Update it. Commit it. Never let context get lost again.*
+*For laughs, read `docs/OUTTAKES.md`. For decisions, read `docs/DECISIONS.md`. For session context, read `docs/sessions/`.*
