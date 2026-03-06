@@ -1,10 +1,22 @@
 /* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useMemo, useEffect } from 'react';
-import { getSessions, today, addDays } from '../utils/storage';
 
-const SeasonContext = createContext({ season: 'summer' });
+const SeasonContext = createContext({
+  season: 'spring',
+  hue: 200,
+  saturation: 40,
+  warmth: 0.5,
+});
 
-// Same algorithm as RiverSVG.jsx detectSeason — single source of truth
+// Season visual config — Thermal Drift from Competition F
+const SEASON_CONFIG = {
+  spring:  { hue: 160, saturation: 45, warmth: 0.5, glowOpacity: 0.12, driftSpeed: 90 },
+  summer:  { hue: 215, saturation: 50, warmth: 0.6, glowOpacity: 0.15, driftSpeed: 120 },
+  autumn:  { hue: 35,  saturation: 40, warmth: 0.7, glowOpacity: 0.10, driftSpeed: 75 },
+  winter:  { hue: 220, saturation: 15, warmth: 0.3, glowOpacity: 0.08, driftSpeed: 180 },
+};
+
+// Detect practice season from session history
 function detectSeason(sessions) {
   if (!sessions || sessions.length === 0) return 'spring';
   const now = new Date();
@@ -31,14 +43,59 @@ function detectSeason(sessions) {
 export function SeasonProvider({ children, sessions }) {
   const season = useMemo(() => detectSeason(sessions), [sessions]);
 
-  // Set data-season attribute on <html> for CSS
-  useEffect(() => {
-    document.documentElement.setAttribute('data-season', season);
-    return () => document.documentElement.removeAttribute('data-season');
+  // Thermal Drift: blend config and set CSS custom properties
+  const config = useMemo(() => {
+    const target = SEASON_CONFIG[season] || SEASON_CONFIG.spring;
+
+    // Try to blend from previous season for smooth transitions
+    try {
+      const stored = localStorage.getItem('river-season-state');
+      const state = stored ? JSON.parse(stored) : null;
+
+      if (state && state.current !== season) {
+        const prev = SEASON_CONFIG[state.current] || target;
+        const blend = Math.min(1, (state.blendFactor || 0) + 0.25);
+        localStorage.setItem('river-season-state', JSON.stringify({ current: season, blendFactor: blend }));
+
+        const lerp = (a, b, t) => a + (b - a) * t;
+        return {
+          season,
+          hue: Math.round(lerp(prev.hue, target.hue, blend)),
+          saturation: Math.round(lerp(prev.saturation, target.saturation, blend)),
+          warmth: lerp(prev.warmth, target.warmth, blend),
+          glowOpacity: lerp(prev.glowOpacity, target.glowOpacity, blend),
+          driftSpeed: Math.round(lerp(prev.driftSpeed, target.driftSpeed, blend)),
+        };
+      }
+
+      localStorage.setItem('river-season-state', JSON.stringify({ current: season, blendFactor: 1 }));
+    } catch { /* ignore storage errors */ }
+
+    return { season, ...target };
   }, [season]);
 
+  // Apply CSS custom properties to <html>
+  useEffect(() => {
+    const root = document.documentElement;
+    root.setAttribute('data-season', season);
+    root.style.setProperty('--season-hue', config.hue);
+    root.style.setProperty('--season-saturation', `${config.saturation}%`);
+    root.style.setProperty('--season-warmth', config.warmth);
+    root.style.setProperty('--season-glow-opacity', config.glowOpacity);
+    root.style.setProperty('--season-drift-speed', `${config.driftSpeed}s`);
+
+    return () => {
+      root.removeAttribute('data-season');
+      root.style.removeProperty('--season-hue');
+      root.style.removeProperty('--season-saturation');
+      root.style.removeProperty('--season-warmth');
+      root.style.removeProperty('--season-glow-opacity');
+      root.style.removeProperty('--season-drift-speed');
+    };
+  }, [season, config]);
+
   return (
-    <SeasonContext.Provider value={{ season }}>
+    <SeasonContext.Provider value={config}>
       {children}
     </SeasonContext.Provider>
   );
