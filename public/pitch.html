@@ -1,0 +1,1877 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The River — Pitch Deck</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600;700&display=swap');
+
+  :root {
+    --bg-deep: #0a0f1a;
+    --bg-mid: #0d1b2a;
+    --glass: rgba(255,255,255,0.04);
+    --glass-border: rgba(255,255,255,0.08);
+    --glass-border-2: rgba(255,255,255,0.12);
+    --text-primary: #e8e4df;
+    --text-muted: #7a8a9e;
+    --text-dim: #4a5568;
+    --river-1: #2dd4bf;
+    --river-2: #3b82f6;
+    --river-3: #8b5cf6;
+    --amber: #f0a830;
+    --coral: #f87171;
+    --serif: 'Playfair Display', Georgia, serif;
+    --sans: 'Inter', -apple-system, sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html {
+    scroll-behavior: smooth;
+    scroll-snap-type: y mandatory;
+    overflow-y: scroll;
+    overflow-x: hidden;
+  }
+
+  body {
+    font-family: var(--sans);
+    background: var(--bg-deep);
+    color: var(--text-primary);
+    -webkit-font-smoothing: antialiased;
+    opacity: 0;
+    animation: pageLoad 1s ease 0.3s forwards;
+  }
+
+  @keyframes pageLoad {
+    to { opacity: 1; }
+  }
+
+  /* === VIGNETTE === */
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    z-index: 998;
+    pointer-events: none;
+    background: radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.4) 100%);
+  }
+
+  /* === NOISE TEXTURE OVERLAY === */
+  body::after {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    z-index: 999;
+    pointer-events: none;
+    opacity: 0.025;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    background-repeat: repeat;
+    background-size: 128px;
+  }
+
+  /* === SCROLL PROGRESS BAR === */
+  .scroll-progress {
+    position: fixed;
+    top: 0; left: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--river-1), var(--river-2), var(--river-3));
+    z-index: 201;
+    width: 0%;
+    transition: width 0.15s ease-out;
+    box-shadow: 0 0 12px rgba(59,130,246,0.5);
+  }
+
+  /* === SLIDE NUMBER === */
+  .slide-num {
+    position: fixed;
+    bottom: 2rem;
+    left: 2rem;
+    z-index: 100;
+    font-family: var(--sans);
+    font-size: 0.6rem;
+    font-weight: 500;
+    letter-spacing: 0.25em;
+    color: rgba(255,255,255,0.15);
+    transition: opacity 0.4s ease;
+  }
+
+  /* === INK WASH RIVER === */
+  .ink-river-container {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    z-index: 1;
+    pointer-events: none;
+    overflow: hidden;
+  }
+
+  .ink-river-container svg {
+    width: 100%;
+    height: 100%;
+    mix-blend-mode: screen;
+  }
+
+  .ink-state {
+    opacity: 0;
+    transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .ink-state.active {
+    opacity: 1;
+  }
+
+  .ink-state.fading {
+    opacity: 0.15;
+  }
+
+  /* Soul line — always visible, thin bright core with breathing pulse */
+  .soul-line {
+    fill: none;
+    stroke: url(#soulGrad);
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    opacity: 0.4;
+    filter: url(#soulGlow);
+    transition: d 1.2s cubic-bezier(0.4, 0, 0.2, 1),
+                stroke 1.2s ease,
+                opacity 0.6s ease;
+    stroke-dasharray: 1600;
+    stroke-dashoffset: 0;
+    animation: soulBreathe 4s ease-in-out infinite, soulFlow 12s linear infinite;
+    will-change: opacity, stroke-dashoffset;
+  }
+
+  @keyframes soulBreathe {
+    0%, 100% { opacity: var(--soul-opacity, 0.4); stroke-width: 1.5; }
+    50% { opacity: calc(var(--soul-opacity, 0.4) + 0.15); stroke-width: 2; }
+  }
+
+  @keyframes soulFlow {
+    0% { stroke-dashoffset: 0; }
+    100% { stroke-dashoffset: -1600; }
+  }
+
+  /* Anticipatory particles */
+  .ink-particle {
+    position: fixed;
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 2;
+    opacity: 0;
+    filter: blur(0.5px);
+    transition: background 0.8s ease;
+    will-change: transform, opacity;
+  }
+
+  @keyframes inkParticleDrift {
+    0% { transform: translateY(100vh) translateX(0) scale(0.3); opacity: 0; }
+    5% { opacity: var(--particle-opacity, 0.5); }
+    50% { transform: translateY(50vh) translateX(var(--particle-drift, 20px)) scale(1); }
+    95% { opacity: var(--particle-opacity, 0.3); }
+    100% { transform: translateY(-10vh) translateX(calc(var(--particle-drift, 20px) * -0.5)) scale(0.2); opacity: 0; }
+  }
+
+  /* Settling animation — spring-damper feel when scroll stops */
+  @keyframes inkSettle {
+    0% { filter: blur(0px); transform: scale(1); }
+    30% { filter: blur(0.5px); transform: scale(1.003); }
+    60% { filter: blur(0.1px); transform: scale(0.999); }
+    100% { filter: blur(0.2px); transform: scale(1); }
+  }
+
+  .ink-settled .ink-state.active {
+    animation: inkSettle 2s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  }
+
+  /* Velocity-responsive turbulence — proportional, not binary */
+  .ink-turbulent .ink-state.active {
+    filter: url(#inkTurbulence);
+    transition: filter 0.3s ease;
+  }
+
+  .ink-velocity-low .ink-state.active {
+    filter: blur(0.3px);
+  }
+
+  .ink-velocity-med .ink-state.active {
+    filter: blur(0.8px) url(#inkBlur);
+  }
+
+  /* Golden crescendo bloom on final slide */
+  @keyframes crescendoBloom {
+    0% { filter: url(#inkBlurWide); }
+    50% { filter: url(#inkBlurWide) brightness(1.3); }
+    100% { filter: url(#inkBlurWide); }
+  }
+
+  .ink-crescendo .ink-state[data-slide="10"].active {
+    animation: crescendoBloom 3s ease-in-out infinite;
+  }
+
+  /* Accumulation decay — ghost traces fade further over time */
+  .ink-state.fading {
+    opacity: 0.15;
+    transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .ink-state.fading-old {
+    opacity: 0.07;
+  }
+
+  /* Reduced motion: respect user preference */
+  @media (prefers-reduced-motion: reduce) {
+    .soul-line { animation: none; }
+    .ink-particle { animation: none !important; display: none; }
+    .ink-state { transition: opacity 0.3s ease; }
+    .ink-settled .ink-state.active { animation: none; }
+    .ink-crescendo .ink-state[data-slide="10"].active { animation: none; }
+  }
+
+  /* === PARTICLES === */
+  .particle {
+    position: fixed;
+    border-radius: 50%;
+    opacity: 0;
+    animation: drift linear infinite;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  @keyframes drift {
+    0% { transform: translateY(100vh) translateX(0) scale(0.5); opacity: 0; }
+    8% { opacity: 0.4; transform: translateY(90vh) translateX(5px) scale(1); }
+    92% { opacity: 0.3; }
+    100% { transform: translateY(-10vh) translateX(40px) scale(0.3); opacity: 0; }
+  }
+
+  /* === AMBIENT GLOW — Mouse-following === */
+  .ambient-glow {
+    position: fixed;
+    width: 700px;
+    height: 700px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(59,130,246,0.1) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    animation: breathe 6s ease-in-out infinite;
+    transition: background 1.2s ease;
+    will-change: transform;
+  }
+
+  @keyframes breathe {
+    0%, 100% { opacity: 0.6; }
+    50% { opacity: 1; }
+  }
+
+  /* Second glow — follows mouse */
+  .mouse-glow {
+    position: fixed;
+    width: 400px;
+    height: 400px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(59,130,246,0.06) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+    transform: translate(-50%, -50%);
+    transition: left 0.8s ease-out, top 0.8s ease-out, background 1s ease;
+    will-change: left, top;
+  }
+
+  /* === SLIDE SYSTEM === */
+  .slide {
+    min-height: 100vh;
+    scroll-snap-align: start;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 3rem 2rem;
+    position: relative;
+    z-index: 2;
+  }
+
+  .slide-content {
+    max-width: 900px;
+    width: 100%;
+    text-align: center;
+    opacity: 0;
+    transform: translateY(50px);
+    transition: opacity 1s cubic-bezier(0.16, 1, 0.3, 1), transform 1s cubic-bezier(0.16, 1, 0.3, 1), filter 1s ease;
+  }
+
+  .slide-content.visible {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0) !important;
+  }
+
+  /* Slide 1: Scale from center */
+  [data-slide="0"] .slide-content {
+    transform: scale(0.85);
+    filter: blur(8px);
+    transition: opacity 1.2s ease, transform 1.2s cubic-bezier(0.16, 1, 0.3, 1), filter 1.2s ease;
+  }
+  [data-slide="0"] .slide-content.visible { transform: scale(1); }
+
+  /* Slide 2: Scale up from tiny */
+  [data-slide="1"] .slide-content {
+    transform: scale(0.3);
+    filter: blur(12px);
+    transition: opacity 1.4s ease, transform 1.4s cubic-bezier(0.16, 1, 0.3, 1), filter 1s ease;
+  }
+  [data-slide="1"] .slide-content.visible { transform: scale(1); }
+
+  /* Slide 3: From left */
+  [data-slide="2"] .slide-content { transform: translateX(-80px); }
+  [data-slide="2"] .slide-content.visible { transform: translateX(0); }
+
+  /* Slide 4: Float with perspective */
+  [data-slide="3"] .slide-content {
+    transform: translateY(80px) rotateX(8deg);
+    transition: opacity 1.2s ease, transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  [data-slide="3"] .slide-content.visible { transform: translateY(0) rotateX(0); }
+
+  /* Slide 5: From right */
+  [data-slide="4"] .slide-content { transform: translateX(60px); }
+  [data-slide="4"] .slide-content.visible { transform: translateX(0); }
+
+  /* Slide 6: Gentle rise */
+  [data-slide="5"] .slide-content { transform: translateY(60px); }
+  [data-slide="5"] .slide-content.visible { transform: translateY(0); }
+
+  /* Slide 8: Zoom out */
+  [data-slide="7"] .slide-content {
+    transform: scale(1.3);
+    filter: blur(6px);
+    transition: opacity 1.2s ease, transform 1.2s cubic-bezier(0.16, 1, 0.3, 1), filter 1s ease;
+  }
+  [data-slide="7"] .slide-content.visible { transform: scale(1); }
+
+  /* Slide 11: CTA rise */
+  [data-slide="10"] .slide-content { transform: translateY(30px) scale(0.95); }
+  [data-slide="10"] .slide-content.visible { transform: translateY(0) scale(1); }
+
+  /* === DEEP GLASSMORPHISM === */
+  .glass {
+    background: linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%);
+    border: 1px solid var(--glass-border-2);
+    border-radius: 24px;
+    backdrop-filter: blur(40px) saturate(1.2);
+    -webkit-backdrop-filter: blur(40px) saturate(1.2);
+    padding: 2.5rem;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.4s ease, box-shadow 0.4s ease, transform 0.4s ease;
+  }
+
+  .glass::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+  }
+
+  .glass:hover {
+    border-color: rgba(255,255,255,0.16);
+    box-shadow: 0 8px 40px rgba(0,0,0,0.2), 0 0 0 1px rgba(255,255,255,0.05);
+    transform: translateY(-2px);
+  }
+
+  .glass-sm {
+    background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    backdrop-filter: blur(30px) saturate(1.1);
+    -webkit-backdrop-filter: blur(30px) saturate(1.1);
+    padding: 1.5rem;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
+  }
+
+  .glass-sm::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+  }
+
+  .glass-sm:hover {
+    border-color: rgba(255,255,255,0.14);
+    box-shadow: 0 4px 24px rgba(0,0,0,0.15);
+    transform: translateY(-2px);
+  }
+
+  /* === TYPOGRAPHY === */
+  h1 {
+    font-family: var(--serif);
+    font-size: clamp(2.5rem, 6vw, 5rem);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    margin-bottom: 1rem;
+    text-shadow: 0 0 60px rgba(255,255,255,0.05);
+  }
+
+  h2 {
+    font-family: var(--serif);
+    font-size: clamp(1.8rem, 4vw, 3.5rem);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+    margin-bottom: 1rem;
+  }
+
+  .subtitle {
+    font-size: clamp(0.9rem, 1.5vw, 1.1rem);
+    color: var(--text-muted);
+    font-weight: 300;
+    line-height: 1.6;
+  }
+
+  .serif-quote {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: clamp(1.3rem, 3vw, 2.2rem);
+    line-height: 1.5;
+    color: var(--text-primary);
+  }
+
+  .stat-number {
+    font-family: var(--sans);
+    font-size: clamp(2.5rem, 6vw, 5rem);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    line-height: 1;
+    background: linear-gradient(135deg, var(--river-1), var(--river-2), var(--river-3));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .stat-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--text-muted);
+    margin-top: 0.5rem;
+  }
+
+  /* === SHIMMER HEADING === */
+  .shimmer-text {
+    background: linear-gradient(
+      120deg,
+      var(--text-primary) 0%,
+      var(--text-primary) 30%,
+      var(--river-1) 45%,
+      var(--river-2) 50%,
+      var(--river-3) 55%,
+      var(--text-primary) 70%,
+      var(--text-primary) 100%
+    );
+    background-size: 300% 100%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: shimmer 6s ease-in-out infinite;
+  }
+
+  @keyframes shimmer {
+    0%, 100% { background-position: 100% 50%; }
+    50% { background-position: 0% 50%; }
+  }
+
+  /* === "NO ADS" EMPHASIS === */
+  .privacy-pledge {
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    margin-top: 1.5rem;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    opacity: 0.6;
+    transition: opacity 0.3s ease;
+  }
+
+  .privacy-pledge:hover { opacity: 1; }
+
+  /* === FOUNDER LINE === */
+  .founder-note {
+    font-size: 0.6rem;
+    color: rgba(255,255,255,0.15);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-top: 2rem;
+  }
+
+  /* === HERO 90% === */
+  .mega-stat {
+    font-family: var(--serif);
+    font-size: clamp(7rem, 20vw, 16rem);
+    font-weight: 700;
+    letter-spacing: -0.04em;
+    line-height: 0.85;
+    color: var(--coral);
+    text-shadow: 0 0 80px rgba(248,113,113,0.25), 0 0 160px rgba(248,113,113,0.1);
+    animation: statPulse 4s ease-in-out infinite;
+  }
+
+  @keyframes statPulse {
+    0%, 100% { text-shadow: 0 0 80px rgba(248,113,113,0.25), 0 0 160px rgba(248,113,113,0.1); }
+    50% { text-shadow: 0 0 120px rgba(248,113,113,0.35), 0 0 200px rgba(248,113,113,0.15); }
+  }
+
+  /* === SCROLL HINT === */
+  .scroll-hint {
+    position: absolute;
+    bottom: 2.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    opacity: 0;
+    animation: hintFade 1.5s ease 2s forwards;
+  }
+
+  .scroll-hint span {
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: rgba(255,255,255,0.2);
+  }
+
+  .scroll-hint-arrow {
+    width: 1px;
+    height: 24px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.15), transparent);
+    animation: arrowBounce 2s ease-in-out infinite;
+  }
+
+  @keyframes hintFade {
+    to { opacity: 1; }
+  }
+
+  @keyframes arrowBounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(6px); }
+  }
+
+  /* === TYPEWRITER === */
+  .typewriter {
+    overflow: hidden;
+    white-space: nowrap;
+    border-right: 2px solid rgba(255,255,255,0.3);
+    width: 0;
+    animation: typewrite 1.5s steps(16) 1.2s forwards, blink 0.8s step-end infinite 1.2s;
+    display: inline-block;
+  }
+
+  @keyframes typewrite {
+    to { width: 100%; }
+  }
+
+  @keyframes blink {
+    50% { border-color: transparent; }
+  }
+
+  /* === DEVICE MOCKUP === */
+  .device-frame {
+    width: 280px;
+    height: 580px;
+    border-radius: 36px;
+    border: 2px solid rgba(255,255,255,0.1);
+    background: linear-gradient(145deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02));
+    backdrop-filter: blur(20px);
+    overflow: hidden;
+    position: relative;
+    margin: 0 auto;
+    box-shadow:
+      0 0 100px rgba(59, 130, 246, 0.15),
+      0 30px 80px rgba(0,0,0,0.5),
+      0 0 0 1px rgba(255,255,255,0.05),
+      inset 0 1px 0 rgba(255,255,255,0.15),
+      inset 0 -1px 0 rgba(0,0,0,0.3);
+    transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.5s ease;
+  }
+
+  .device-frame:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow:
+      0 0 140px rgba(59, 130, 246, 0.2),
+      0 40px 100px rgba(0,0,0,0.5),
+      inset 0 1px 0 rgba(255,255,255,0.2);
+  }
+
+  .device-frame::before {
+    content: '';
+    position: absolute;
+    top: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 24px;
+    background: #000;
+    border-radius: 0 0 16px 16px;
+    z-index: 10;
+  }
+
+  .device-screen {
+    width: 100%;
+    height: 100%;
+    background: var(--bg-deep);
+    border-radius: 34px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2.5rem 1.5rem 2rem;
+  }
+
+  /* === TRIPTYCH === */
+  .triptych {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    width: 100%;
+    max-width: 800px;
+  }
+
+  @media (max-width: 640px) {
+    .triptych { grid-template-columns: 1fr; }
+  }
+
+  .triptych-card {
+    text-align: center;
+    opacity: 0;
+    transform: translateY(40px) scale(0.95);
+    transition: opacity 0.7s ease, transform 0.7s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .triptych-card.visible { opacity: 1; transform: translateY(0) scale(1); }
+  .triptych-card:nth-child(2) { transition-delay: 0.2s; }
+  .triptych-card:nth-child(3) { transition-delay: 0.4s; }
+
+  .triptych-card:nth-child(1):hover { border-color: rgba(59,130,246,0.25); box-shadow: 0 0 40px rgba(59,130,246,0.08); }
+  .triptych-card:nth-child(2):hover { border-color: rgba(139,92,246,0.25); box-shadow: 0 0 40px rgba(139,92,246,0.08); }
+  .triptych-card:nth-child(3):hover { border-color: rgba(240,168,48,0.25); box-shadow: 0 0 40px rgba(240,168,48,0.08); }
+
+  .triptych-icon {
+    font-size: 2.8rem;
+    margin-bottom: 1.2rem;
+    display: block;
+    transition: transform 0.3s ease;
+  }
+
+  .triptych-card:hover .triptych-icon { transform: scale(1.15) translateY(-2px); }
+
+  .triptych-label {
+    font-family: var(--serif);
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+
+  .triptych-desc {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    line-height: 1.5;
+  }
+
+  /* === STATS GRID === */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+    width: 100%;
+  }
+
+  /* Stagger entrance */
+  .stats-grid .glass-sm {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .stats-grid .glass-sm.visible { opacity: 1; transform: translateY(0); }
+  .stats-grid .glass-sm:nth-child(1) { transition-delay: 0s; }
+  .stats-grid .glass-sm:nth-child(2) { transition-delay: 0.15s; }
+  .stats-grid .glass-sm:nth-child(3) { transition-delay: 0.3s; }
+  .stats-grid .glass-sm:nth-child(4) { transition-delay: 0.45s; }
+
+  @media (max-width: 640px) {
+    .stats-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  /* === MARKET MAP === */
+  .market-rings {
+    position: relative;
+    width: 300px;
+    height: 300px;
+    margin: 0;
+  }
+
+  .ring {
+    position: absolute;
+    border-radius: 50%;
+    border: 1px solid var(--glass-border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    opacity: 0;
+    transform: scale(0);
+    transition: opacity 0.8s ease, transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .ring.visible { opacity: 1; transform: scale(1); }
+
+  .ring-outer {
+    width: 300px; height: 300px;
+    top: 0; left: 0;
+    background: rgba(255,255,255,0.02);
+  }
+
+  .ring-mid {
+    width: 195px; height: 195px;
+    top: 52px; left: 52px;
+    background: rgba(255,255,255,0.03);
+    transition-delay: 0.2s;
+  }
+
+  .ring-inner {
+    width: 90px; height: 90px;
+    top: 105px; left: 105px;
+    background: linear-gradient(135deg, rgba(45,212,191,0.15), rgba(59,130,246,0.15));
+    border-color: rgba(59,130,246,0.3);
+    animation: innerGlow 3s ease-in-out infinite;
+    transition-delay: 0.4s;
+  }
+
+  @keyframes innerGlow {
+    0%, 100% { box-shadow: 0 0 30px rgba(59,130,246,0.1); }
+    50% { box-shadow: 0 0 80px rgba(59,130,246,0.3); }
+  }
+
+  .ring-label {
+    font-size: 0.6rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    padding: 0.5rem;
+    line-height: 1.4;
+  }
+
+  /* Fix label positioning */
+  .ring-outer .ring-label {
+    position: absolute;
+    top: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
+  }
+
+  .ring-mid .ring-label {
+    position: absolute;
+    top: 14px;
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
+  }
+
+  .ring-inner .ring-label {
+    color: var(--river-2);
+    font-size: 0.5rem;
+    line-height: 1.5;
+  }
+
+  /* === TIER COLUMNS === */
+  .tier-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    width: 100%;
+    max-width: 700px;
+  }
+
+  @media (max-width: 640px) {
+    .tier-grid { grid-template-columns: 1fr; }
+  }
+
+  .tier-header {
+    font-family: var(--serif);
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--glass-border);
+  }
+
+  .tier-item {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    padding: 0.4rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .tier-item::before {
+    content: '';
+    width: 4px; height: 4px;
+    border-radius: 50%;
+    background: var(--river-2);
+    flex-shrink: 0;
+  }
+
+  .tier-price {
+    font-family: var(--sans);
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--river-2);
+    margin-top: 1rem;
+  }
+
+  .tier-premium {
+    border-color: rgba(59,130,246,0.2);
+    box-shadow: 0 0 40px rgba(59,130,246,0.05);
+  }
+
+  .tier-premium:hover {
+    border-color: rgba(59,130,246,0.3);
+    box-shadow: 0 0 60px rgba(59,130,246,0.1);
+  }
+
+  /* === ROADMAP === */
+  .roadmap {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    max-width: 800px;
+    position: relative;
+  }
+
+  .roadmap-line {
+    position: absolute;
+    top: 50%;
+    left: 0; right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--river-1), var(--river-2), var(--river-3));
+    border-radius: 2px;
+    opacity: 0.4;
+    transform: translateY(-50%) scaleX(0);
+    transform-origin: left;
+  }
+
+  .roadmap-line.visible {
+    animation: lineGrow 1.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  @keyframes lineGrow {
+    to { transform: translateY(-50%) scaleX(1); }
+  }
+
+  .roadmap-node {
+    flex: 1;
+    text-align: center;
+    position: relative;
+    z-index: 1;
+    padding: 0 0.5rem;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .roadmap-node.visible { opacity: 1; transform: translateY(0); }
+  .roadmap-node:nth-child(2) { transition-delay: 0.3s; }
+  .roadmap-node:nth-child(3) { transition-delay: 0.6s; }
+  .roadmap-node:nth-child(4) { transition-delay: 0.9s; }
+  .roadmap-node:nth-child(5) { transition-delay: 1.2s; }
+
+  .roadmap-dot {
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    background: var(--river-2);
+    margin: 0 auto 0.75rem;
+    box-shadow: 0 0 20px rgba(59,130,246,0.4);
+    animation: dotPulse 2s ease-in-out infinite;
+  }
+
+  .roadmap-node:nth-child(3) .roadmap-dot { animation-delay: 0.5s; }
+  .roadmap-node:nth-child(4) .roadmap-dot { animation-delay: 1s; }
+  .roadmap-node:nth-child(5) .roadmap-dot { animation-delay: 1.5s; }
+
+  @keyframes dotPulse {
+    0%, 100% { box-shadow: 0 0 20px rgba(59,130,246,0.3); transform: scale(1); }
+    50% { box-shadow: 0 0 35px rgba(59,130,246,0.6); transform: scale(1.15); }
+  }
+
+  .roadmap-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    margin-bottom: 0.25rem;
+  }
+
+  .roadmap-text { font-size: 0.75rem; color: var(--text-dim); }
+
+  /* === CTA === */
+  .cta-card {
+    border: 1px solid rgba(240, 168, 48, 0.3);
+    animation: ctaPulse 3s ease-in-out infinite;
+    cursor: pointer;
+  }
+
+  @keyframes ctaPulse {
+    0%, 100% { box-shadow: 0 0 80px rgba(240, 168, 48, 0.08); }
+    50% { box-shadow: 0 0 120px rgba(240, 168, 48, 0.15), 0 0 200px rgba(240, 168, 48, 0.05); }
+  }
+
+  .cta-link {
+    color: var(--amber);
+    font-weight: 500;
+    font-size: 0.9rem;
+    text-decoration: none;
+    transition: text-shadow 0.3s ease;
+  }
+
+  .cta-card:hover { transform: translateY(-4px); }
+  .cta-card:hover .cta-link { text-shadow: 0 0 20px rgba(240,168,48,0.4); }
+
+  /* === NAV DOTS === */
+  .slide-counter {
+    position: fixed;
+    right: 2rem;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .slide-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.12);
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    cursor: pointer;
+  }
+
+  .slide-dot:hover { background: rgba(255,255,255,0.3); transform: scale(1.3); }
+
+  .slide-dot.active {
+    background: var(--river-2);
+    box-shadow: 0 0 12px rgba(59,130,246,0.6);
+    transform: scale(1.8);
+  }
+
+  /* === MINI RIVER === */
+  .mini-river { width: 100%; height: 180px; }
+  .mini-river-path {
+    fill: none;
+    stroke: url(#riverGrad);
+    stroke-width: 40;
+    stroke-linecap: round;
+    filter: blur(2px);
+    opacity: 0.8;
+  }
+
+  /* === SPECIAL CARDS === */
+  .philosophy-card {
+    border-color: rgba(240,168,48,0.12);
+    box-shadow: 0 0 100px rgba(240,168,48,0.06), inset 0 1px 0 rgba(255,255,255,0.05);
+  }
+  .philosophy-card:hover {
+    border-color: rgba(240,168,48,0.2);
+    box-shadow: 0 0 140px rgba(240,168,48,0.1);
+  }
+
+  .source-card {
+    border-color: rgba(240,168,48,0.15);
+    box-shadow: 0 0 80px rgba(240,168,48,0.06);
+  }
+  .source-card::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(240,168,48,0.3), transparent);
+  }
+  .source-card:hover {
+    border-color: rgba(240,168,48,0.25);
+    box-shadow: 0 0 120px rgba(240,168,48,0.1), 0 8px 40px rgba(0,0,0,0.2);
+  }
+
+  /* === RESPONSIVE === */
+  @media (max-width: 640px) {
+    .slide { padding: 2rem 1.5rem; }
+    .glass { padding: 1.5rem; }
+    .market-rings { width: 200px; height: 200px; }
+    .ring-outer { width: 200px; height: 200px; }
+    .ring-mid { width: 130px; height: 130px; top: 35px; left: 35px; }
+    .ring-inner { width: 60px; height: 60px; top: 70px; left: 70px; }
+    .device-frame { width: 220px; height: 460px; }
+    .slide-counter, .slide-num { display: none; }
+    .scroll-hint span { font-size: 0.5rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="scroll-progress" id="scrollProgress"></div>
+
+<!-- === INK WASH RIVER === -->
+<div class="ink-river-container" id="inkRiver">
+  <svg viewBox="0 0 1280 800" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <!-- Soul line gradient — always teal-blue core -->
+      <linearGradient id="soulGrad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#2dd4bf" stop-opacity="0"/>
+        <stop offset="15%" stop-color="#2dd4bf" stop-opacity="0.6"/>
+        <stop offset="50%" stop-color="#3b82f6" stop-opacity="0.8"/>
+        <stop offset="85%" stop-color="#8b5cf6" stop-opacity="0.6"/>
+        <stop offset="100%" stop-color="#8b5cf6" stop-opacity="0"/>
+      </linearGradient>
+
+      <!-- Per-slide ink gradients -->
+      <linearGradient id="inkGrad0" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#2dd4bf" stop-opacity="0"/>
+        <stop offset="20%" stop-color="#2dd4bf" stop-opacity="0.4"/>
+        <stop offset="80%" stop-color="#3b82f6" stop-opacity="0.3"/>
+        <stop offset="100%" stop-color="#3b82f6" stop-opacity="0"/>
+      </linearGradient>
+      <linearGradient id="inkGrad1" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#f87171" stop-opacity="0"/>
+        <stop offset="30%" stop-color="#f87171" stop-opacity="0.5"/>
+        <stop offset="70%" stop-color="#dc2626" stop-opacity="0.4"/>
+        <stop offset="100%" stop-color="#991b1b" stop-opacity="0"/>
+      </linearGradient>
+      <linearGradient id="inkGrad2" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#f0a830" stop-opacity="0"/>
+        <stop offset="25%" stop-color="#f0a830" stop-opacity="0.35"/>
+        <stop offset="75%" stop-color="#d97706" stop-opacity="0.25"/>
+        <stop offset="100%" stop-color="#92400e" stop-opacity="0"/>
+      </linearGradient>
+      <linearGradient id="inkGrad3" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#3b82f6" stop-opacity="0"/>
+        <stop offset="20%" stop-color="#3b82f6" stop-opacity="0.45"/>
+        <stop offset="80%" stop-color="#2dd4bf" stop-opacity="0.35"/>
+        <stop offset="100%" stop-color="#2dd4bf" stop-opacity="0"/>
+      </linearGradient>
+      <linearGradient id="inkGrad4" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#8b5cf6" stop-opacity="0"/>
+        <stop offset="20%" stop-color="#8b5cf6" stop-opacity="0.3"/>
+        <stop offset="50%" stop-color="#3b82f6" stop-opacity="0.35"/>
+        <stop offset="80%" stop-color="#2dd4bf" stop-opacity="0.25"/>
+        <stop offset="100%" stop-color="#2dd4bf" stop-opacity="0"/>
+      </linearGradient>
+      <linearGradient id="inkGrad5" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#f0a830" stop-opacity="0"/>
+        <stop offset="30%" stop-color="#f0a830" stop-opacity="0.4"/>
+        <stop offset="70%" stop-color="#b45309" stop-opacity="0.3"/>
+        <stop offset="100%" stop-color="#78350f" stop-opacity="0"/>
+      </linearGradient>
+      <linearGradient id="inkGrad6" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#2dd4bf" stop-opacity="0"/>
+        <stop offset="15%" stop-color="#2dd4bf" stop-opacity="0.5"/>
+        <stop offset="50%" stop-color="#3b82f6" stop-opacity="0.45"/>
+        <stop offset="85%" stop-color="#2dd4bf" stop-opacity="0.4"/>
+        <stop offset="100%" stop-color="#3b82f6" stop-opacity="0"/>
+      </linearGradient>
+      <linearGradient id="inkGrad7" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#3b82f6" stop-opacity="0"/>
+        <stop offset="20%" stop-color="#3b82f6" stop-opacity="0.4"/>
+        <stop offset="50%" stop-color="#8b5cf6" stop-opacity="0.35"/>
+        <stop offset="80%" stop-color="#3b82f6" stop-opacity="0.3"/>
+        <stop offset="100%" stop-color="#8b5cf6" stop-opacity="0"/>
+      </linearGradient>
+      <linearGradient id="inkGrad8" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#3b82f6" stop-opacity="0"/>
+        <stop offset="25%" stop-color="#3b82f6" stop-opacity="0.35"/>
+        <stop offset="75%" stop-color="#2dd4bf" stop-opacity="0.3"/>
+        <stop offset="100%" stop-color="#2dd4bf" stop-opacity="0"/>
+      </linearGradient>
+      <linearGradient id="inkGrad9" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#2dd4bf" stop-opacity="0"/>
+        <stop offset="20%" stop-color="#2dd4bf" stop-opacity="0.35"/>
+        <stop offset="50%" stop-color="#8b5cf6" stop-opacity="0.4"/>
+        <stop offset="80%" stop-color="#3b82f6" stop-opacity="0.35"/>
+        <stop offset="100%" stop-color="#8b5cf6" stop-opacity="0"/>
+      </linearGradient>
+      <linearGradient id="inkGrad10" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#f0a830" stop-opacity="0"/>
+        <stop offset="15%" stop-color="#f0a830" stop-opacity="0.55"/>
+        <stop offset="40%" stop-color="#d97706" stop-opacity="0.5"/>
+        <stop offset="60%" stop-color="#f0a830" stop-opacity="0.45"/>
+        <stop offset="85%" stop-color="#b45309" stop-opacity="0.4"/>
+        <stop offset="100%" stop-color="#f0a830" stop-opacity="0"/>
+      </linearGradient>
+
+      <!-- Soul line glow filter -->
+      <filter id="soulGlow" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur in="SourceGraphic" stdDeviation="2" result="blur"/>
+        <feMerge>
+          <feMergeNode in="blur"/>
+          <feMergeNode in="SourceGraphic"/>
+        </feMerge>
+      </filter>
+
+      <!-- Ink wash blur for each state -->
+      <filter id="inkBlur" x="-20%" y="-20%" width="140%" height="140%">
+        <feGaussianBlur in="SourceGraphic" stdDeviation="8"/>
+      </filter>
+      <filter id="inkBlurWide" x="-30%" y="-20%" width="160%" height="140%">
+        <feGaussianBlur in="SourceGraphic" stdDeviation="14"/>
+      </filter>
+      <filter id="inkBlurSplatter" x="-25%" y="-25%" width="150%" height="150%">
+        <feGaussianBlur in="SourceGraphic" stdDeviation="6"/>
+      </filter>
+
+      <!-- Turbulence filter for fast scroll -->
+      <filter id="inkTurbulence" x="-10%" y="-10%" width="120%" height="120%">
+        <feTurbulence type="fractalNoise" baseFrequency="0.015" numOctaves="2" seed="3" result="turb"/>
+        <feDisplacementMap in="SourceGraphic" in2="turb" scale="8" xChannelSelector="R" yChannelSelector="G"/>
+      </filter>
+    </defs>
+
+    <!-- Soul line — always present, thin bright centerline -->
+    <path id="soulLine" class="soul-line"
+      d="M640,0 C640,80 620,160 640,240 C660,320 630,400 640,480 C650,560 620,640 640,720 C660,780 640,790 640,800"/>
+
+    <!-- Ink wash states — one per slide, crossfaded -->
+    <!-- Slide 0: Hook — thin calligraphic stroke, teal -->
+    <g class="ink-state active" data-slide="0">
+      <path d="M640,0 C638,60 635,120 640,200 C645,280 632,360 640,440 C648,520 635,600 640,700 C642,750 640,780 640,800"
+        fill="none" stroke="url(#inkGrad0)" stroke-width="18" stroke-linecap="round" filter="url(#inkBlur)" opacity="0.7"/>
+      <path d="M640,50 C642,130 636,210 641,290 C646,370 634,450 639,530 C644,610 637,690 640,770"
+        fill="none" stroke="url(#inkGrad0)" stroke-width="6" stroke-linecap="round" filter="url(#inkBlur)" opacity="0.4"/>
+    </g>
+
+    <!-- Slide 1: Wound — aggressive splatter, coral/red -->
+    <g class="ink-state" data-slide="1">
+      <path d="M640,0 C680,50 580,120 660,200 C740,280 560,360 680,440 C750,500 570,560 650,650 C700,720 620,770 640,800"
+        fill="none" stroke="url(#inkGrad1)" stroke-width="35" stroke-linecap="round" filter="url(#inkBlurSplatter)" opacity="0.65"/>
+      <path d="M620,30 C700,100 540,180 670,260 C750,320 550,400 660,480 C730,540 580,620 640,750"
+        fill="none" stroke="url(#inkGrad1)" stroke-width="14" stroke-linecap="round" filter="url(#inkBlurSplatter)" opacity="0.4"/>
+      <!-- Splatter dots -->
+      <circle cx="580" cy="180" r="4" fill="#f87171" opacity="0.3" filter="url(#inkBlurSplatter)"/>
+      <circle cx="700" cy="320" r="6" fill="#f87171" opacity="0.25" filter="url(#inkBlurSplatter)"/>
+      <circle cx="560" cy="500" r="3" fill="#dc2626" opacity="0.2" filter="url(#inkBlurSplatter)"/>
+      <circle cx="720" cy="600" r="5" fill="#f87171" opacity="0.2" filter="url(#inkBlurSplatter)"/>
+    </g>
+
+    <!-- Slide 2: Philosophy — warm amber calligraphy, meditative -->
+    <g class="ink-state" data-slide="2">
+      <path d="M640,0 C635,80 630,160 635,250 C640,340 628,420 633,510 C638,590 630,670 635,760 C637,780 636,790 636,800"
+        fill="none" stroke="url(#inkGrad2)" stroke-width="22" stroke-linecap="round" filter="url(#inkBlur)" opacity="0.6"/>
+      <path d="M638,20 C633,110 637,200 634,290 C631,380 639,460 636,550 C633,640 637,730 636,790"
+        fill="none" stroke="url(#inkGrad2)" stroke-width="8" stroke-linecap="round" filter="url(#inkBlur)" opacity="0.35"/>
+    </g>
+
+    <!-- Slide 3: Product — centered confident blue -->
+    <g class="ink-state" data-slide="3">
+      <path d="M640,0 C640,70 640,150 640,230 C640,310 640,390 640,470 C640,550 640,630 640,710 C640,760 640,790 640,800"
+        fill="none" stroke="url(#inkGrad3)" stroke-width="28" stroke-linecap="round" filter="url(#inkBlur)" opacity="0.6"/>
+      <path d="M640,10 C641,90 639,170 640,250 C641,330 639,410 640,490 C641,570 639,650 640,730"
+        fill="none" stroke="url(#inkGrad3)" stroke-width="10" stroke-linecap="round" filter="url(#inkBlur)" opacity="0.35"/>
+    </g>
+
+    <!-- Slide 4: Experience — flowing wave, purple-blue-teal -->
+    <g class="ink-state" data-slide="4">
+      <path d="M640,0 C660,60 600,130 660,210 C720,290 580,370 650,450 C710,530 590,610 640,700 C660,750 640,790 640,800"
+        fill="none" stroke="url(#inkGrad4)" stroke-width="30" stroke-linecap="round" filter="url(#inkBlurWide)" opacity="0.55"/>
+      <path d="M650,40 C620,110 680,190 630,270 C580,350 690,430 640,510 C600,590 670,670 640,760"
+        fill="none" stroke="url(#inkGrad4)" stroke-width="12" stroke-linecap="round" filter="url(#inkBlur)" opacity="0.3"/>
+    </g>
+
+    <!-- Slide 5: Source — intimate side drift, amber glow -->
+    <g class="ink-state" data-slide="5">
+      <path d="M640,0 C620,70 600,150 580,240 C560,330 570,410 575,500 C580,580 590,660 600,740 C610,770 615,790 620,800"
+        fill="none" stroke="url(#inkGrad5)" stroke-width="24" stroke-linecap="round" filter="url(#inkBlur)" opacity="0.6"/>
+      <path d="M635,30 C615,100 605,180 590,270 C575,360 578,440 582,530 C586,620 592,700 605,770"
+        fill="none" stroke="url(#inkGrad5)" stroke-width="9" stroke-linecap="round" filter="url(#inkBlur)" opacity="0.35"/>
+    </g>
+
+    <!-- Slide 6: Proof — bold wide stroke, confident -->
+    <g class="ink-state" data-slide="6">
+      <path d="M640,0 C645,70 650,150 645,240 C640,330 648,410 643,500 C638,590 646,670 642,760 C640,780 641,790 640,800"
+        fill="none" stroke="url(#inkGrad6)" stroke-width="40" stroke-linecap="round" filter="url(#inkBlurWide)" opacity="0.6"/>
+      <path d="M640,20 C643,100 637,180 641,260 C645,340 636,420 641,500 C646,580 637,660 641,740"
+        fill="none" stroke="url(#inkGrad6)" stroke-width="14" stroke-linecap="round" filter="url(#inkBlur)" opacity="0.35"/>
+    </g>
+
+    <!-- Slide 7: Market — expansive wash, fills width -->
+    <g class="ink-state" data-slide="7">
+      <path d="M640,0 C700,60 540,140 700,230 C800,300 480,380 720,470 C840,530 500,610 680,700 C720,750 660,790 640,800"
+        fill="none" stroke="url(#inkGrad7)" stroke-width="45" stroke-linecap="round" filter="url(#inkBlurWide)" opacity="0.5"/>
+      <path d="M640,30 C580,90 720,170 580,260 C480,340 750,420 600,510 C500,580 700,660 640,760"
+        fill="none" stroke="url(#inkGrad7)" stroke-width="18" stroke-linecap="round" filter="url(#inkBlurWide)" opacity="0.25"/>
+    </g>
+
+    <!-- Slide 8: Model — balanced, symmetrical -->
+    <g class="ink-state" data-slide="8">
+      <path d="M640,0 C650,80 630,160 645,240 C660,320 620,400 640,480 C660,560 620,640 640,720 C650,770 640,790 640,800"
+        fill="none" stroke="url(#inkGrad8)" stroke-width="26" stroke-linecap="round" filter="url(#inkBlur)" opacity="0.55"/>
+      <path d="M640,15 C635,95 645,175 638,255 C631,335 649,415 640,495 C631,575 649,655 640,735"
+        fill="none" stroke="url(#inkGrad8)" stroke-width="10" stroke-linecap="round" filter="url(#inkBlur)" opacity="0.3"/>
+    </g>
+
+    <!-- Slide 9: Vision — forward-leaning, building energy -->
+    <g class="ink-state" data-slide="9">
+      <path d="M640,0 C660,60 670,140 680,220 C690,300 695,380 700,460 C705,540 700,620 690,700 C680,760 660,790 640,800"
+        fill="none" stroke="url(#inkGrad9)" stroke-width="32" stroke-linecap="round" filter="url(#inkBlurWide)" opacity="0.6"/>
+      <path d="M638,25 C655,85 662,165 672,245 C682,325 685,405 690,485 C693,565 688,645 680,725"
+        fill="none" stroke="url(#inkGrad9)" stroke-width="12" stroke-linecap="round" filter="url(#inkBlur)" opacity="0.35"/>
+    </g>
+
+    <!-- Slide 10: Ask — golden crescendo, maximum presence, all accumulated -->
+    <g class="ink-state" data-slide="10">
+      <path d="M640,0 C680,50 560,120 700,210 C780,280 520,370 720,460 C820,530 500,610 700,700 C740,750 670,790 640,800"
+        fill="none" stroke="url(#inkGrad10)" stroke-width="50" stroke-linecap="round" filter="url(#inkBlurWide)" opacity="0.65"/>
+      <path d="M640,20 C600,80 710,160 580,250 C500,320 740,400 600,490 C500,570 720,650 640,750"
+        fill="none" stroke="url(#inkGrad10)" stroke-width="22" stroke-linecap="round" filter="url(#inkBlurWide)" opacity="0.35"/>
+      <!-- Golden glow splatter for crescendo -->
+      <circle cx="560" cy="200" r="8" fill="#f0a830" opacity="0.15" filter="url(#inkBlurWide)"/>
+      <circle cx="740" cy="350" r="10" fill="#d97706" opacity="0.12" filter="url(#inkBlurWide)"/>
+      <circle cx="520" cy="480" r="7" fill="#f0a830" opacity="0.1" filter="url(#inkBlurWide)"/>
+      <circle cx="710" cy="620" r="9" fill="#d97706" opacity="0.12" filter="url(#inkBlurWide)"/>
+      <circle cx="580" cy="720" r="6" fill="#f0a830" opacity="0.1" filter="url(#inkBlurWide)"/>
+    </g>
+  </svg>
+</div>
+
+<!-- Anticipatory particles — carry next slide's color -->
+<div id="inkParticles"></div>
+
+<div class="ambient-glow" id="ambientGlow"></div>
+<div class="mouse-glow" id="mouseGlow"></div>
+
+<!-- Particles -->
+<div class="particle" style="left:10%; width:2px; height:2px; background:#3b82f6; animation-delay:0s; animation-duration:10s;"></div>
+<div class="particle" style="left:20%; width:3px; height:3px; background:#2dd4bf; animation-delay:1.5s; animation-duration:14s;"></div>
+<div class="particle" style="left:35%; width:2px; height:2px; background:#8b5cf6; animation-delay:3s; animation-duration:11s;"></div>
+<div class="particle" style="left:50%; width:1px; height:1px; background:#3b82f6; animation-delay:0.5s; animation-duration:16s;"></div>
+<div class="particle" style="left:65%; width:3px; height:3px; background:#2dd4bf; animation-delay:4s; animation-duration:12s;"></div>
+<div class="particle" style="left:75%; width:2px; height:2px; background:#8b5cf6; animation-delay:2s; animation-duration:13s;"></div>
+<div class="particle" style="left:85%; width:1px; height:1px; background:#3b82f6; animation-delay:5.5s; animation-duration:15s;"></div>
+<div class="particle" style="left:45%; width:2px; height:2px; background:#2dd4bf; animation-delay:6s; animation-duration:9s;"></div>
+<div class="particle" style="left:30%; width:1px; height:1px; background:#8b5cf6; animation-delay:7s; animation-duration:11s;"></div>
+<div class="particle" style="left:90%; width:2px; height:2px; background:#3b82f6; animation-delay:3.5s; animation-duration:14s;"></div>
+<div class="particle" style="left:5%; width:2px; height:2px; background:#2dd4bf; animation-delay:8s; animation-duration:12s;"></div>
+<div class="particle" style="left:95%; width:1px; height:1px; background:#8b5cf6; animation-delay:9s; animation-duration:10s;"></div>
+
+<nav class="slide-counter" id="slideNav"></nav>
+<div class="slide-num" id="slideNum">01 / 11</div>
+
+<!-- ===== SLIDE 1: THE HOOK ===== -->
+<section class="slide" data-slide="0">
+  <div class="slide-content">
+    <h1 class="shimmer-text">The River</h1>
+    <p style="letter-spacing: 0.3em; text-transform: uppercase; font-size: 0.75rem; color: var(--text-muted); font-weight: 300; overflow: hidden; white-space: nowrap; border-right: 2px solid rgba(255,255,255,0.3); width: 0; display: inline-block; animation: typewrite 1.5s steps(16) 1.5s forwards, blink 0.8s step-end infinite 1.5s;" id="typewriterText">PRACTICE FLOWS.</p>
+  </div>
+  <div class="scroll-hint" id="scrollHint">
+    <span>Scroll</span>
+    <div class="scroll-hint-arrow"></div>
+  </div>
+</section>
+
+<!-- ===== SLIDE 2: THE WOUND ===== -->
+<section class="slide" data-slide="1">
+  <div class="slide-content">
+    <p class="mega-stat">90%</p>
+    <p class="subtitle" style="max-width: 480px; margin: 2rem auto 0;">of guitar beginners quit within a year.<br><em style="color: var(--text-primary); font-weight: 400;">Not because it's hard. Because no one's watching.</em></p>
+  </div>
+</section>
+
+<!-- ===== SLIDE 3: THE PHILOSOPHY ===== -->
+<section class="slide" data-slide="2">
+  <div class="slide-content">
+    <div class="glass philosophy-card" style="max-width: 620px; margin: 0 auto;">
+      <p class="serif-quote">"I picked up the guitar because my dad used to play on Sunday mornings, and I want my daughter to have that."</p>
+      <p style="color: var(--amber); font-size: 0.65rem; margin-top: 1.5rem; text-transform: uppercase; letter-spacing: 0.15em; opacity: 0.6;">— A real answer from The Source</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===== SLIDE 4: THE PRODUCT ===== -->
+<section class="slide" data-slide="3" style="perspective: 800px;">
+  <div class="slide-content">
+    <div class="device-frame">
+      <div class="device-screen">
+        <p style="color: var(--text-dim); font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 0.5rem;">Total Practice</p>
+        <p style="font-size: 2.5rem; font-weight: 700; letter-spacing: -0.02em;">43h 25m</p>
+        <p style="color: var(--text-dim); font-size: 0.55rem; text-transform: uppercase; letter-spacing: 0.1em; margin: 0.5rem 0;">Last practiced: just now</p>
+        <div style="display: inline-flex; align-items: center; gap: 6px; background: rgba(59,130,246,0.15); border: 1px solid rgba(59,130,246,0.2); border-radius: 20px; padding: 4px 14px; margin: 0.5rem 0;">
+          <span style="width:6px;height:6px;border-radius:50%;background:var(--river-2);"></span>
+          <span style="font-size: 0.75rem; font-weight: 600; color: var(--river-2);">16 day flow</span>
+        </div>
+        <svg class="mini-river" viewBox="0 0 260 180" preserveAspectRatio="none">
+          <defs>
+            <linearGradient id="riverGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="#3b82f6" stop-opacity="0.9"/>
+              <stop offset="50%" stop-color="#2dd4bf" stop-opacity="0.7"/>
+              <stop offset="100%" stop-color="#3b82f6" stop-opacity="0.5"/>
+            </linearGradient>
+          </defs>
+          <path class="mini-river-path" d="M130,10 C160,30 100,50 140,70 C180,90 90,110 130,130 C170,150 80,170 130,180"/>
+        </svg>
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; width: 100%; margin-top: 0.25rem;">
+          <div style="background: rgba(255,255,255,0.04); border-radius: 10px; padding: 6px; text-align: center;">
+            <p style="font-weight: 700; font-size: 0.85rem;">1m</p>
+            <p style="font-size: 0.45rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.1em;">Today</p>
+          </div>
+          <div style="background: rgba(255,255,255,0.04); border-radius: 10px; padding: 6px; text-align: center;">
+            <p style="font-weight: 700; font-size: 0.85rem;">16</p>
+            <p style="font-size: 0.45rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.1em;">Streak</p>
+          </div>
+          <div style="background: rgba(255,255,255,0.04); border-radius: 10px; padding: 6px; text-align: center;">
+            <p style="font-weight: 700; font-size: 0.85rem;">83%</p>
+            <p style="font-size: 0.45rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.1em;">Week</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p class="subtitle" style="margin-top: 2rem; letter-spacing: 0.05em;">75 sessions. 43 hours. One river.</p>
+  </div>
+</section>
+
+<!-- ===== SLIDE 5: THE EXPERIENCE ===== -->
+<section class="slide" data-slide="4">
+  <div class="slide-content">
+    <div class="triptych">
+      <div class="triptych-card glass-sm">
+        <span class="triptych-icon">🎵</span>
+        <p class="triptych-label">Rain & Rhythm</p>
+        <p class="triptych-desc">Ambient timer with metronome and rain soundscapes. Deep focus for every session.</p>
+      </div>
+      <div class="triptych-card glass-sm">
+        <span class="triptych-icon">🌫️</span>
+        <p class="triptych-label">Fog Horns</p>
+        <p class="triptych-desc">Rest days that protect your streak. Because rivers pause but never stop.</p>
+      </div>
+      <div class="triptych-card glass-sm">
+        <span class="triptych-icon">📜</span>
+        <p class="triptych-label">Messages in Bottles</p>
+        <p class="triptych-desc">Write notes to your future self. They wash ashore when you need them most.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== SLIDE 6: THE SOURCE ===== -->
+<section class="slide" data-slide="5">
+  <div class="slide-content">
+    <h2>The Source</h2>
+    <p class="subtitle" style="max-width: 460px; margin: 0 auto 2rem;">The app remembers why you started.</p>
+    <div class="glass source-card" style="max-width: 500px; margin: 0 auto; text-align: left;">
+      <p style="font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--amber); margin-bottom: 1rem; opacity: 0.7;">Margin Note — Hour 25</p>
+      <p class="serif-quote" style="font-size: 1.1rem;">"You started because of Sunday mornings. Twenty-five hours in, the song is becoming yours."</p>
+      <p style="color: var(--text-dim); font-size: 0.7rem; margin-top: 1rem; font-style: italic;">Written silently by the app. Revealed at The Reading.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===== SLIDE 7: THE PROOF ===== -->
+<section class="slide" data-slide="6" id="proofSlide">
+  <div class="slide-content">
+    <h2 style="background: linear-gradient(135deg, var(--river-1), var(--text-primary), var(--river-2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">Built. Shipped. Played.</h2>
+    <div class="stats-grid" style="margin-top: 2.5rem;">
+      <div class="glass-sm">
+        <p class="stat-number" data-target="43" data-suffix="h">0</p>
+        <p class="stat-label">Hours tracked</p>
+      </div>
+      <div class="glass-sm">
+        <p class="stat-number" data-target="75" data-suffix="">0</p>
+        <p class="stat-label">Sessions logged</p>
+      </div>
+      <div class="glass-sm">
+        <p class="stat-number" data-target="0" data-suffix="">0</p>
+        <p class="stat-label">Servers needed</p>
+      </div>
+      <div class="glass-sm">
+        <p class="stat-number" data-target="100" data-suffix="%">0</p>
+        <p class="stat-label">Offline</p>
+      </div>
+    </div>
+    <p class="subtitle" style="margin-top: 2rem;">PWA. No backend. localStorage only.</p>
+  </div>
+</section>
+
+<!-- ===== SLIDE 8: THE MARKET ===== -->
+<section class="slide" data-slide="7">
+  <div class="slide-content">
+    <h2>$1.2B in guitar ed-tech.<br><span style="color: var(--river-2);">$0</span> for practice companions.</h2>
+
+    <div style="display: flex; gap: 2.5rem; align-items: center; margin: 1.5rem 0;">
+      <!-- Concentric rings -->
+      <div class="market-rings" id="marketRings" style="flex-shrink: 0;">
+        <div class="ring ring-outer">
+          <span class="ring-label">Guitar Ecosystem — $7.8B</span>
+        </div>
+        <div class="ring ring-mid">
+          <span class="ring-label">Learning — $1.2B</span>
+        </div>
+        <div class="ring ring-inner">
+          <span class="ring-label">Practice<br>Companion<br>?</span>
+        </div>
+      </div>
+
+      <!-- Competitor landscape -->
+      <div style="flex: 1; text-align: left;">
+        <p style="font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.15em; color: var(--text-dim); margin-bottom: 0.6rem;">Where the money went</p>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.35rem 1rem; font-size: 0.72rem;">
+          <div style="color: var(--text-muted);"><span style="color: #f87171;">Fender Play</span> — lessons · $100M+</div>
+          <div style="color: var(--text-muted);"><span style="color: #60a5fa;">Yousician</span> — AI tutor · $50M raised</div>
+          <div style="color: var(--text-muted);"><span style="color: #fbbf24;">Ultimate Guitar</span> — tabs · $50M acq.</div>
+          <div style="color: var(--text-muted);"><span style="color: #a78bfa;">Rocksmith+</span> — game · $50M+ dev</div>
+          <div style="color: var(--text-muted);"><span style="color: #34d399;">Guitar Tricks</span> — courses · 4M users</div>
+          <div style="color: var(--text-muted);"><span style="color: #f472b6;">JustinGuitar</span> — free lessons · 3M visits/mo</div>
+        </div>
+        <div style="margin-top: 0.8rem; padding-top: 0.6rem; border-top: 1px solid rgba(255,255,255,0.06);">
+          <p style="font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.15em; color: var(--text-dim); margin-bottom: 0.4rem;">What they all have in common</p>
+          <p style="font-size: 0.8rem; color: var(--text-secondary);">They teach. They don't <em style="color: var(--river-2);">keep you practicing.</em></p>
+          <p style="font-size: 0.65rem; color: var(--text-dim); margin-top: 0.5rem;">Strava didn't teach running. Headspace didn't invent meditation.<br>The River doesn't teach guitar. <span style="color: var(--text-primary);">It makes practice matter.</span></p>
+        </div>
+      </div>
+    </div>
+
+    <p class="subtitle" style="font-size: 0.7rem;">40M+ active guitarists worldwide · 90% quit in year one (Fender research) · Zero venture-funded practice companion</p>
+  </div>
+</section>
+
+<!-- ===== SLIDE 9: THE MODEL ===== -->
+<section class="slide" data-slide="8">
+  <div class="slide-content">
+    <h2>Free forever at the core.</h2>
+    <p class="subtitle" style="margin-bottom: 2rem;">Revenue comes from depth.</p>
+    <div class="tier-grid" style="margin: 0 auto;">
+      <div class="glass-sm">
+        <p class="tier-header">The River <span style="color: var(--text-dim); font-weight: 400;">Free</span></p>
+        <div class="tier-item">Unlimited practice timer</div>
+        <div class="tier-item">River visualization</div>
+        <div class="tier-item">Metronome + rain</div>
+        <div class="tier-item">1 Fog Horn / month</div>
+        <div class="tier-item">Basic insights</div>
+      </div>
+      <div class="glass-sm tier-premium">
+        <p class="tier-header">The Delta <span style="color: var(--river-2); font-weight: 400;">Premium</span></p>
+        <div class="tier-item">Everything in Free</div>
+        <div class="tier-item">3 Fog Horns / month</div>
+        <div class="tier-item">Messages in Bottles</div>
+        <div class="tier-item">The Source + margin notes</div>
+        <div class="tier-item">Share cards + analytics</div>
+        <p class="tier-price">$4.99<span style="font-size: 0.75rem; font-weight: 400; color: var(--text-muted);">/mo</span></p>
+      </div>
+    </div>
+    <p class="privacy-pledge">No ads. No data sold. Ever.</p>
+  </div>
+</section>
+
+<!-- ===== SLIDE 10: THE VISION ===== -->
+<section class="slide" data-slide="9" id="visionSlide">
+  <div class="slide-content">
+    <h2>Where the river goes</h2>
+    <p class="subtitle" style="margin-bottom: 3rem;">Guitar is the first river. It won't be the last.</p>
+    <div class="roadmap" id="roadmap">
+      <div class="roadmap-line" id="roadmapLine"></div>
+      <div class="roadmap-node">
+        <div class="roadmap-dot"></div>
+        <p class="roadmap-label">Now</p>
+        <p class="roadmap-text">PWA live</p>
+      </div>
+      <div class="roadmap-node">
+        <div class="roadmap-dot" style="background: var(--river-1);"></div>
+        <p class="roadmap-label">Q3 2026</p>
+        <p class="roadmap-text">iOS + Android</p>
+      </div>
+      <div class="roadmap-node">
+        <div class="roadmap-dot" style="background: var(--river-3);"></div>
+        <p class="roadmap-label">Q4 2026</p>
+        <p class="roadmap-text">Premium launch</p>
+      </div>
+      <div class="roadmap-node">
+        <div class="roadmap-dot" style="background: var(--amber);"></div>
+        <p class="roadmap-label">2027</p>
+        <p class="roadmap-text">Multi-instrument</p>
+      </div>
+    </div>
+    <p class="subtitle" style="margin-top: 3rem;">Every musician deserves a river.</p>
+  </div>
+</section>
+
+<!-- ===== SLIDE 11: THE ASK ===== -->
+<section class="slide" data-slide="10">
+  <div class="slide-content">
+    <h1 class="shimmer-text">Fund the river.</h1>
+    <p class="subtitle" style="max-width: 500px; margin: 1rem auto 2.5rem;">Seeking $750K pre-seed to bring The River to the 40 million guitarists practicing alone tonight.</p>
+    <div class="glass cta-card" style="max-width: 400px; margin: 0 auto;">
+      <p style="font-family: var(--serif); font-size: 1.2rem; margin-bottom: 0.5rem;">Let's talk.</p>
+      <p class="cta-link">the-river.app</p>
+    </div>
+    <p class="founder-note">Built by a musician. Funded by conviction.</p>
+  </div>
+</section>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  const triptychCards = document.querySelectorAll('.triptych-card');
+  const rings = document.querySelectorAll('.ring');
+  const roadmapLine = document.getElementById('roadmapLine');
+  const roadmapNodes = document.querySelectorAll('.roadmap-node');
+  const slideNum = document.getElementById('slideNum');
+  const ambientGlow = document.getElementById('ambientGlow');
+  const mouseGlow = document.getElementById('mouseGlow');
+  const scrollHint = document.getElementById('scrollHint');
+
+  const glowColors = [
+    'rgba(59,130,246,0.1)',
+    'rgba(248,113,113,0.12)',
+    'rgba(240,168,48,0.1)',
+    'rgba(59,130,246,0.12)',
+    'rgba(139,92,246,0.1)',
+    'rgba(240,168,48,0.1)',
+    'rgba(45,212,191,0.1)',
+    'rgba(59,130,246,0.1)',
+    'rgba(59,130,246,0.1)',
+    'rgba(139,92,246,0.1)',
+    'rgba(240,168,48,0.12)',
+  ];
+
+  const mouseGlowColors = [
+    'rgba(59,130,246,0.05)',
+    'rgba(248,113,113,0.06)',
+    'rgba(240,168,48,0.05)',
+    'rgba(59,130,246,0.06)',
+    'rgba(139,92,246,0.05)',
+    'rgba(240,168,48,0.05)',
+    'rgba(45,212,191,0.05)',
+    'rgba(59,130,246,0.05)',
+    'rgba(59,130,246,0.05)',
+    'rgba(139,92,246,0.05)',
+    'rgba(240,168,48,0.06)',
+  ];
+
+  let activeSlide = 0;
+
+  // ===== INK WASH RIVER ENGINE =====
+  const inkStates = document.querySelectorAll('.ink-state');
+  const soulLine = document.getElementById('soulLine');
+  const inkContainer = document.getElementById('inkRiver');
+  const inkParticlesContainer = document.getElementById('inkParticles');
+  let prevSlide = 0;
+  let scrollVelocity = 0;
+  let lastScrollY = 0;
+  let lastScrollTime = Date.now();
+  let settleTimeout = null;
+  let isSettled = false;
+  let accumulatedSlides = new Set([0]); // Track which slides have been visited
+
+  // Per-slide soul line paths — each slide has a unique centerline shape
+  const soulPaths = [
+    'M640,0 C640,80 620,160 640,240 C660,320 630,400 640,480 C650,560 620,640 640,720 C660,780 640,790 640,800',
+    'M640,0 C670,60 590,140 660,220 C730,300 570,380 660,460 C730,540 580,620 640,720 C660,780 640,790 640,800',
+    'M640,0 C635,80 625,170 632,260 C639,350 627,440 633,530 C639,620 630,710 635,780 C637,790 636,795 636,800',
+    'M640,0 C640,80 640,160 640,240 C640,320 640,400 640,480 C640,560 640,640 640,720 C640,760 640,790 640,800',
+    'M640,0 C660,70 610,150 660,230 C710,310 590,390 650,470 C700,550 600,630 640,720 C655,770 640,790 640,800',
+    'M640,0 C625,70 605,160 585,250 C565,340 572,430 578,520 C584,610 595,690 608,760 C615,780 618,790 620,800',
+    'M640,0 C644,80 648,160 644,240 C640,320 646,400 642,480 C638,560 644,640 641,720 C640,760 640,790 640,800',
+    'M640,0 C690,60 560,150 700,240 C790,310 500,400 710,490 C800,560 530,650 670,730 C700,770 660,790 640,800',
+    'M640,0 C648,80 632,160 644,240 C656,320 624,400 640,480 C656,560 624,640 640,720 C648,770 640,790 640,800',
+    'M640,0 C658,60 668,150 678,240 C688,330 692,420 696,510 C700,600 694,680 682,750 C668,780 652,790 640,800',
+    'M640,0 C680,50 570,130 700,220 C780,300 530,390 710,480 C810,550 510,640 690,720 C730,770 670,790 640,800',
+  ];
+
+  // Slide colors for anticipatory particles
+  const slideColors = [
+    '#2dd4bf', '#f87171', '#f0a830', '#3b82f6', '#8b5cf6',
+    '#f0a830', '#2dd4bf', '#3b82f6', '#3b82f6', '#8b5cf6', '#f0a830'
+  ];
+
+  // Create anticipatory particles
+  const PARTICLE_COUNT = 20;
+  const inkParticles = [];
+  for (let i = 0; i < PARTICLE_COUNT; i++) {
+    const p = document.createElement('div');
+    p.className = 'ink-particle';
+    const leftPos = 42 + Math.random() * 16; // Cluster around center (42-58%)
+    const drift = (Math.random() - 0.5) * 40;
+    const duration = 8 + Math.random() * 10;
+    const delay = Math.random() * duration;
+    p.style.cssText = `
+      left: ${leftPos}%;
+      width: ${2 + Math.random() * 3}px;
+      height: ${2 + Math.random() * 3}px;
+      --particle-drift: ${drift}px;
+      --particle-opacity: ${0.2 + Math.random() * 0.35};
+      animation: inkParticleDrift ${duration}s linear ${delay}s infinite;
+      background: ${slideColors[0]};
+    `;
+    inkParticlesContainer.appendChild(p);
+    inkParticles.push(p);
+  }
+
+  // Track visit order for accumulation decay
+  const slideVisitOrder = [0]; // ordered list of when slides were first visited
+
+  // Update ink wash state based on current slide
+  function updateInkWash(newSlideIdx) {
+    // Track visited slides for accumulation with visit order
+    if (!accumulatedSlides.has(newSlideIdx)) {
+      accumulatedSlides.add(newSlideIdx);
+      slideVisitOrder.push(newSlideIdx);
+    }
+
+    // Crossfade ink states with accumulation decay
+    const currentVisitIdx = slideVisitOrder.indexOf(newSlideIdx);
+    inkStates.forEach((state, i) => {
+      const slideIdx = parseInt(state.dataset.slide);
+      if (slideIdx === newSlideIdx) {
+        state.classList.add('active');
+        state.classList.remove('fading', 'fading-old');
+      } else if (accumulatedSlides.has(slideIdx)) {
+        // Accumulation decay: older visits fade more
+        const visitIdx = slideVisitOrder.indexOf(slideIdx);
+        const age = currentVisitIdx - visitIdx;
+        state.classList.remove('active');
+        if (age > 3) {
+          // Old ghosts fade further
+          state.classList.add('fading-old');
+          state.classList.remove('fading');
+        } else {
+          state.classList.add('fading');
+          state.classList.remove('fading-old');
+        }
+      } else {
+        state.classList.remove('active', 'fading', 'fading-old');
+      }
+    });
+
+    // Morph soul line with per-slide intensity
+    if (soulLine && soulPaths[newSlideIdx]) {
+      soulLine.setAttribute('d', soulPaths[newSlideIdx]);
+      const intensities = [0.4, 0.6, 0.35, 0.5, 0.4, 0.35, 0.55, 0.45, 0.4, 0.5, 0.7];
+      soulLine.style.setProperty('--soul-opacity', intensities[newSlideIdx]);
+    }
+
+    // Crescendo mode on final slide
+    inkContainer.classList.toggle('ink-crescendo', newSlideIdx === 10);
+
+    // Update anticipatory particles — carry NEXT slide's color
+    const nextSlide = Math.min(newSlideIdx + 1, 10);
+    const currentColor = slideColors[newSlideIdx];
+    const nextColor = slideColors[nextSlide];
+    inkParticles.forEach((p, i) => {
+      p.style.background = i < PARTICLE_COUNT * 0.6 ? currentColor : nextColor;
+      // Crescendo: particles get bigger and brighter on slide 10
+      if (newSlideIdx === 10) {
+        p.style.width = p.style.height = (3 + Math.random() * 4) + 'px';
+        p.style.filter = 'blur(1px)';
+      } else {
+        p.style.width = p.style.height = (2 + Math.random() * 3) + 'px';
+        p.style.filter = 'blur(0.5px)';
+      }
+    });
+
+    prevSlide = newSlideIdx;
+  }
+
+  // Scroll velocity tracking — proportional turbulence, not binary
+  function trackScrollVelocity() {
+    const now = Date.now();
+    const currentY = document.documentElement.scrollTop;
+    const dt = Math.max(now - lastScrollTime, 1);
+    scrollVelocity = Math.abs(currentY - lastScrollY) / dt;
+    lastScrollY = currentY;
+    lastScrollTime = now;
+
+    // Proportional velocity classes
+    inkContainer.classList.remove('ink-turbulent', 'ink-velocity-low', 'ink-velocity-med');
+    if (scrollVelocity > 2.0) {
+      inkContainer.classList.add('ink-turbulent');
+      inkContainer.classList.remove('ink-settled');
+      isSettled = false;
+    } else if (scrollVelocity > 1.0) {
+      inkContainer.classList.add('ink-velocity-med');
+      inkContainer.classList.remove('ink-settled');
+      isSettled = false;
+    } else if (scrollVelocity > 0.3) {
+      inkContainer.classList.add('ink-velocity-low');
+    }
+
+    // Spring-damper settle when scrolling stops
+    clearTimeout(settleTimeout);
+    settleTimeout = setTimeout(() => {
+      inkContainer.classList.remove('ink-velocity-low', 'ink-velocity-med');
+      if (!isSettled) {
+        inkContainer.classList.add('ink-settled');
+        isSettled = true;
+        setTimeout(() => {
+          inkContainer.classList.remove('ink-settled');
+        }, 2000);
+      }
+    }, 300);
+  }
+
+  window.addEventListener('scroll', trackScrollVelocity, { passive: true });
+
+  // Nav dots
+  const nav = document.getElementById('slideNav');
+  slides.forEach((_, i) => {
+    const dot = document.createElement('div');
+    dot.className = 'slide-dot';
+    dot.addEventListener('click', () => slides[i].scrollIntoView({ behavior: 'smooth' }));
+    nav.appendChild(dot);
+  });
+  const dots = document.querySelectorAll('.slide-dot');
+
+  // Mouse-following glow
+  document.addEventListener('mousemove', (e) => {
+    mouseGlow.style.left = e.clientX + 'px';
+    mouseGlow.style.top = e.clientY + 'px';
+  }, { passive: true });
+
+  // Slide visibility
+  const slideObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      const content = entry.target.querySelector('.slide-content');
+      if (entry.isIntersecting) {
+        content?.classList.add('visible');
+        const idx = parseInt(entry.target.dataset.slide);
+        activeSlide = idx;
+        updateInkWash(idx);
+        dots.forEach((d, i) => d.classList.toggle('active', i === idx));
+        slideNum.textContent = String(idx + 1).padStart(2, '0') + ' / 11';
+        ambientGlow.style.background = `radial-gradient(circle, ${glowColors[idx]} 0%, transparent 60%)`;
+        mouseGlow.style.background = `radial-gradient(circle, ${mouseGlowColors[idx]} 0%, transparent 60%)`;
+
+        // Hide scroll hint after first scroll
+        if (idx > 0 && scrollHint) scrollHint.style.opacity = '0';
+
+        // Counter animation with suffixes
+        entry.target.querySelectorAll('[data-target]').forEach(el => {
+          if (el.dataset.counted) return;
+          el.dataset.counted = 'true';
+          const target = parseInt(el.dataset.target);
+          const suffix = el.dataset.suffix || '';
+          const duration = 1800;
+          const start = performance.now();
+          const animate = (now) => {
+            const progress = Math.min((now - start) / duration, 1);
+            const eased = 1 - Math.pow(1 - progress, 4);
+            el.textContent = Math.round(target * eased) + suffix;
+            if (progress < 1) requestAnimationFrame(animate);
+          };
+          requestAnimationFrame(animate);
+        });
+      }
+    });
+  }, { threshold: 0.5 });
+  slides.forEach(s => slideObserver.observe(s));
+
+  // Triptych
+  const cardObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) entry.target.classList.add('visible');
+    });
+  }, { threshold: 0.3 });
+  triptychCards.forEach(c => cardObserver.observe(c));
+
+  // Stats stagger
+  const statsObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.querySelectorAll('.stats-grid .glass-sm').forEach(card => {
+          card.classList.add('visible');
+        });
+      }
+    });
+  }, { threshold: 0.4 });
+  const proofSlide = document.getElementById('proofSlide');
+  if (proofSlide) statsObserver.observe(proofSlide);
+
+  // Market rings
+  const ringObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) rings.forEach(r => r.classList.add('visible'));
+    });
+  }, { threshold: 0.4 });
+  const marketRings = document.getElementById('marketRings');
+  if (marketRings) ringObserver.observe(marketRings);
+
+  // Roadmap
+  const roadmapObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        roadmapLine?.classList.add('visible');
+        roadmapNodes.forEach(n => n.classList.add('visible'));
+      }
+    });
+  }, { threshold: 0.4 });
+  const visionSlide = document.getElementById('visionSlide');
+  if (visionSlide) roadmapObserver.observe(visionSlide);
+
+  // Scroll progress
+  const scrollProgress = document.getElementById('scrollProgress');
+  window.addEventListener('scroll', () => {
+    const scrollTop = document.documentElement.scrollTop;
+    const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
+    if (scrollHeight > 0) scrollProgress.style.width = ((scrollTop / scrollHeight) * 100) + '%';
+  }, { passive: true });
+
+  // Keyboard nav
+  let currentSlide = 0;
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowDown' || e.key === ' ' || e.key === 'ArrowRight') {
+      e.preventDefault();
+      currentSlide = Math.min(currentSlide + 1, slides.length - 1);
+      slides[currentSlide].scrollIntoView({ behavior: 'smooth' });
+    } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
+      e.preventDefault();
+      currentSlide = Math.max(currentSlide - 1, 0);
+      slides[currentSlide].scrollIntoView({ behavior: 'smooth' });
+    }
+  });
+
+  // Track slide from scroll
+  const scrollTracker = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) currentSlide = parseInt(entry.target.dataset.slide);
+    });
+  }, { threshold: 0.6 });
+  slides.forEach(s => scrollTracker.observe(s));
+
+  // Touch swipe support
+  let touchStartY = 0;
+  document.addEventListener('touchstart', (e) => {
+    touchStartY = e.touches[0].clientY;
+  }, { passive: true });
+
+  document.addEventListener('touchend', (e) => {
+    const diff = touchStartY - e.changedTouches[0].clientY;
+    if (Math.abs(diff) > 50) {
+      if (diff > 0) {
+        currentSlide = Math.min(currentSlide + 1, slides.length - 1);
+      } else {
+        currentSlide = Math.max(currentSlide - 1, 0);
+      }
+      slides[currentSlide].scrollIntoView({ behavior: 'smooth' });
+    }
+  }, { passive: true });
+</script>
+
+</body>
+</html>
