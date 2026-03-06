@@ -33,12 +33,14 @@ const tabs = [
   },
   {
     id: 'shed',
-    label: 'Shed',
+    label: 'Dock',
     icon: (
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M12 2L2 7l10 5 10-5-10-5z" />
-        <path d="M2 17l10 5 10-5" />
-        <path d="M2 12l10 5 10-5" />
+        {/* Pier post icon */}
+        <line x1="12" y1="3" x2="12" y2="21" />
+        <line x1="6" y1="3" x2="18" y2="3" />
+        <line x1="8" y1="8" x2="16" y2="8" />
+        <path d="M4 21c2-2 4-2 6 0s4 2 6 0s4-2 6 0" />
       </svg>
     ),
   },

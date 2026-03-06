@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback, useRef } from 'react';
 
 // ─── Music Theory Data ───
 
@@ -96,6 +96,33 @@ function getCAGEDPositions(rootIdx) {
 const FIFTHS_ORDER = ['C', 'G', 'D', 'A', 'E', 'B', 'F#', 'C#', 'G#', 'D#', 'A#', 'F'];
 const MINOR_FIFTHS = ['A', 'E', 'B', 'F#', 'C#', 'G#', 'D#', 'A#', 'F', 'C', 'G', 'D'];
 
+// ─── Tuning Frequencies ───
+const STRING_FREQS = [
+  { label: 'E', freq: 329.63 },  // high E
+  { label: 'B', freq: 246.94 },
+  { label: 'G', freq: 196.00 },
+  { label: 'D', freq: 146.83 },
+  { label: 'A', freq: 110.00 },
+  { label: 'E', freq: 82.41 },   // low E
+];
+
+// ─── Common Progressions ───
+function getProgressions(scale) {
+  if (scale === 'minor' || scale === 'dorian') {
+    return [
+      { name: 'Minor Pop', numerals: ['i', 'iv', 'VII', 'III'] },
+      { name: 'Andalusian', numerals: ['i', 'VI', 'III', 'VII'] },
+      { name: 'Natural Minor', numerals: ['i', 'iv', 'v', 'i'] },
+    ];
+  }
+  return [
+    { name: 'Pop/Rock', numerals: ['I', 'V', 'vi', 'IV'] },
+    { name: 'Blues/Country', numerals: ['I', 'IV', 'V', 'I'] },
+    { name: 'Jazz Essential', numerals: ['ii', 'V', 'I'] },
+    { name: '50s/Doo-wop', numerals: ['I', 'vi', 'IV', 'V'] },
+  ];
+}
+
 // ─── Intent Categories ───
 
 const INTENTS = [
@@ -112,18 +139,44 @@ function FretboardDiagram({ scaleNoteIndexes, rootIdx, showDegrees, highlightRan
   const STRINGS = 6;
   const LEFT = 32;
   const NUT_W = 4;
-  const FRET_W = 52;
+  const BASE_FRET_W = 52;
   const STRING_GAP = 28;
-  const TOP = 30;           // extra space for open string indicators
+  const TOP = 30;
   const DOT_R = 11;
-  const W = LEFT + NUT_W + FRETS * FRET_W + 10;
-  const H = TOP + (STRINGS - 1) * STRING_GAP + 40;
   const STRING_THICKNESS = [0.8, 1, 1.2, 1.6, 2, 2.4];
   const MARKERS = [3, 5, 7, 9, 12, 15];
   const DOUBLE_MARKERS = [12];
 
-  const fretX = (f) => LEFT + NUT_W + (f - 0.5) * FRET_W;
-  const fretLineX = (f) => LEFT + NUT_W + f * FRET_W;
+  // Proportional fret spacing (Luthier's Blueprint: fretWidth(n) = BASE * 0.9439^n)
+  const fretWidths = useMemo(() => {
+    const widths = [];
+    for (let i = 0; i < FRETS; i++) {
+      widths.push(BASE_FRET_W * Math.pow(0.9439, i));
+    }
+    return widths;
+  }, []);
+
+  // Cumulative positions for fret lines
+  const fretPositions = useMemo(() => {
+    const positions = [LEFT + NUT_W]; // fret 0 line = right edge of nut
+    let x = LEFT + NUT_W;
+    for (let i = 0; i < FRETS; i++) {
+      x += fretWidths[i];
+      positions.push(x);
+    }
+    return positions;
+  }, [fretWidths]);
+
+  const W = fretPositions[FRETS] + 10;
+  const H = TOP + (STRINGS - 1) * STRING_GAP + 40;
+
+  const fretX = (f) => {
+    if (f <= 0) return LEFT + NUT_W;
+    const left = fretPositions[f - 1];
+    const right = fretPositions[f];
+    return (left + right) / 2;
+  };
+  const fretLineX = (f) => fretPositions[f];
   const stringY = (s) => TOP + s * STRING_GAP;
 
   // Build degree lookup: noteIdx → degree string
@@ -155,7 +208,7 @@ function FretboardDiagram({ scaleNoteIndexes, rootIdx, showDegrees, highlightRan
           <rect
             x={fretLineX(highlightRange.start - 1) + 1}
             y={TOP - 6}
-            width={highlightRange.span * FRET_W - 2}
+            width={fretLineX(highlightRange.start - 1 + highlightRange.span) - fretLineX(highlightRange.start - 1) - 2}
             height={(STRINGS - 1) * STRING_GAP + 12}
             rx="3"
             fill="rgba(59,130,246,0.06)"
@@ -416,6 +469,86 @@ function ChordDiagram({ name, frets }) {
   );
 }
 
+// ─── Tuning Strip Component ───
+
+function TuningStrip() {
+  const audioCtxRef = useRef(null);
+  const activeOscRef = useRef(null);
+
+  const playString = useCallback((freq) => {
+    // Stop previous
+    if (activeOscRef.current) {
+      try { activeOscRef.current.stop(); } catch {}
+      activeOscRef.current = null;
+    }
+
+    if (!audioCtxRef.current) {
+      audioCtxRef.current = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    const ctx = audioCtxRef.current;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    osc.type = 'sine';
+    osc.frequency.value = freq;
+    gain.gain.value = 0.3;
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 2);
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start();
+    osc.stop(ctx.currentTime + 2);
+    activeOscRef.current = osc;
+  }, []);
+
+  return (
+    <div className="flex gap-1.5 mb-4">
+      {STRING_FREQS.map((s, i) => (
+        <button
+          key={i}
+          onClick={() => playString(s.freq)}
+          className="flex-1 card py-2 text-center active:scale-95 transition-all"
+        >
+          <span className="text-xs font-bold text-text-2">{s.label}</span>
+          <span className="text-[8px] text-text-3 block">{i === 0 ? 'hi' : i === 5 ? 'lo' : ''}</span>
+        </button>
+      ))}
+    </div>
+  );
+}
+
+// ─── Progression Strip Component ───
+
+function ProgressionStrips({ rootNote, scale, diatonicChords }) {
+  const progressions = useMemo(() => getProgressions(scale), [scale]);
+
+  // Map numeral to chord name
+  const numeralToChord = useCallback((numeral) => {
+    const clean = numeral.replace('°', '');
+    const chord = diatonicChords.find(c => c.numeral.replace('°', '') === clean);
+    if (!chord) return numeral;
+    return chord.quality === 'major' ? chord.root : `${chord.root}m`;
+  }, [diatonicChords]);
+
+  return (
+    <div className="space-y-2">
+      {progressions.map((prog, i) => (
+        <div key={i} className="card px-3 py-2.5 flex items-center gap-2">
+          <span className="text-[9px] text-text-3 font-medium w-16 shrink-0">{prog.name}</span>
+          <div className="flex gap-1.5 flex-1">
+            {prog.numerals.map((num, j) => (
+              <div key={j} className="flex-1 text-center">
+                <span className="text-[8px] text-text-3 block">{num}</span>
+                <span className="text-xs font-bold text-water-4">{numeralToChord(num)}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 // ─── Main Component ───
 
 export default function ShedPage() {
@@ -439,10 +572,13 @@ export default function ShedPage() {
   return (
     <div className="px-4 pt-14 pb-24">
       {/* Header */}
-      <div className="mb-5">
-        <h1 className="text-xl font-bold text-text">The Shed</h1>
-        <p className="text-xs text-text-3 mt-0.5">Guitar reference — organized by what you need</p>
+      <div className="mb-4">
+        <h1 className="text-xl font-bold text-text">The Dock</h1>
+        <p className="text-xs text-text-3 mt-0.5">Your launchpad — reference, tune, play</p>
       </div>
+
+      {/* Tuning Strip */}
+      <TuningStrip />
 
       {/* Root Lock — key selector */}
       <div className="mb-4">
@@ -514,6 +650,14 @@ export default function ShedPage() {
               <ChordCard key={i} {...chord} />
             ))}
           </div>
+
+          {/* Progressions */}
+          <div className="flex items-center gap-2 mt-6 mb-3">
+            <p className="text-[10px] font-semibold uppercase tracking-widest text-text-3">Progressions</p>
+            <div className="flex-1 h-px bg-dry" />
+          </div>
+          <ProgressionStrips rootNote={rootNote} scale={scale} diatonicChords={diatonicChords} />
+
           <p className="text-xs text-text-3 mb-2 mt-6">Scale notes</p>
           <div className="flex gap-1.5 mb-2">
             {scaleNoteIndexes.map((idx, i) => (
@@ -643,6 +787,11 @@ export default function ShedPage() {
           </div>
         </div>
       )}
+
+      {/* Easter egg */}
+      <p className="text-center text-text-3/30 text-[9px] mt-12 italic">
+        If the answer isn&apos;t here, just play the blues in E and look confident.
+      </p>
     </div>
   );
 }
