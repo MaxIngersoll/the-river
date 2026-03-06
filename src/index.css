@@ -1,11 +1,11 @@
 @import "tailwindcss";
 
 @theme {
-  /* ===== Light mode (default) ===== */
-  --color-bg: #F2F1ED;
-  --color-card: rgba(255, 255, 255, 0.55);
-  --color-card-border: rgba(255, 255, 255, 0.7);
-  --color-card-highlight: rgba(255, 255, 255, 0.9);
+  /* ===== Light mode (default) — River Glass ===== */
+  --color-bg: #EDEAE4;
+  --color-card: rgba(238, 243, 255, 0.58);
+  --color-card-border: rgba(0, 0, 0, 0.06);
+  --color-card-highlight: rgba(255, 255, 255, 0.90);
 
   --color-water-1: #BFDBFE;
   --color-water-2: #60A5FA;
@@ -13,17 +13,17 @@
   --color-water-4: #2563EB;
   --color-water-5: #1E40AF;
 
-  --color-dry: #E8E4DD;
-  --color-dry-bank: #D4C9BC;
+  --color-dry: #E2DDD5;
+  --color-dry-bank: #C8BBAC;
 
   --color-coral: #E8735A;
   --color-lavender: #A78BFA;
   --color-forest: #166534;
-  --color-amber: #F59E0B;
+  --color-amber: #B45309;
 
   --color-text: #1A1715;
   --color-text-2: #57534E;
-  --color-text-3: #A8A29E;
+  --color-text-3: #78716C;
 
   --font-serif: 'Lora', Georgia, serif;
   --font-sans: 'DM Sans', system-ui, -apple-system, sans-serif;
@@ -92,8 +92,9 @@ input, select, textarea {
   right: -20%;
   bottom: -20%;
   background:
-    radial-gradient(ellipse 60% 50% at 30% 20%, rgba(191, 219, 254, 0.08) 0%, transparent 60%),
-    radial-gradient(ellipse 50% 40% at 70% 70%, rgba(96, 165, 250, 0.06) 0%, transparent 50%);
+    radial-gradient(ellipse 55% 45% at 25% 15%, rgba(191, 219, 254, 0.16) 0%, transparent 55%),
+    radial-gradient(ellipse 45% 35% at 75% 75%, rgba(96, 165, 250, 0.10) 0%, transparent 45%),
+    radial-gradient(ellipse 65% 55% at 50% 50%, rgba(245, 235, 220, 0.18) 0%, transparent 55%);
   pointer-events: none;
   z-index: 0;
   transition: opacity 0.4s ease;
@@ -116,19 +117,22 @@ html.dark #root::before {
   overflow: hidden;
   transition: all 0.35s ease;
 
-  /* Frosted glass core */
+  /* Frosted glass — cool-tinted River Glass */
   background: var(--color-card);
-  backdrop-filter: blur(40px) saturate(180%) brightness(1.1);
-  -webkit-backdrop-filter: blur(40px) saturate(180%) brightness(1.1);
+  backdrop-filter: blur(40px) saturate(190%) brightness(1.05);
+  -webkit-backdrop-filter: blur(40px) saturate(190%) brightness(1.05);
 
-  /* Shadow — soft and diffuse */
+  /* Three-layer shadow + contact ring + Mach band inset */
   box-shadow:
-    0 2px 8px rgba(0, 0, 0, 0.04),
-    0 8px 32px rgba(0, 0, 0, 0.03),
-    inset 0 1px 0 var(--color-card-highlight);
+    0 1px 3px rgba(80, 100, 130, 0.07),
+    0 4px 16px rgba(80, 100, 130, 0.06),
+    0 12px 40px rgba(60, 80, 110, 0.04),
+    0 0 0 0.5px rgba(0, 0, 0, 0.05),
+    inset 0 1px 0 var(--color-card-highlight),
+    inset 0 0 0 0.5px rgba(255, 255, 255, 0.35);
 }
 
-/* Specular highlight — bright edge along top like glass catching light */
+/* Specular highlight — hot white against cool glass body */
 .card::before {
   content: '';
   position: absolute;
@@ -139,27 +143,29 @@ html.dark #root::before {
   background: linear-gradient(
     90deg,
     transparent 5%,
-    var(--color-card-highlight) 20%,
-    rgba(255, 255, 255, 0.5) 50%,
-    var(--color-card-highlight) 80%,
+    rgba(255, 255, 255, 0.75) 20%,
+    rgba(255, 255, 255, 0.95) 50%,
+    rgba(255, 255, 255, 0.75) 80%,
     transparent 95%
   );
   z-index: 1;
   pointer-events: none;
 }
 
-/* Inner refraction glow — simulates light passing through glass */
+/* Inner refraction — full height with gravity gradient (Cornsweet illusion) */
 .card::after {
   content: '';
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
-  height: 50%;
+  height: 100%;
   background: linear-gradient(
     180deg,
-    rgba(255, 255, 255, 0.08) 0%,
-    transparent 100%
+    rgba(255, 255, 255, 0.12) 0%,
+    rgba(255, 255, 255, 0.03) 40%,
+    transparent 60%,
+    rgba(0, 0, 0, 0.01) 100%
   );
   z-index: 0;
   pointer-events: none;
@@ -204,14 +210,15 @@ html.dark .card::after {
    ======================================== */
 .glass {
   position: relative;
-  background: rgba(255, 255, 255, 0.50);
-  backdrop-filter: blur(50px) saturate(200%) brightness(1.1);
-  -webkit-backdrop-filter: blur(50px) saturate(200%) brightness(1.1);
+  background: rgba(235, 241, 252, 0.58);
+  backdrop-filter: blur(50px) saturate(190%) brightness(1.04);
+  -webkit-backdrop-filter: blur(50px) saturate(190%) brightness(1.04);
   transition: all 0.35s ease;
-  border-color: rgba(255, 255, 255, 0.6);
+  border-color: rgba(0, 0, 0, 0.05);
+  box-shadow: 0 -1px 0 rgba(255, 255, 255, 0.6), 0 -4px 16px rgba(80, 100, 130, 0.04);
 }
 
-/* Specular top edge on glass tab bar */
+/* Specular top edge on glass tab bar — full white Mach band */
 .glass::before {
   content: '';
   position: absolute;
@@ -222,9 +229,9 @@ html.dark .card::after {
   background: linear-gradient(
     90deg,
     transparent,
-    rgba(255, 255, 255, 0.7) 30%,
-    rgba(255, 255, 255, 0.9) 50%,
-    rgba(255, 255, 255, 0.7) 70%,
+    rgba(255, 255, 255, 0.85) 30%,
+    rgba(255, 255, 255, 1.0) 50%,
+    rgba(255, 255, 255, 0.85) 70%,
     transparent
   );
   z-index: 1;
@@ -443,12 +450,12 @@ html.dark .theme-toggle-option.active {
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 200px;
-  height: 200px;
+  width: 220px;
+  height: 220px;
   transform: translate(-50%, -50%);
   background: radial-gradient(
     circle,
-    rgba(59, 130, 246, 0.12) 0%,
+    rgba(59, 130, 246, 0.10) 0%,
     rgba(37, 99, 235, 0.05) 40%,
     transparent 70%
   );
@@ -496,6 +503,32 @@ html.dark .hero-glow::before {
 button, [role="tab"], [role="tablist"], .card {
   -webkit-user-select: none;
   user-select: none;
+}
+
+/* ========================================
+   Progressive contrast enhancement (River Glass)
+   AAA mode for users who request increased contrast
+   ======================================== */
+@media (prefers-contrast: more) {
+  :root:not(.dark) {
+    --color-text-3: #534E48;
+    --color-card-border: rgba(0, 0, 0, 0.12);
+    --color-amber: #7C4508;
+  }
+
+  :root:not(.dark) .card {
+    box-shadow:
+      0 0 0 1px rgba(0, 0, 0, 0.10),
+      0 1px 3px rgba(80, 100, 130, 0.10),
+      0 4px 16px rgba(80, 100, 130, 0.08),
+      0 12px 40px rgba(60, 80, 110, 0.06),
+      inset 0 1px 0 var(--color-card-highlight),
+      inset 0 0 0 0.5px rgba(255, 255, 255, 0.45);
+  }
+
+  :root:not(.dark) .glass-input:focus {
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.40);
+  }
 }
 
 /* ========================================
