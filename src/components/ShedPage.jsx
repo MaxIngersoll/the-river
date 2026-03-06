@@ -362,15 +362,23 @@ function PositionDiagram({ scaleNoteIndexes, rootIdx, startFret, name }) {
   );
 }
 
-function ChordCard({ root, quality, numeral }) {
+function ChordCard({ root, quality, numeral, showBarre = false, showIntervals = false }) {
   const name = quality === 'major' ? root : quality === 'minor' ? `${root}m` : `${root}${quality}`;
-  const qualityColor = quality === 'major' ? 'text-water-4' : quality === 'minor' ? 'text-lavender' : 'text-coral';
+  const voicing = getChordVoicing(root, quality, showBarre);
+  const rootIdx = NOTES.indexOf(root);
+
   return (
-    <div className="card px-3 py-2.5 text-center">
-      <p className="text-[10px] text-text-3 font-medium mb-0.5">{numeral}</p>
-      <p className={`text-sm font-bold ${qualityColor}`}>{name}</p>
-      <p className="text-[9px] text-text-3 mt-0.5">
-        {CHORD_FORMULAS[quality]?.map(i => NOTES[(NOTES.indexOf(root) + i) % 12]).join(' · ')}
+    <div className="card px-2 py-2 text-center">
+      <p className="text-[9px] text-text-3 font-medium mb-0.5">{numeral}</p>
+      <ChordDiagram
+        name={name}
+        frets={voicing.frets}
+        barre={voicing.barre}
+        rootIdx={rootIdx}
+        showIntervals={showIntervals}
+      />
+      <p className="text-[8px] text-text-3 mt-0.5">
+        {CHORD_FORMULAS[quality]?.map(i => NOTES[(rootIdx + i) % 12]).join(' · ')}
       </p>
     </div>
   );
@@ -418,7 +426,102 @@ function CircleOfFifths({ selectedRoot, onSelect }) {
   );
 }
 
-// Common chord shapes for quick ref
+// ─── Chord Voicing Database ───
+// Open voicings keyed by note+quality (e.g. "C_major", "F#_minor")
+// frets: [E A D G B e] — -1 = muted, 0 = open
+// fingers: optional finger numbers for display
+// barre: fret number if barre chord
+
+const OPEN_VOICINGS = {
+  'C_major':  { frets: [-1, 3, 2, 0, 1, 0] },
+  'D_major':  { frets: [-1, -1, 0, 2, 3, 2] },
+  'E_major':  { frets: [0, 2, 2, 1, 0, 0] },
+  'F_major':  { frets: [1, 3, 3, 2, 1, 1], barre: 1 },
+  'G_major':  { frets: [3, 2, 0, 0, 0, 3] },
+  'A_major':  { frets: [-1, 0, 2, 2, 2, 0] },
+  'B_major':  { frets: [-1, 2, 4, 4, 4, 2], barre: 2 },
+  'C_minor':  { frets: [-1, 3, 5, 5, 4, 3], barre: 3 },
+  'D_minor':  { frets: [-1, -1, 0, 2, 3, 1] },
+  'E_minor':  { frets: [0, 2, 2, 0, 0, 0] },
+  'F_minor':  { frets: [1, 3, 3, 1, 1, 1], barre: 1 },
+  'G_minor':  { frets: [3, 5, 5, 3, 3, 3], barre: 3 },
+  'A_minor':  { frets: [-1, 0, 2, 2, 1, 0] },
+  'B_minor':  { frets: [-1, 2, 4, 4, 3, 2], barre: 2 },
+  'C_dim':    { frets: [-1, 3, 4, 2, 4, 2] },
+  'D_dim':    { frets: [-1, -1, 0, 1, 3, 1] },
+  'E_dim':    { frets: [0, 1, 2, 0, -1, -1] },
+  'F_dim':    { frets: [1, 2, 3, 1, -1, -1] },
+  'G_dim':    { frets: [3, 4, 5, 3, -1, -1] },
+  'A_dim':    { frets: [-1, 0, 1, 2, 1, -1] },
+  'B_dim':    { frets: [-1, 2, 3, 4, 3, -1] },
+  // Sharps/flats (enharmonic equivalents)
+  'C#_major': { frets: [-1, 4, 3, 1, 2, 1], barre: 1 },
+  'D#_major': { frets: [-1, -1, 1, 3, 4, 3], barre: 1 },
+  'F#_major': { frets: [2, 4, 4, 3, 2, 2], barre: 2 },
+  'G#_major': { frets: [4, 6, 6, 5, 4, 4], barre: 4 },
+  'A#_major': { frets: [-1, 1, 3, 3, 3, 1], barre: 1 },
+  'C#_minor': { frets: [-1, 4, 6, 6, 5, 4], barre: 4 },
+  'D#_minor': { frets: [-1, -1, 1, 3, 4, 2] },
+  'F#_minor': { frets: [2, 4, 4, 2, 2, 2], barre: 2 },
+  'G#_minor': { frets: [4, 6, 6, 4, 4, 4], barre: 4 },
+  'A#_minor': { frets: [-1, 1, 3, 3, 2, 1], barre: 1 },
+  'C#_dim':   { frets: [-1, 4, 5, 3, 5, 3] },
+  'D#_dim':   { frets: [-1, -1, 1, 2, 4, 2] },
+  'F#_dim':   { frets: [2, 3, 4, 2, -1, -1] },
+  'G#_dim':   { frets: [4, 5, 6, 4, -1, -1] },
+  'A#_dim':   { frets: [-1, 1, 2, 3, 2, -1] },
+};
+
+// E-form and A-form barre chord generators
+function getBarreVoicing(root, quality) {
+  const rootIdx = NOTES.indexOf(root);
+  // E-form barre (root on 6th string)
+  const eFret = (rootIdx - 4 + 12) % 12 || 12;
+  // A-form barre (root on 5th string)
+  const aFret = (rootIdx - 9 + 12) % 12 || 12;
+
+  if (quality === 'major') {
+    return eFret <= 7
+      ? { frets: [eFret, eFret + 2, eFret + 2, eFret + 1, eFret, eFret], barre: eFret }
+      : { frets: [-1, aFret, aFret + 2, aFret + 2, aFret + 2, aFret], barre: aFret };
+  }
+  if (quality === 'minor') {
+    return eFret <= 7
+      ? { frets: [eFret, eFret + 2, eFret + 2, eFret, eFret, eFret], barre: eFret }
+      : { frets: [-1, aFret, aFret + 2, aFret + 2, aFret + 1, aFret], barre: aFret };
+  }
+  return null;
+}
+
+// Look up the best voicing for a chord
+function getChordVoicing(root, quality, preferBarre = false) {
+  const key = `${root}_${quality}`;
+  if (preferBarre) {
+    const barre = getBarreVoicing(root, quality);
+    if (barre) return barre;
+  }
+  return OPEN_VOICINGS[key] || getBarreVoicing(root, quality) || { frets: [-1, -1, -1, -1, -1, -1] };
+}
+
+// Interval color system: root=blue, 3rd=warm, 5th=neutral, 7th=purple
+const INTERVAL_COLORS = {
+  root: '#2563EB',   // vivid blue
+  third: '#F59E0B',  // warm amber
+  fifth: '#64748B',  // neutral slate
+  seventh: '#A78BFA', // purple
+  other: '#3B82F6',  // default blue
+};
+
+function getIntervalColor(noteIdx, rootIdx, quality) {
+  const interval = (noteIdx - rootIdx + 12) % 12;
+  if (interval === 0) return INTERVAL_COLORS.root;
+  if (interval === 3 || interval === 4) return INTERVAL_COLORS.third; // minor or major 3rd
+  if (interval === 7) return INTERVAL_COLORS.fifth;
+  if (interval === 10 || interval === 11) return INTERVAL_COLORS.seventh; // minor or major 7th
+  return INTERVAL_COLORS.other;
+}
+
+// Common chord shapes for quick ref (kept for backward compat)
 const COMMON_SHAPES = [
   { name: 'E Major', frets: [0, 2, 2, 1, 0, 0] },
   { name: 'A Major', frets: [-1, 0, 2, 2, 2, 0] },
@@ -434,36 +537,57 @@ const COMMON_SHAPES = [
   { name: 'A7', frets: [-1, 0, 2, 0, 2, 0] },
 ];
 
-function ChordDiagram({ name, frets }) {
+function ChordDiagram({ name, frets, rootIdx, barre, showIntervals = false }) {
   const FRETS_SHOWN = 4;
-  const minFret = Math.max(0, Math.min(...frets.filter(f => f > 0)));
+  const playedFrets = frets.filter(f => f > 0);
+  const minFret = playedFrets.length > 0 ? Math.min(...playedFrets) : 0;
   const offset = minFret > 2 ? minFret - 1 : 0;
 
   return (
     <div className="text-center">
       <p className="text-[10px] font-bold text-text-2 mb-1">{name}</p>
-      <svg viewBox="0 0 50 56" className="w-12 mx-auto">
+      <svg viewBox="0 0 50 60" className="w-14 mx-auto">
         {/* Nut or position indicator */}
         {offset === 0 ? (
-          <rect x="8" y="8" width="34" height="2" fill="currentColor" className="text-text-2" />
+          <rect x="8" y="8" width="34" height="2.5" rx="0.5" fill="currentColor" className="text-text-2" />
         ) : (
-          <text x="5" y="18" fontSize="6" fill="#A8A29E" textAnchor="middle">{offset + 1}</text>
+          <text x="4" y="18" fontSize="6" fill="#A8A29E" textAnchor="middle" fontWeight="600">{offset + 1}</text>
+        )}
+        {/* Barre indicator */}
+        {barre && barre > offset && (
+          <rect
+            x="7" y={10 + (barre - offset - 0.5) * 10 - 2.5}
+            width="36" height="5" rx="2.5"
+            fill="rgba(59,130,246,0.2)" stroke="rgba(59,130,246,0.3)" strokeWidth="0.5"
+          />
         )}
         {/* Fret lines */}
         {Array.from({ length: FRETS_SHOWN + 1 }, (_, i) => (
           <line key={i} x1="8" y1={10 + i * 10} x2="42" y2={10 + i * 10} stroke="#57534E" strokeWidth="0.5" />
         ))}
-        {/* String lines */}
+        {/* String lines with gauge variation */}
         {Array.from({ length: 6 }, (_, i) => (
-          <line key={i} x1={8 + i * 6.8} y1="10" x2={8 + i * 6.8} y2={10 + FRETS_SHOWN * 10} stroke="#57534E" strokeWidth="0.5" />
+          <line key={i} x1={8 + i * 6.8} y1="10" x2={8 + i * 6.8} y2={10 + FRETS_SHOWN * 10}
+            stroke="#57534E" strokeWidth={0.4 + (5 - i) * 0.08} />
         ))}
-        {/* Finger positions */}
+        {/* Finger positions with interval colors */}
         {frets.map((f, i) => {
           const x = 8 + i * 6.8;
           if (f === -1) return <text key={i} x={x} y="6" fontSize="6" textAnchor="middle" fill="#E8735A">×</text>;
-          if (f === 0) return <circle key={i} cx={x} cy="6" r="2" fill="none" stroke="#A8A29E" strokeWidth="0.5" />;
+          if (f === 0) return <circle key={i} cx={x} cy="6" r="2" fill="none" stroke="#A8A29E" strokeWidth="0.6" />;
           const y = 10 + (f - offset - 0.5) * 10;
-          return <circle key={i} cx={x} cy={y} r="2.5" fill="#3B82F6" />;
+          // Determine interval color
+          const noteIdx = (OPEN_STRINGS[i] + f) % 12;
+          const color = showIntervals && rootIdx != null
+            ? getIntervalColor(noteIdx, rootIdx, 'major')
+            : '#3B82F6';
+          const isRoot = rootIdx != null && noteIdx === rootIdx;
+          return (
+            <g key={i}>
+              <circle cx={x} cy={y} r={isRoot ? 3.2 : 2.5} fill={color} />
+              {isRoot && <circle cx={x} cy={y} r={3.2} fill="none" stroke="white" strokeWidth="0.4" opacity={0.5} />}
+            </g>
+          );
         })}
       </svg>
     </div>
@@ -520,6 +644,11 @@ function TuningStrip() {
 
 // ─── Progression Strip Component ───
 
+// Dispatch a custom event to start the timer from any component
+function dispatchTimerStart(note) {
+  window.dispatchEvent(new CustomEvent('river-start-timer', { detail: { note } }));
+}
+
 function ProgressionStrips({ rootNote, scale, diatonicChords }) {
   const progressions = useMemo(() => getProgressions(scale), [scale]);
 
@@ -531,11 +660,16 @@ function ProgressionStrips({ rootNote, scale, diatonicChords }) {
     return chord.quality === 'major' ? chord.root : `${chord.root}m`;
   }, [diatonicChords]);
 
+  const handlePractice = useCallback((prog) => {
+    const chordNames = prog.numerals.map(n => numeralToChord(n)).join(' → ');
+    dispatchTimerStart(`${rootNote} ${prog.name}: ${chordNames}`);
+  }, [rootNote, numeralToChord]);
+
   return (
     <div className="space-y-2">
       {progressions.map((prog, i) => (
         <div key={i} className="card px-3 py-2.5 flex items-center gap-2">
-          <span className="text-[9px] text-text-3 font-medium w-16 shrink-0">{prog.name}</span>
+          <span className="text-[9px] text-text-3 font-medium w-14 shrink-0">{prog.name}</span>
           <div className="flex gap-1.5 flex-1">
             {prog.numerals.map((num, j) => (
               <div key={j} className="flex-1 text-center">
@@ -544,6 +678,16 @@ function ProgressionStrips({ rootNote, scale, diatonicChords }) {
               </div>
             ))}
           </div>
+          <button
+            onClick={() => handlePractice(prog)}
+            className="shrink-0 w-7 h-7 rounded-full flex items-center justify-center active:scale-90 transition-all"
+            style={{ background: 'linear-gradient(135deg, rgba(59,130,246,0.8), rgba(30,64,175,0.9))' }}
+            aria-label={`Practice ${prog.name} progression`}
+          >
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="white">
+              <polygon points="5,3 19,12 5,21" />
+            </svg>
+          </button>
         </div>
       ))}
     </div>
@@ -698,25 +842,46 @@ function CurrentCard({ sessions, onSetRoot, onSetScale, onSetIntent }) {
   // Build suggestion text
   const suggestion = `Try ${explore.root} ${SCALE_NAMES[explore.scale]} — focus on ${leastTag}`;
 
+  const handleFlow = useCallback(() => {
+    onSetRoot(explore.root);
+    onSetScale(explore.scale);
+    onSetIntent('scale');
+  }, [explore, onSetRoot, onSetScale, onSetIntent]);
+
+  const handleStartTimer = useCallback((e) => {
+    e.stopPropagation();
+    dispatchTimerStart(`${explore.root} ${SCALE_NAMES[explore.scale]} — ${leastTag}`);
+  }, [explore, leastTag]);
+
   return (
-    <button
-      onClick={() => {
-        onSetRoot(explore.root);
-        onSetScale(explore.scale);
-        onSetIntent('scale');
-      }}
+    <div
       className="w-full card p-4 mb-5 text-left active:scale-[0.98] transition-all group"
-      style={{
-        borderLeft: '3px solid rgba(59,130,246,0.4)',
-      }}
+      style={{ borderLeft: '3px solid rgba(59,130,246,0.4)' }}
     >
       <div className="flex items-center justify-between mb-1">
         <span className="text-[10px] font-semibold text-water-4 uppercase tracking-widest">The Current</span>
-        <span className="text-[9px] text-text-3 opacity-0 group-hover:opacity-100 transition-opacity">Tap to load</span>
       </div>
-      <p className="text-sm text-text font-medium">{suggestion}</p>
-      <p className="text-[9px] text-text-3 mt-1">Based on your last {Math.min(sessions.length, 14)} sessions</p>
-    </button>
+      <button onClick={handleFlow} className="text-left w-full">
+        <p className="text-sm text-text font-medium">{suggestion}</p>
+        <p className="text-[9px] text-text-3 mt-1">Based on your last {Math.min(sessions.length, 14)} sessions</p>
+      </button>
+      <div className="flex items-center gap-2 mt-3">
+        <button
+          onClick={handleStartTimer}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-semibold text-white active:scale-95 transition-all"
+          style={{ background: 'linear-gradient(135deg, rgba(59,130,246,0.9), rgba(30,64,175,0.95))' }}
+        >
+          <svg width="8" height="8" viewBox="0 0 24 24" fill="white"><polygon points="5,3 19,12 5,21" /></svg>
+          Flow
+        </button>
+        <button
+          onClick={handleFlow}
+          className="px-3 py-1.5 rounded-full text-[10px] font-medium text-text-3 active:scale-95 transition-all"
+        >
+          Load reference
+        </button>
+      </div>
+    </div>
   );
 }
 
@@ -728,6 +893,8 @@ export default function ShedPage({ sessions = [], onNavigate }) {
   const [intent, setIntent] = useState('chords');
   const [showDegrees, setShowDegrees] = useState(false);
   const [activePosition, setActivePosition] = useState(null);
+  const [showBarre, setShowBarre] = useState(false);
+  const [showIntervals, setShowIntervals] = useState(true);
 
   const rootIdx = NOTES.indexOf(rootNote);
   const scaleNoteIndexes = useMemo(() => getScaleNotes(rootNote, scale), [rootNote, scale]);
@@ -828,12 +995,32 @@ export default function ShedPage({ sessions = [], onNavigate }) {
       {/* Content based on intent */}
       {intent === 'chords' && (
         <div>
-          <p className="text-xs text-text-3 mb-3">
-            Diatonic chords in <span className="text-water-4 font-semibold">{rootNote} {SCALE_NAMES[scale]}</span>
-          </p>
+          <div className="flex items-center justify-between mb-3">
+            <p className="text-xs text-text-3">
+              Diatonic chords in <span className="text-water-4 font-semibold">{rootNote} {SCALE_NAMES[scale]}</span>
+            </p>
+            <div className="flex gap-1.5">
+              <button
+                onClick={() => setShowBarre(b => !b)}
+                className={`px-2 py-1 rounded-full text-[9px] font-semibold transition-all active:scale-95 ${
+                  showBarre ? 'bg-water-2/20 text-water-5' : 'card text-text-3'
+                }`}
+              >
+                Barre
+              </button>
+              <button
+                onClick={() => setShowIntervals(v => !v)}
+                className={`px-2 py-1 rounded-full text-[9px] font-semibold transition-all active:scale-95 ${
+                  showIntervals ? 'bg-water-2/20 text-water-5' : 'card text-text-3'
+                }`}
+              >
+                Colors
+              </button>
+            </div>
+          </div>
           <div className="grid grid-cols-4 gap-2 mb-4">
             {diatonicChords.map((chord, i) => (
-              <ChordCard key={i} {...chord} />
+              <ChordCard key={i} {...chord} showBarre={showBarre} showIntervals={showIntervals} />
             ))}
           </div>
 
