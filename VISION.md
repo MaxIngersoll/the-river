@@ -63,14 +63,48 @@ It's not a dashboard. It's a *place*. The river metaphor isn't decorative — it
 - **Problem:** Work was left uncommitted in loving-euclid worktree. Lost session context. This caused frustration.
 - Max's feedback on fretboard: *"terrible, not clear, not easy to see, not useful"* — rebuilt as proper SVG with nut, frets, inlays, proper sizing.
 
-### Session 6 (Current): Resumption
+### Session 6: Resumption
 - Recovered all context from loving-euclid worktree docs
 - Created this VISION.md to prevent context loss
-- 4 new competitions prepared but not yet evaluated:
-  - A: The Dock (guitar reference overhaul)
-  - B: Light Theme quality gap
-  - C: Pitch Deck content & narrative
-  - D: The Living River (in-app river redesign)
+- Evaluated all 4 competitions (A–D), implemented winners for B, D Phase 1, A Phase 1
+
+### Session 7: The Current Card + Quick Start
+- Implemented Practice Intelligence engine (Continue/Explore/Challenge)
+- Built CurrentCard: context-aware smart suggestion at top of The Dock
+- Built QuickStartCards: triptych of practice modes
+- Added `sessions` + `onNavigate` props from App.jsx to ShedPage
+
+### Session 8 (Current): Three Features + Two Competitions
+- **Methodology Reflection:** Created `docs/competitions/METHODOLOGY.md` — captured lessons from past competitions. Key innovation: "Build While Competing" (implement foundations while competitions run in background).
+- **Competition E: "The Fingers & The Flow"** — Chord diagrams + timer integration. Winner: B6 "Luthier's Blueprint" (42/50). Synthesis: "The Luthier's Current".
+- **Competition F: "The Atmosphere"** — River everywhere + onboarding + data safety. 3 personas: Interior Designer, Storyteller, Archivist. Results pending.
+
+#### Feature 1: Dynamic Chord Fingering Diagrams
+- Added comprehensive `OPEN_VOICINGS` database (35+ chord voicings)
+- Added algorithmic `getBarreVoicing()` for E-form + A-form barre computation
+- Enhanced `ChordDiagram` SVG: interval-colored dots, barre indicators, string gauge variation
+- Replaced ChordCard to render real fingering positions, not just note names
+- Added Barre/Colors toggle buttons in chord view
+- Interval color system: root=blue, 3rd=amber, 5th=slate, 7th=purple
+
+#### Feature 2: Timer Integration ("Practice This" Flow)
+- Created `CustomEvent` bridge: `river-start-timer` event
+- Added `dispatchTimerStart()` helper in ShedPage
+- Modified TimerFAB to listen for external start events with `prefillNote`
+- Added play buttons to ProgressionStrips (auto-generates session note from key + progression)
+- Added "Flow" button on CurrentCard (start timer with practice context)
+
+#### Feature 3: Season Ambient System ("River Everywhere")
+- Created `src/contexts/SeasonContext.jsx` — season detection + `data-season` CSS attribute
+- Season engine: analyzes 2-week/4-week practice windows → spring/summer/autumn/winter
+- Added 8 CSS ambient gradient rules (4 seasons × light/dark mode)
+- Added season-tinted hero glow overrides (spring, autumn, winter)
+- Wrapped app root with SeasonProvider in App.jsx
+
+#### Max's Feedback
+- *"Dive into all three of the fingering diagrams, timer integration, and river everywhere."*
+- *"Take it to another level in efficiency and quality."*
+- Strategy: build while competitions run, reflect on methodology first
 
 ---
 
@@ -107,6 +141,7 @@ It's not a dashboard. It's a *place*. The river metaphor isn't decorative — it
 ### What's Built & Working
 - Full Liquid Glass UI (dark + light modes, blue/indigo palette)
 - Timer FAB (start/pause/stop/save with localStorage persistence)
+- Timer integration: external start via CustomEvent bridge (`river-start-timer`)
 - Soundscape panel (rain + metronome with Web Audio API)
 - Share cards (canvas-based 1080x1080 with native share)
 - Reading Ceremony (margin notes surface at 10/25/50h)
@@ -117,23 +152,31 @@ It's not a dashboard. It's a *place*. The river metaphor isn't decorative — it
 - Celebration overlay (milestones, fog days, bottles)
 - Error boundary, offline support, PWA
 - 32+ milestones across hours/streak/sessions
-
-### What's In Progress (unmerged from loving-euclid)
-- ShedPage.jsx (guitar reference with Root Lock, SVG fretboard, CAGED, Circle of Fifths)
+- The Dock: tuning strip, progressions, proportional frets, CAGED, Circle of Fifths
+- The Dock: CurrentCard (practice intelligence), QuickStartCards (Continue/Explore/Challenge)
+- The Dock: dynamic chord fingering diagrams (SVG, 35+ open voicings, barre computation, interval colors)
+- The Dock: "Practice This" flow — play buttons on progressions + Flow button on CurrentCard
+- Season ambient system: SeasonContext + data-season CSS + 4-season ambient gradients
+- Living River: soul line, seasonal particles, season engine (RiverSVG.jsx)
+- River Glass light theme (cool-tinted glass, WCAG AA)
 - Petrichor audio engine (3-layer brown noise rain with LFO)
 - Breathing FAB animation
-- Ink Wash pitch deck visualization
+- Ink Wash pitch deck (pitch.html)
 
-### Competition Results (Session 6)
-- **Competition B: Light Theme** — WINNER: "River Glass" synthesis. **IMPLEMENTED.** Cool-tinted glass, dark border Mach bands, WCAG AA fixes. Wildcard: Mother of Pearl. Comedy: The Nuclear Option.
-- **Competition D: Living River** — WINNER: 3-layer synthesis. **IMPLEMENTED (Phase 1).** Soul line, seasonal particles, season engine. Wildcard: Emotional River States.
-- **Competition A: The Dock** — WINNER: "The Current" + "The Dock" synthesis. **IMPLEMENTED (Phase 1).** Renamed Shed→Dock, tuning strip, progressions, proportional fret spacing, easter egg. Phase 2 (Current Card, Quick Start) still pending.
-- **Competition C: Pitch Deck** — WINNER: "Maya's River" synthesis. The Dropout's Diary (45/50) + The Flipbook + Split Screen + 24 Hours. Wildcard: The Flipbook. Comedy: The Set List. **AWAITING IMPLEMENTATION.**
+### What's Next
+- Competition F results (atmosphere, onboarding, data export) — pending
+- Onboarding flow for first-time users
+- Data export/import in Settings (localStorage safety net)
+- Refine chord diagrams based on Competition E synthesis ("The Luthier's Current")
+- Competition C implementation: Maya's River pitch deck narrative
 
-### Codebase Audit Score: 9/10
-- Feature completeness: 92%
-- Code quality: 94%
-- Polish/UX: 88%
+### Competition Results
+- **Competition A: The Dock** — WINNER: "The Current" + "The Dock" synthesis. **IMPLEMENTED (Phase 1 + 2).** Renamed Shed→Dock, tuning strip, progressions, proportional frets, CurrentCard, QuickStartCards.
+- **Competition B: Light Theme** — WINNER: "River Glass" synthesis. **IMPLEMENTED.** Cool-tinted glass, dark border Mach bands, WCAG AA fixes.
+- **Competition C: Pitch Deck** — WINNER: "Maya's River" synthesis. **AWAITING IMPLEMENTATION.**
+- **Competition D: Living River** — WINNER: 3-layer synthesis. **IMPLEMENTED (Phase 1).** Soul line, seasonal particles, season engine.
+- **Competition E: Fingers & Flow** — WINNER: B6 "Luthier's Blueprint" (42/50). Synthesis: "The Luthier's Current". **IMPLEMENTED (Phase 1).** Chord diagrams, timer integration, interval colors, barre support.
+- **Competition F: Atmosphere** — Brief written (river everywhere, onboarding, data safety). **RESULTS PENDING.**
 
 ---
 
