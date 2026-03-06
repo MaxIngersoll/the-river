@@ -1650,3 +1650,31 @@ Prototype **Chromatic Depth** as the premium alternative. The blue-tinted glass 
 Keep **The Nuclear Option** in a feature branch. One day, someone with low vision will write to you and say "I love this app but the light theme is really hard for me." On that day, you will ship the medium-gray background, and it will be the easiest accessibility fix you have ever made, because all it changes is one CSS variable, and everything downstream improves automatically.
 
 > "Accessibility is not a feature. It is a prerequisite. Everything else is decoration -- and decoration that excludes people is just vandalism with good typography."
+
+---
+
+## RESULTS
+
+**Winner: River Glass** -- a synthesis combining five proposals:
+- "The Etched Line" (Material Scientist)
+- "Inverted Glass" (Material Scientist)
+- "Chromatic Depth" (Accessibility Engineer)
+- "Double Vision" (Accessibility Engineer)
+- "The Warm Floor" (Material Scientist)
+
+### Key Changes
+- Cool-tinted card glass: `rgba(238,243,255,0.58)` on warmer background `#EDEAE4`
+- Dark border polarity flip: `rgba(0,0,0,0.06)`
+- Mach band inset pair
+- 3-layer cool shadows
+- Cornsweet gravity gradient
+- text-3 fixed to `#78716C` (4.7:1 contrast ratio)
+- Amber fixed to `#B45309` (5.2:1 contrast ratio)
+- `prefers-contrast:more` block for AAA compliance
+
+### Special Awards
+- **Wildcard**: "Mother of Pearl" (Luxury Designer)
+- **Comedy**: "The Nuclear Option" (Accessibility Engineer)
+
+### Status
+IMPLEMENTED in `index.css`

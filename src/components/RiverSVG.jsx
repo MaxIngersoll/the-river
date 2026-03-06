@@ -18,6 +18,44 @@ function seeded(seed) {
   return x - Math.floor(x);
 }
 
+// ─── Season Engine ───
+// Determines the river's "emotional season" from recent practice patterns
+function detectSeason(sessions) {
+  if (!sessions || sessions.length === 0) return 'spring';
+  const now = new Date();
+  const twoWeeksAgo = new Date(now - 14 * 86400000);
+  const fourWeeksAgo = new Date(now - 28 * 86400000);
+
+  const recent = sessions.filter(s => new Date(s.date + 'T12:00:00') >= twoWeeksAgo && !s.fog);
+  const older = sessions.filter(s => {
+    const d = new Date(s.date + 'T12:00:00');
+    return d >= fourWeeksAgo && d < twoWeeksAgo && !s.fog;
+  });
+
+  const recentMins = recent.reduce((sum, s) => sum + s.duration_minutes, 0);
+  const olderMins = older.reduce((sum, s) => sum + s.duration_minutes, 0);
+  const recentDays = new Set(recent.map(s => s.date)).size;
+
+  // No recent practice = winter (dormancy)
+  if (recentDays === 0) return 'winter';
+  // Coming back after a break = spring (renewal)
+  if (olderMins === 0 && recentMins > 0) return 'spring';
+  // Increasing practice = summer (peak)
+  if (recentMins > olderMins * 1.2 && recentDays >= 5) return 'summer';
+  // Decreasing = autumn (slowing)
+  if (recentMins < olderMins * 0.7) return 'autumn';
+  // Steady = summer
+  return 'summer';
+}
+
+// Season-specific particle configs
+const SEASON_PARTICLES = {
+  spring: { emoji: null, color: 'rgba(147, 197, 253, 0.6)', count: 5, speed: 0.4 },
+  summer: { emoji: null, color: 'rgba(96, 165, 250, 0.5)', count: 8, speed: 0.3 },
+  autumn: { emoji: null, color: 'rgba(251, 191, 36, 0.4)', count: 4, speed: 0.5 },
+  winter: { emoji: null, color: 'rgba(226, 232, 240, 0.4)', count: 3, speed: 0.2 },
+};
+
 // Catmull-Rom to cubic bezier curve conversion
 function curveThrough(points, tension = 5) {
   if (points.length < 2) return '';
@@ -86,6 +124,10 @@ export default function RiverSVG({ sessions, compact = false, daysToShow }) {
     []
   );
 
+  // Season detection
+  const season = useMemo(() => detectSeason(sessions), [sessions]);
+  const particleConfig = SEASON_PARTICLES[season];
+
   const rowHeight = compact ? 16 : 26;
   const labelSpace = compact ? 0 : 52;
 
@@ -149,9 +191,9 @@ export default function RiverSVG({ sessions, compact = false, daysToShow }) {
   const maxW = riverArea * 0.86;
 
   // Generate the organic river shape
-  const { riverPath, highlightPath, gradientStops, dryDays, fogDays } = useMemo(() => {
+  const { riverPath, highlightPath, soulLinePath, gradientStops, dryDays, fogDays } = useMemo(() => {
     if (days.length === 0 || width === 0) {
-      return { riverPath: '', highlightPath: '', gradientStops: [], dryDays: [], fogDays: [] };
+      return { riverPath: '', highlightPath: '', soulLinePath: '', gradientStops: [], dryDays: [], fogDays: [] };
     }
 
     const left = [];
@@ -229,7 +271,18 @@ export default function RiverSVG({ sessions, compact = false, daysToShow }) {
     }
     stops.push({ offset: '100%', color: prevColor });
 
-    return { riverPath: path, highlightPath: hlPath, gradientStops: stops, dryDays: dry, fogDays: fog };
+    // Soul line — thin center path with gentle organic drift
+    const soulPoints = [{ x: centerX, y: -rowHeight * 0.5 }];
+    for (const day of days) {
+      const y = day.index * rowHeight + rowHeight / 2;
+      const drift = (seeded(day.index * 373) - 0.5) * 3;
+      soulPoints.push({ x: centerX + drift, y });
+    }
+    soulPoints.push({ x: centerX, y: lastY + rowHeight * 0.5 });
+    const soulCurves = curveThrough(soulPoints, 4);
+    const slPath = `M ${soulPoints[0].x} ${soulPoints[0].y} ${soulCurves}`;
+
+    return { riverPath: path, highlightPath: hlPath, soulLinePath: slPath, gradientStops: stops, dryDays: dry, fogDays: fog };
   }, [days, width, centerX, maxW, rowHeight, svgHeight, compact, isDark]);
 
   const handleTap = useCallback((day) => {
@@ -371,6 +424,83 @@ export default function RiverSVG({ sessions, compact = false, daysToShow }) {
               />
             </ellipse>
           ))}
+        </g>
+      )}
+
+      {/* Soul line — breathing center thread */}
+      {soulLinePath && riverPath && (
+        <g clipPath={`url(#${flowClipId})`}>
+          <path
+            d={soulLinePath}
+            fill="none"
+            stroke={isDark ? 'rgba(255,255,255,0.12)' : 'rgba(255,255,255,0.35)'}
+            strokeWidth={1.5}
+          >
+            {!prefersReducedMotion && (
+              <animate
+                attributeName="stroke-opacity"
+                values={isDark ? '0.08;0.18;0.08' : '0.25;0.45;0.25'}
+                dur="4s"
+                repeatCount="indefinite"
+              />
+            )}
+          </path>
+          {/* Luminous core */}
+          <path
+            d={soulLinePath}
+            fill="none"
+            stroke="white"
+            strokeWidth={0.5}
+            opacity={isDark ? 0.06 : 0.2}
+          >
+            {!prefersReducedMotion && (
+              <animate
+                attributeName="opacity"
+                values={isDark ? '0.04;0.1;0.04' : '0.12;0.28;0.12'}
+                dur="4s"
+                repeatCount="indefinite"
+              />
+            )}
+          </path>
+        </g>
+      )}
+
+      {/* Seasonal particles — floating along the river */}
+      {riverPath && !prefersReducedMotion && !compact && (
+        <g clipPath={`url(#${flowClipId})`}>
+          {Array.from({ length: particleConfig.count }, (_, i) => {
+            const xOffset = (seeded(i * 491) - 0.5) * maxW * 0.4;
+            const startY = seeded(i * 677) * svgHeight;
+            const size = 1.2 + seeded(i * 331) * 1.8;
+            const dur = `${6 + seeded(i * 173) * 8}s`;
+            return (
+              <circle
+                key={`p-${i}`}
+                cx={centerX + xOffset}
+                cy={startY}
+                r={size}
+                fill={particleConfig.color}
+              >
+                <animateTransform
+                  attributeName="transform"
+                  type="translate"
+                  from={`0 0`}
+                  to={`${(seeded(i * 557) - 0.5) * 10} ${svgHeight}`}
+                  dur={dur}
+                  begin={`${-seeded(i * 811) * 10}s`}
+                  repeatCount="indefinite"
+                />
+                <animate
+                  attributeName="opacity"
+                  values="0;0.7;0.7;0"
+                  keyTimes="0;0.1;0.8;1"
+                  dur={dur}
+                  begin={`${-seeded(i * 811) * 10}s`}
+                  repeatCount="indefinite"
+                />
+              </circle>
+            );
+          })}
         </g>
       )}
 
