@@ -11,6 +11,7 @@ import StatsPage from './components/StatsPage';
 import SettingsPage from './components/SettingsPage';
 import CelebrationOverlay from './components/CelebrationOverlay';
 import ReadingCeremony from './components/ReadingCeremony';
+import ShedPage from './components/ShedPage';
 import TimerFAB from './components/TimerFAB';
 
 export default function App() {
@@ -200,6 +201,9 @@ export default function App() {
             onSessionUpdate={handleSessionUpdate}
             onSessionDelete={handleSessionDelete}
           />
+        )}
+        {displayedTab === 'shed' && (
+          <ShedPage />
         )}
         {displayedTab === 'settings' && (
           <SettingsPage

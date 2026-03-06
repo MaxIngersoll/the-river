@@ -12,13 +12,13 @@ let currentBeat = 0;
 
 // Rain state
 let rainRunning = false;
-let rainSource = null;
+let rainNodes = null;  // holds all rain audio nodes for cleanup
 let rainGain = null;
 let rainVolume = 0.3;
 
 // Constants
-const LOOKAHEAD_MS = 25;     // How often the scheduler checks (ms)
-const SCHEDULE_AHEAD = 0.1;  // How far ahead to schedule (seconds)
+const LOOKAHEAD_MS = 25;
+const SCHEDULE_AHEAD = 0.1;
 const BPM_MIN = 40;
 const BPM_MAX = 208;
 
@@ -33,7 +33,7 @@ export function initAudio() {
   }
 
   const Ctx = window.AudioContext || window.webkitAudioContext;
-  if (!Ctx) return; // Browser doesn't support Web Audio
+  if (!Ctx) return;
 
   try {
     audioCtx = new Ctx();
@@ -62,27 +62,53 @@ function ensureContext() {
 }
 
 // ─── Metronome ───
+// Uses a noise burst + pitched oscillator for a warm, woody click
 
 function scheduleClick(time, isAccent) {
+  // --- Pitched component: short triangle wave for warmth ---
   const osc = audioCtx.createOscillator();
-  const gain = audioCtx.createGain();
+  const oscGain = audioCtx.createGain();
+  osc.type = 'triangle';
+  osc.frequency.value = isAccent ? 1200 : 800;
 
-  osc.type = 'sine';
-  osc.frequency.value = isAccent ? 880 : 440;
+  const duration = isAccent ? 0.035 : 0.025;
+  const peakGain = isAccent ? 0.35 : 0.2;
 
-  // Gain envelope: quick attack, fast decay for a click sound
-  const duration = isAccent ? 0.08 : 0.05;
-  const peakGain = isAccent ? 0.6 : 0.3;
+  oscGain.gain.setValueAtTime(0, time);
+  oscGain.gain.linearRampToValueAtTime(peakGain, time + 0.001);
+  oscGain.gain.exponentialRampToValueAtTime(0.001, time + duration);
 
-  gain.gain.setValueAtTime(0, time);
-  gain.gain.linearRampToValueAtTime(peakGain, time + 0.002);
-  gain.gain.linearRampToValueAtTime(0, time + duration);
-
-  osc.connect(gain);
-  gain.connect(masterGain);
-
+  osc.connect(oscGain);
+  oscGain.connect(masterGain);
   osc.start(time);
   osc.stop(time + duration + 0.01);
+
+  // --- Noise burst for transient snap ---
+  const noiseLen = Math.ceil(audioCtx.sampleRate * 0.015);
+  const noiseBuf = audioCtx.createBuffer(1, noiseLen, audioCtx.sampleRate);
+  const noiseData = noiseBuf.getChannelData(0);
+  for (let i = 0; i < noiseLen; i++) {
+    noiseData[i] = (Math.random() * 2 - 1) * (1 - i / noiseLen); // decaying noise
+  }
+
+  const noiseSrc = audioCtx.createBufferSource();
+  noiseSrc.buffer = noiseBuf;
+
+  const noiseFilter = audioCtx.createBiquadFilter();
+  noiseFilter.type = 'bandpass';
+  noiseFilter.frequency.value = isAccent ? 3500 : 2500;
+  noiseFilter.Q.value = 1.5;
+
+  const noiseGain = audioCtx.createGain();
+  const noisePeak = isAccent ? 0.25 : 0.15;
+  noiseGain.gain.setValueAtTime(noisePeak, time);
+  noiseGain.gain.exponentialRampToValueAtTime(0.001, time + 0.02);
+
+  noiseSrc.connect(noiseFilter);
+  noiseFilter.connect(noiseGain);
+  noiseGain.connect(masterGain);
+  noiseSrc.start(time);
+  noiseSrc.stop(time + 0.03);
 }
 
 function schedulerTick() {
@@ -90,7 +116,6 @@ function schedulerTick() {
     const isAccent = currentBeat === 0;
     scheduleClick(nextNoteTime, isAccent);
 
-    // Advance beat
     const secondsPerBeat = 60.0 / metronomeBPM;
     nextNoteTime += secondsPerBeat;
     currentBeat = (currentBeat + 1) % 4;
@@ -136,23 +161,33 @@ function clampBPM(bpm) {
 }
 
 // ─── Ambient: Rain ───
+// Uses brown noise (warmer than white noise) with multiple filter layers
+// and LFO modulation for organic movement
 
-let cachedNoiseBuffer = null;
+let cachedBrownBuffer = null;
 
-function getWhiteNoiseBuffer() {
-  if (cachedNoiseBuffer && cachedNoiseBuffer.sampleRate === audioCtx.sampleRate) {
-    return cachedNoiseBuffer;
+function getBrownNoiseBuffer() {
+  if (cachedBrownBuffer && cachedBrownBuffer.sampleRate === audioCtx.sampleRate) {
+    return cachedBrownBuffer;
   }
+
   const sampleRate = audioCtx.sampleRate;
-  const length = sampleRate * 10; // 10-second buffer to avoid audible looping
-  const buffer = audioCtx.createBuffer(1, length, sampleRate);
-  const data = buffer.getChannelData(0);
+  const length = sampleRate * 12; // 12-second buffer
+  const buffer = audioCtx.createBuffer(2, length, sampleRate); // stereo
 
-  for (let i = 0; i < length; i++) {
-    data[i] = Math.random() * 2 - 1;
+  for (let ch = 0; ch < 2; ch++) {
+    const data = buffer.getChannelData(ch);
+    let lastOut = 0;
+
+    for (let i = 0; i < length; i++) {
+      const white = Math.random() * 2 - 1;
+      // Brown noise: integrated white noise with leaky integration
+      lastOut = (lastOut + (0.02 * white)) / 1.02;
+      data[i] = lastOut * 3.5; // Normalize amplitude
+    }
   }
 
-  cachedNoiseBuffer = buffer;
+  cachedBrownBuffer = buffer;
   return buffer;
 }
 
@@ -165,63 +200,154 @@ export function startRain(volume = 0.3) {
 
   rainVolume = Math.min(1, Math.max(0, volume));
 
-  const buffer = getWhiteNoiseBuffer();
+  const buffer = getBrownNoiseBuffer();
 
-  rainSource = audioCtx.createBufferSource();
-  rainSource.buffer = buffer;
-  rainSource.loop = true;
+  // --- Layer 1: Low rumble (distant rain / room ambience) ---
+  const src1 = audioCtx.createBufferSource();
+  src1.buffer = buffer;
+  src1.loop = true;
 
-  // Two-filter chain for more realistic rain texture
-  const lowpass = audioCtx.createBiquadFilter();
-  lowpass.type = 'lowpass';
-  lowpass.frequency.value = 2400;
-  lowpass.Q.value = 0.3;
+  const lowFilter = audioCtx.createBiquadFilter();
+  lowFilter.type = 'lowpass';
+  lowFilter.frequency.value = 400;
+  lowFilter.Q.value = 0.5;
 
-  const bandpass = audioCtx.createBiquadFilter();
-  bandpass.type = 'bandpass';
-  bandpass.frequency.value = 800;
-  bandpass.Q.value = 0.4;
+  const lowGain = audioCtx.createGain();
+  lowGain.gain.value = 0.6;
 
+  src1.connect(lowFilter);
+  lowFilter.connect(lowGain);
+
+  // --- Layer 2: Mid splatter (rain hitting surfaces) ---
+  const src2 = audioCtx.createBufferSource();
+  src2.buffer = buffer;
+  src2.loop = true;
+  // Offset the second source to decorrelate from first
+  src2.loopStart = 3.7;
+  src2.loopEnd = 12;
+
+  const midFilter = audioCtx.createBiquadFilter();
+  midFilter.type = 'bandpass';
+  midFilter.frequency.value = 1800;
+  midFilter.Q.value = 0.3;
+
+  const midGain = audioCtx.createGain();
+  midGain.gain.value = 0.25;
+
+  src2.connect(midFilter);
+  midFilter.connect(midGain);
+
+  // --- Layer 3: High shimmer (fine droplets / patter) ---
+  const src3 = audioCtx.createBufferSource();
+  src3.buffer = buffer;
+  src3.loop = true;
+  src3.loopStart = 6.2;
+  src3.loopEnd = 12;
+
+  const highFilter = audioCtx.createBiquadFilter();
+  highFilter.type = 'highpass';
+  highFilter.frequency.value = 4000;
+  highFilter.Q.value = 0.2;
+
+  const highShelf = audioCtx.createBiquadFilter();
+  highShelf.type = 'highshelf';
+  highShelf.frequency.value = 6000;
+  highShelf.gain.value = -8; // tame harsh highs
+
+  const highGain = audioCtx.createGain();
+  highGain.gain.value = 0.12;
+
+  src3.connect(highFilter);
+  highFilter.connect(highShelf);
+  highShelf.connect(highGain);
+
+  // --- LFO: Slow modulation on mid-frequency filter for organic variation ---
+  const lfo = audioCtx.createOscillator();
+  lfo.type = 'sine';
+  lfo.frequency.value = 0.15; // very slow wobble
+  const lfoGain = audioCtx.createGain();
+  lfoGain.gain.value = 400; // modulate ±400 Hz around 1800
+  lfo.connect(lfoGain);
+  lfoGain.connect(midFilter.frequency);
+  lfo.start();
+
+  // Second LFO for volume breathing
+  const lfo2 = audioCtx.createOscillator();
+  lfo2.type = 'sine';
+  lfo2.frequency.value = 0.08; // even slower
+  const lfo2Gain = audioCtx.createGain();
+  lfo2Gain.gain.value = 0.04; // subtle volume swell ±0.04
+  lfo2.connect(lfo2Gain);
+
+  // --- Mix bus ---
   rainGain = audioCtx.createGain();
   rainGain.gain.setValueAtTime(0, audioCtx.currentTime);
-  rainGain.gain.linearRampToValueAtTime(rainVolume, audioCtx.currentTime + 0.5);
+  rainGain.gain.linearRampToValueAtTime(rainVolume, audioCtx.currentTime + 1.5); // slow fade in
 
-  rainSource.connect(lowpass);
-  lowpass.connect(bandpass);
-  bandpass.connect(rainGain);
-  rainGain.connect(masterGain);
+  lowGain.connect(rainGain);
+  midGain.connect(rainGain);
+  highGain.connect(rainGain);
+  lfo2Gain.connect(rainGain.gain);
 
-  rainSource.start();
+  // Gentle compression to even out the noise
+  const compressor = audioCtx.createDynamicsCompressor();
+  compressor.threshold.value = -24;
+  compressor.knee.value = 12;
+  compressor.ratio.value = 3;
+  compressor.attack.value = 0.1;
+  compressor.release.value = 0.25;
+
+  rainGain.connect(compressor);
+  compressor.connect(masterGain);
+
+  // Start all sources
+  src1.start();
+  src2.start();
+  src3.start();
+
+  // Store references for cleanup
+  rainNodes = { src1, src2, src3, lfo, lfo2, lowFilter, midFilter, highFilter, highShelf, lowGain, midGain, highGain, lfoGain, lfo2Gain, compressor };
   rainRunning = true;
 }
 
 export function stopRain() {
-  if (!rainRunning || !rainSource) return;
+  if (!rainRunning || !rainNodes) return;
 
   try {
-    // Fade out for click-free stop
     const now = audioCtx.currentTime;
     rainGain.gain.cancelScheduledValues(now);
     rainGain.gain.setValueAtTime(rainGain.gain.value, now);
-    rainGain.gain.linearRampToValueAtTime(0, now + 0.15);
+    rainGain.gain.linearRampToValueAtTime(0, now + 0.8); // slower fade out
 
-    // Stop and disconnect after fade
-    const source = rainSource;
+    const nodes = rainNodes;
     const gain = rainGain;
     setTimeout(() => {
       try {
-        source.stop();
-        source.disconnect();
+        nodes.src1.stop(); nodes.src1.disconnect();
+        nodes.src2.stop(); nodes.src2.disconnect();
+        nodes.src3.stop(); nodes.src3.disconnect();
+        nodes.lfo.stop(); nodes.lfo.disconnect();
+        nodes.lfo2.stop(); nodes.lfo2.disconnect();
+        nodes.lowFilter.disconnect();
+        nodes.midFilter.disconnect();
+        nodes.highFilter.disconnect();
+        nodes.highShelf.disconnect();
+        nodes.lowGain.disconnect();
+        nodes.midGain.disconnect();
+        nodes.highGain.disconnect();
+        nodes.lfoGain.disconnect();
+        nodes.lfo2Gain.disconnect();
+        nodes.compressor.disconnect();
         gain.disconnect();
       } catch {
         // Already stopped or disconnected
       }
-    }, 200);
+    }, 1000);
   } catch {
     // Graceful fallback
   }
 
-  rainSource = null;
+  rainNodes = null;
   rainGain = null;
   rainRunning = false;
 }
@@ -232,7 +358,7 @@ export function setRainVolume(volume) {
     const now = audioCtx.currentTime;
     rainGain.gain.cancelScheduledValues(now);
     rainGain.gain.setValueAtTime(rainGain.gain.value, now);
-    rainGain.gain.linearRampToValueAtTime(rainVolume, now + 0.05);
+    rainGain.gain.linearRampToValueAtTime(rainVolume, now + 0.1);
   }
 }
 

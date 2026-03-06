@@ -355,7 +355,7 @@ export default function TimerFAB({ onSaveSession, showTabBar = true }) {
   return (
     <button
       onClick={isActive ? () => setExpanded(true) : handleStart}
-      className="fixed z-40 flex items-center justify-center active:scale-[0.90] transition-all"
+      className={`fixed z-40 flex items-center justify-center active:scale-[0.90] transition-all ${!isActive ? 'animate-pulse-glow' : ''}`}
       style={{
         bottom: showTabBar ? 'calc(88px + env(safe-area-inset-bottom, 0px))' : 'calc(24px + env(safe-area-inset-bottom, 0px))',
         right: '20px',
