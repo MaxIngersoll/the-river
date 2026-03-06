@@ -1,10 +1,11 @@
 # The River — Project Instructions
 
 ## MANDATORY: Session Start
-1. Read `VISION.md` in repo root FIRST — it has Max's design philosophy, feedback history, current state, and what's been built
-2. Read the latest Bridge Note in `docs/sessions/` for immediate context from the previous session
-3. Check `docs/DECISIONS.md` for the decision trail
-4. Check all worktrees for uncommitted work: `git worktree list` then check `git status` in each
+1. Read `VISION.md` in repo root FIRST — design philosophy, feedback history, current state, what's next
+2. Read `HANDOFF.md` — complete technical reference (architecture, components, data flow, all features)
+3. Read the latest Bridge Note in `docs/sessions/` for immediate context from the previous session
+4. Check `docs/DECISIONS.md` for the decision trail
+5. Check all worktrees for uncommitted work: `git worktree list` then check `git status` in each
 
 ## MANDATORY: Communication Protocol
 After every task completion, post a standup to Max:
@@ -18,14 +19,15 @@ After every commit: one-line celebration.
 
 ## MANDATORY: Session End
 1. Update `VISION.md` with any new decisions, feedback, or state changes
-2. Write a Bridge Note to `docs/sessions/session-N-bridge.md`:
+2. Update `HANDOFF.md` if architecture, components, or features changed
+3. Write a Bridge Note to `docs/sessions/session-N-bridge.md`:
    - What we did (3 bullets)
    - What Max said (key quotes)
    - What's next (prioritized)
    - Unfinished work
    - Mood / vibe check
-3. Update `docs/DECISIONS.md` with any new decisions
-4. Commit everything. Never leave work uncommitted.
+4. Update `docs/DECISIONS.md` with any new decisions
+5. Commit everything. Push to GitHub. Never leave work only on local machine.
 
 ## MANDATORY: After Every Meaningful Decision
 1. Update `VISION.md` — add to feedback history, update current state section
@@ -60,10 +62,12 @@ After every commit: one-line celebration.
 
 ## Key Documents
 - `VISION.md` — Living design doc, project state, philosophy (READ FIRST)
-- `docs/DECISIONS.md` — Why things are the way they are
-- `docs/sessions/` — Bridge Notes from previous sessions
+- `HANDOFF.md` — Complete technical reference: architecture, every component, data flow, all features
+- `docs/DECISIONS.md` — Why things are the way they are (18+ entries)
+- `docs/sessions/` — Bridge Notes from previous sessions (start with latest)
 - `docs/AGENT-PROTOCOL.md` — Team culture and competition protocol
 - `docs/competitions/METHODOLOGY.md` — Lessons from past competitions
+- `docs/OUTTAKES.md` — Comedy archive, running jokes, post-credits scenes (for joy)
 
 ## Tech Stack
 - React 19 + Tailwind CSS v4 + Vite 7

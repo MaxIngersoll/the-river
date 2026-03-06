@@ -84,6 +84,13 @@ It's not a dashboard. It's a *place*. The river metaphor isn't decorative — it
 - **Max's milestone:** First real practice session — 67:52 logged. "I enjoyed my use of it."
 - **Stale docs cleaned:** Deleted HANDOFF.md, PLAN.md, EXECUTION-PLAN.md, OVERNIGHT-PLAN/REPORT.md
 
+### Session 9: Documentation & GitHub Safety
+- Discovered 22 commits existed only locally — none pushed to GitHub
+- Pushed `claude/musing-nightingale` branch and merged all work into `main`
+- Wrote comprehensive `HANDOFF.md` — complete technical reference for any new agent
+- Updated all documentation: Bridge Notes, VISION.md, MEMORY.md
+- **Lesson reinforced:** "Commit early, commit often" includes PUSHING to remote
+
 ---
 
 ## Design Competition Protocol
@@ -135,9 +142,12 @@ See `docs/AGENT-PROTOCOL.md` for the full protocol. Key elements:
 - Breathing FAB animation
 - Ink Wash pitch deck (pitch.html)
 
-### What's Next
-- Refine chord diagrams based on Competition E synthesis ("The Luthier's Current")
-- Competition C implementation: Maya's River pitch deck narrative
+### What's Next (Priority Order)
+1. Refine chord diagrams based on Competition E synthesis ("The Luthier's Current")
+2. Competition C implementation: Maya's River pitch deck narrative (designed, not built)
+3. Polish: ShedPage.jsx breakup (1,170 lines → sub-components), mobile audit, accessibility
+4. Real device testing: PWA install flow, touch interactions
+5. Max may have new directions — ask before assuming
 
 ### Competition Results
 - **Competition A: The Dock** — WINNER: "The Current" + "The Dock" synthesis. **IMPLEMENTED (Phase 1 + 2).** Renamed Shed→Dock, tuning strip, progressions, proportional frets, CurrentCard, QuickStartCards.
@@ -179,4 +189,4 @@ See `docs/AGENT-PROTOCOL.md` for the full protocol. Key elements:
 ---
 
 *This document is the first thing any new session should read. Update it. Commit it. Never let context get lost again.*
-*For laughs, read `docs/OUTTAKES.md`. For decisions, read `docs/DECISIONS.md`. For session context, read `docs/sessions/`.*
+*For a complete technical reference, read `HANDOFF.md`. For laughs, read `docs/OUTTAKES.md`. For decisions, read `docs/DECISIONS.md`. For session context, read `docs/sessions/`.*
