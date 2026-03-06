@@ -1,3 +1,5 @@
+import { memo } from 'react';
+
 const tabs = [
   {
     id: 'home',
@@ -15,8 +17,8 @@ const tabs = [
     icon: (
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
         <circle cx="12" cy="12" r="10" />
-        <line x1="12" y1="8" x2="12" y2="12" />
-        <line x1="12" y1="12" x2="16" y2="14" />
+        <line x1="12" y1="8" x2="12" y2="16" />
+        <line x1="8" y1="12" x2="16" y2="12" />
       </svg>
     ),
   },
@@ -31,17 +33,19 @@ const tabs = [
   },
 ];
 
-export default function TabBar({ active, onChange }) {
+export default memo(function TabBar({ active, onChange }) {
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-30 glass border-t border-card-border safe-bottom">
-      <div className="flex justify-around items-center h-[72px] max-w-lg mx-auto">
+    <nav className="fixed bottom-0 left-0 right-0 z-30 glass border-t border-card-border safe-bottom" aria-label="Main navigation">
+      <div role="tablist" className="flex justify-around items-center h-[72px] max-w-lg mx-auto">
         {tabs.map((tab) => {
           const isActive = active === tab.id;
           return (
             <button
               key={tab.id}
+              role="tab"
+              aria-selected={isActive}
               onClick={() => onChange(tab.id)}
-              className={`flex flex-col items-center justify-center gap-0.5 w-20 h-full transition-all duration-200 active:scale-90 ${
+              className={`relative flex flex-col items-center justify-center gap-0.5 w-20 h-full transition-all duration-200 active:scale-90 ${
                 isActive ? 'text-water-5' : 'text-text-3'
               }`}
               aria-label={tab.label}
@@ -51,7 +55,7 @@ export default function TabBar({ active, onChange }) {
                 <div
                   className="absolute inset-x-2 inset-y-1 rounded-2xl"
                   style={{
-                    background: 'radial-gradient(ellipse at center, rgba(45,212,191,0.10) 0%, transparent 70%)',
+                    background: 'radial-gradient(ellipse at center, rgba(59,130,246,0.10) 0%, transparent 70%)',
                   }}
                 />
               )}
@@ -69,4 +73,4 @@ export default function TabBar({ active, onChange }) {
       </div>
     </nav>
   );
-}
+})

@@ -82,8 +82,26 @@ export function getQuoteByCategory(...categories) {
   return matching[Math.floor(Math.random() * matching.length)];
 }
 
+let lastRandomIdx = -1;
+
 export function getRandomQuote() {
-  return quotes[Math.floor(Math.random() * quotes.length)];
+  let idx;
+  do {
+    idx = Math.floor(Math.random() * quotes.length);
+  } while (idx === lastRandomIdx && quotes.length > 1);
+  lastRandomIdx = idx;
+  return quotes[idx];
+}
+
+// Cached daily quote — computed once per day
+let dailyCache = { seed: 0, quote: null };
+
+export function getDailyQuoteCached() {
+  const seed = dateSeed();
+  if (dailyCache.seed === seed && dailyCache.quote) return dailyCache.quote;
+  const idx = Math.floor(seededRandom(seed) * quotes.length);
+  dailyCache = { seed, quote: quotes[idx] };
+  return dailyCache.quote;
 }
 
 export default quotes;

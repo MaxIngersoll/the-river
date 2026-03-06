@@ -1,16 +1,24 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
-import { getSessions } from './utils/storage';
+import { getSessions, addSession, updateSession, deleteSession, getTotalHours } from './utils/storage';
+import { checkNewMilestones } from './utils/milestones';
+import { canAddFogDay, addFogDay } from './utils/fogHorn';
+import { getUndeliveredBottle, markBottleDelivered } from './utils/bottleMessages';
+import { checkAndWriteMarginNotes, shouldTriggerReading, completeReading, getSource, getSignalFireNote } from './utils/source';
 import TabBar from './components/TabBar';
 import HomePage from './components/HomePage';
 import LogPage from './components/LogPage';
 import StatsPage from './components/StatsPage';
 import SettingsPage from './components/SettingsPage';
 import CelebrationOverlay from './components/CelebrationOverlay';
+import ReadingCeremony from './components/ReadingCeremony';
+import TimerFAB from './components/TimerFAB';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('home');
   const [sessions, setSessions] = useState(() => getSessions());
   const [celebrations, setCelebrations] = useState([]);
+  const [pendingReading, setPendingReading] = useState(null);
+  const [signalFireNote, setSignalFireNote] = useState(null);
 
   // Page transition state
   const [displayedTab, setDisplayedTab] = useState('home');
@@ -23,8 +31,49 @@ export default function App() {
   }, []);
 
   const handleLog = useCallback(() => {
-    refreshSessions();
-  }, [refreshSessions]);
+    const updated = getSessions();
+    setSessions(updated);
+    // Check margin notes
+    const totalHours = getTotalHours(updated);
+    checkAndWriteMarginNotes(totalHours);
+    // Check reading trigger
+    const reading = shouldTriggerReading(updated);
+    if (reading.should) {
+      setPendingReading(reading);
+    }
+  }, []);
+
+  const handleFogHorn = useCallback(() => {
+    const currentSessions = getSessions();
+    const { allowed } = canAddFogDay(currentSessions);
+    if (!allowed) return;
+    try { navigator.vibrate?.([40, 20, 60]); } catch {}
+    addFogDay();
+    const updated = getSessions();
+    setSessions(updated);
+    // Check for bottle delivery
+    const bottle = getUndeliveredBottle();
+    if (bottle) {
+      markBottleDelivered(bottle.id);
+      setCelebrations([
+        { type: 'fog', id: 'fog-rest' },
+        { type: 'fog-bottle', id: 'fog-bottle', message: bottle.text },
+      ]);
+    } else {
+      setCelebrations([{ type: 'fog', id: 'fog-rest' }]);
+    }
+  }, []);
+
+  const handleReadingComplete = useCallback(() => {
+    if (pendingReading) {
+      completeReading(pendingReading.tier);
+      setPendingReading(null);
+    }
+  }, [pendingReading]);
+
+  const handleSignalFireDismiss = useCallback(() => {
+    setSignalFireNote(null);
+  }, []);
 
   // Smooth tab transition handler — uses ref for recursive calls
   const handleTabChange = useCallback((newTab) => {
@@ -70,10 +119,45 @@ export default function App() {
     setCelebrations((prev) => prev.slice(1));
   }, []);
 
+  const handleTimerSave = useCallback(({ duration_minutes, note, tags }) => {
+    addSession({
+      date: new Date().toISOString().slice(0, 10),
+      duration_minutes,
+      note,
+      tags,
+    });
+    const updated = getSessions();
+    setSessions(updated);
+    const newMilestones = checkNewMilestones(updated);
+    if (newMilestones.length > 0) setCelebrations(newMilestones);
+    // Source: margin notes + reading check
+    const totalHours = getTotalHours(updated);
+    checkAndWriteMarginNotes(totalHours);
+    const reading = shouldTriggerReading(updated);
+    if (reading.should) setPendingReading(reading);
+    handleTabChange('home');
+  }, [handleTabChange]);
+
+  const handleSessionUpdate = useCallback((id, updates) => {
+    updateSession(id, updates);
+    refreshSessions();
+  }, [refreshSessions]);
+
+  const handleSessionDelete = useCallback((id) => {
+    deleteSession(id);
+    refreshSessions();
+  }, [refreshSessions]);
+
   const handleDataCleared = useCallback(() => {
     setSessions([]);
     handleTabChange('home');
   }, [handleTabChange]);
+
+  // Check for Signal Fire on mount
+  useEffect(() => {
+    const note = getSignalFireNote(sessions);
+    if (note) setSignalFireNote(note);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     setDisplayedTab(activeTab);
@@ -92,7 +176,15 @@ export default function App() {
     <div className="min-h-screen bg-bg pb-16">
       <div className={`page-wrapper ${pageClass}`}>
         {displayedTab === 'home' && (
-          <HomePage sessions={sessions} onNavigate={handleTabChange} />
+          <HomePage
+            sessions={sessions}
+            onNavigate={handleTabChange}
+            onSessionUpdate={handleSessionUpdate}
+            onSessionDelete={handleSessionDelete}
+            onFogHorn={handleFogHorn}
+            signalFireNote={signalFireNote}
+            onSignalFireDismiss={handleSignalFireDismiss}
+          />
         )}
         {displayedTab === 'log' && (
           <LogPage
@@ -102,7 +194,13 @@ export default function App() {
             onNavigateHome={handleNavigateHome}
           />
         )}
-        {displayedTab === 'stats' && <StatsPage sessions={sessions} />}
+        {displayedTab === 'stats' && (
+          <StatsPage
+            sessions={sessions}
+            onSessionUpdate={handleSessionUpdate}
+            onSessionDelete={handleSessionDelete}
+          />
+        )}
         {displayedTab === 'settings' && (
           <SettingsPage
             sessions={sessions}
@@ -114,10 +212,22 @@ export default function App() {
 
       {showTabBar && <TabBar active={activeTab} onChange={handleTabChange} />}
 
+      <TimerFAB onSaveSession={handleTimerSave} showTabBar={showTabBar} />
+
       {celebrations.length > 0 && (
         <CelebrationOverlay
           milestone={celebrations[0]}
           onDismiss={dismissCelebration}
+          queuePosition={1}
+          queueTotal={celebrations.length}
+        />
+      )}
+
+      {pendingReading && celebrations.length === 0 && (
+        <ReadingCeremony
+          reading={pendingReading}
+          answer={getSource().answer}
+          onComplete={handleReadingComplete}
         />
       )}
     </div>

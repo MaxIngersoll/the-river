@@ -1,11 +1,14 @@
-import { useState } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import {
+  getData,
+  setData,
   getSettings,
   updateSettings,
   clearAllData,
   getTotalMinutes,
   formatHours,
   formatDuration,
+  isValidSession,
 } from '../utils/storage';
 import { useTheme } from '../contexts/ThemeContext';
 
@@ -17,13 +20,79 @@ const THEME_OPTIONS = [
 ];
 
 export default function SettingsPage({ sessions, onBack, onDataCleared }) {
+  const storageEstimate = useMemo(() => {
+    try {
+      const data = getData();
+      const bytes = new Blob([JSON.stringify(data)]).size;
+      if (bytes < 1024) return `${bytes} B`;
+      if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+      return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+    } catch {
+      return null;
+    }
+  }, [sessions]);
+
   const [settings, setSettings] = useState(() => getSettings());
   const [customGoal, setCustomGoal] = useState('');
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [saved, setSaved] = useState(false);
   const { theme, setTheme } = useTheme();
 
+  const [importStatus, setImportStatus] = useState(null); // null | 'success' | 'error'
   const totalMinutes = getTotalMinutes(sessions);
+
+  const handleExport = useCallback(() => {
+    const data = getData();
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `the-river-backup-${new Date().toISOString().slice(0, 10)}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }, []);
+
+  const handleImport = useCallback(() => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json';
+    input.onchange = (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (evt) => {
+        try {
+          const data = JSON.parse(evt.target.result);
+          // Basic validation: must have sessions array
+          if (!data.sessions || !Array.isArray(data.sessions)) {
+            setImportStatus('error');
+            setTimeout(() => setImportStatus(null), 2500);
+            return;
+          }
+          // Validate each session, drop corrupt ones
+          data.sessions = data.sessions.filter(isValidSession);
+          if (!data.settings || typeof data.settings !== 'object') {
+            data.settings = { weekly_goal_minutes: 300, first_session_date: null };
+          }
+          if (!Array.isArray(data.milestones)) {
+            data.milestones = [];
+          }
+          setData(data);
+          setSettings(data.settings || getSettings());
+          setImportStatus('success');
+          setTimeout(() => {
+            setImportStatus(null);
+            window.location.reload();
+          }, 1500);
+        } catch {
+          setImportStatus('error');
+          setTimeout(() => setImportStatus(null), 2500);
+        }
+      };
+      reader.readAsText(file);
+    };
+    input.click();
+  }, []);
 
   const handleGoalPreset = (mins) => {
     const updated = updateSettings({ weekly_goal_minutes: mins });
@@ -119,8 +188,8 @@ export default function SettingsPage({ sessions, onBack, onDataCleared }) {
                   : 'card text-text-2 active:scale-[0.97]'
               }`}
               style={settings.weekly_goal_minutes === mins ? {
-                background: 'linear-gradient(135deg, rgba(45,212,191,0.9), rgba(17,94,89,0.95))',
-                boxShadow: '0 4px 16px rgba(20,184,166,0.3), inset 0 1px 0 rgba(255,255,255,0.2)',
+                background: 'linear-gradient(135deg, rgba(59,130,246,0.9), rgba(30,64,175,0.95))',
+                boxShadow: '0 4px 16px rgba(59,130,246,0.3), inset 0 1px 0 rgba(255,255,255,0.2)',
               } : undefined}
             >
               {formatDuration(mins)}
@@ -144,7 +213,7 @@ export default function SettingsPage({ sessions, onBack, onDataCleared }) {
             disabled={!customGoal || parseInt(customGoal, 10) <= 0}
             className="px-5 py-3 rounded-2xl text-sm font-semibold text-white disabled:opacity-30 disabled:cursor-not-allowed active:scale-[0.97] transition-all"
             style={{
-              background: 'linear-gradient(135deg, rgba(45,212,191,0.9), rgba(17,94,89,0.95))',
+              background: 'linear-gradient(135deg, rgba(59,130,246,0.9), rgba(30,64,175,0.95))',
               boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.2)',
             }}
           >
@@ -177,7 +246,55 @@ export default function SettingsPage({ sessions, onBack, onDataCleared }) {
               </span>
             </div>
           )}
+          <div className="flex justify-between text-sm">
+            <span className="text-text-2">Storage used</span>
+            <span className="text-text font-semibold">{storageEstimate || '—'}</span>
+          </div>
         </div>
+      </div>
+
+      {/* Export / Import */}
+      <div className="card p-5 mb-4">
+        <h3 className="text-text-2 text-xs font-medium uppercase tracking-wider mb-1">
+          Backup
+        </h3>
+        <p className="text-text-3 text-xs mb-4">
+          Export your data as JSON, or restore from a backup.
+        </p>
+        <div className="flex gap-2">
+          <button
+            onClick={handleExport}
+            className="flex-1 flex items-center justify-center gap-2 py-3 rounded-2xl text-sm font-semibold card text-text-2 active:scale-[0.97] transition-all"
+          >
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="7 10 12 15 17 10" />
+              <line x1="12" y1="15" x2="12" y2="3" />
+            </svg>
+            Export
+          </button>
+          <button
+            onClick={handleImport}
+            className="flex-1 flex items-center justify-center gap-2 py-3 rounded-2xl text-sm font-semibold card text-text-2 active:scale-[0.97] transition-all"
+          >
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="17 8 12 3 7 8" />
+              <line x1="12" y1="3" x2="12" y2="15" />
+            </svg>
+            Import
+          </button>
+        </div>
+        {importStatus === 'success' && (
+          <p className="text-water-4 text-xs font-medium text-center mt-3 animate-fade-in">
+            Data restored! Reloading...
+          </p>
+        )}
+        {importStatus === 'error' && (
+          <p className="text-coral text-xs font-medium text-center mt-3 animate-fade-in">
+            Invalid backup file. Please try a .json file exported from The River.
+          </p>
+        )}
       </div>
 
       {/* Danger zone */}
@@ -228,7 +345,17 @@ export default function SettingsPage({ sessions, onBack, onDataCleared }) {
         <p className="text-text-3 text-xs mt-1">
           A guitar practice tracker that visualizes your journey as a flowing river.
         </p>
-        <p className="text-text-3 text-xs mt-2">Version 1.1</p>
+        {sessions.length > 0 && (
+          <p className="font-serif italic text-text-2 text-xs mt-3 leading-relaxed">
+            {totalMinutes < 60
+              ? 'A single drop falls — \nthe riverbed waits, patient — \nbeginnings are here.'
+              : totalMinutes < 600
+                ? `${Math.round(totalMinutes / 60)} hours have gathered — \nthe current whispers forward — \nkeep going, keep going.`
+                : `${Math.round(totalMinutes / 60)} hours deep now — \n${sessions.length} sessions shape the banks — \nthe river is you.`
+            }
+          </p>
+        )}
+        <p className="text-text-3 text-xs mt-2">Version 2.0</p>
       </div>
     </div>
   );

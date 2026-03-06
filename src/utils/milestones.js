@@ -1,4 +1,4 @@
-import { getMilestones, setMilestones, getTotalHours, calculateStreak } from './storage';
+import { getMilestones, setMilestones, getTotalHours, calculateStreak, getSessionsByDate, today, addDays, generateId } from './storage';
 
 const MILESTONE_DEFINITIONS = [
   // Hours milestones
@@ -37,7 +37,7 @@ export function checkNewMilestones(sessions) {
 
   const totalHours = getTotalHours(sessions);
   const { current: currentStreak } = calculateStreak(sessions);
-  const sessionCount = sessions.length;
+  const sessionCount = sessions.filter(s => !s.fog).length;
 
   const newlyUnlocked = [];
 
@@ -52,7 +52,7 @@ export function checkNewMilestones(sessions) {
 
     if (value >= def.threshold) {
       const milestone = {
-        id: crypto.randomUUID(),
+        id: generateId(),
         type: def.type,
         threshold: def.threshold,
         label: def.label,
@@ -62,6 +62,43 @@ export function checkNewMilestones(sessions) {
       };
       existing.push(milestone);
       newlyUnlocked.push(milestone);
+    }
+  }
+
+  // Check for comeback — first session after 3+ dry days
+  const comebackKey = 'comeback-latest';
+  if (!existingKeys.has(comebackKey)) {
+    const realSessions = sessions.filter(s => !s.fog);
+    const byDate = getSessionsByDate(realSessions);
+    const todayStr = today();
+    const todaySessions = byDate[todayStr];
+    if (todaySessions && todaySessions.length === 1) {
+      // This is the only real session today — check if previous was 3+ days ago
+      const dates = Object.keys(byDate).sort();
+      const todayIdx = dates.indexOf(todayStr);
+      if (todayIdx > 0) {
+        const prevDate = dates[todayIdx - 1];
+        const daysSince = Math.round(
+          (new Date(todayStr + 'T12:00:00') - new Date(prevDate + 'T12:00:00')) / (1000 * 60 * 60 * 24)
+        );
+        if (daysSince >= 3) {
+          // Check we haven't already shown a comeback today
+          const alreadyShown = existing.some(m => m.type === 'comeback' && m.unlocked_at && m.unlocked_at.startsWith(todayStr));
+          if (!alreadyShown) {
+            const comeback = {
+              id: generateId(),
+              type: 'comeback',
+              threshold: daysSince,
+              label: 'The Rain Returns',
+              emoji: '\u{1F327}\u{FE0F}',
+              message: `${daysSince} days away, but you came back. That takes strength.`,
+              unlocked_at: new Date().toISOString(),
+            };
+            existing.push(comeback);
+            newlyUnlocked.push(comeback);
+          }
+        }
+      }
     }
   }
 
@@ -75,5 +112,6 @@ export function checkNewMilestones(sessions) {
 export function getMilestoneQuoteCategories(type) {
   if (type === 'hours') return ['practice', 'growth'];
   if (type === 'streak') return ['persistence', 'consistency'];
+  if (type === 'comeback') return ['persistence', 'growth'];
   return ['identity'];
 }

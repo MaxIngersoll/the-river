@@ -1,18 +1,37 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { getRandomQuote } from '../utils/quotes';
 
 export default function QuoteCard({ quote: initialQuote, showRefresh = false }) {
   const [quote, setQuote] = useState(initialQuote);
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = useCallback(() => {
+    const text = `"${quote.text}" — ${quote.author}`;
+    navigator.clipboard.writeText(text).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    }).catch(() => {});
+  }, [quote]);
 
   return (
-    <div className="card p-5">
+    <div
+      className="card p-5 cursor-pointer select-none"
+      onDoubleClick={handleCopy}
+      title="Double-click to copy"
+    >
       <p className="font-serif italic text-text leading-relaxed text-[15px]">
         &ldquo;{quote.text}&rdquo;
       </p>
       <div className="mt-3 flex items-center justify-between">
         <p className="text-text-3 text-xs">
-          {quote.author}
-          {quote.source && <span className="text-text-3"> &mdash; {quote.source}</span>}
+          {copied ? (
+            <span className="text-water-4 font-medium animate-fade-in">Copied!</span>
+          ) : (
+            <>
+              {quote.author}
+              {quote.source && <span className="text-text-3"> &mdash; {quote.source}</span>}
+            </>
+          )}
         </p>
         {showRefresh && (
           <button

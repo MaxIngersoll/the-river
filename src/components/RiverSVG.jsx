@@ -8,6 +8,7 @@ import {
   getSessionsByDate,
   formatDate,
   formatDuration,
+  TAG_COLORS,
 } from '../utils/storage';
 import { useTheme } from '../contexts/ThemeContext';
 
@@ -37,32 +38,32 @@ function curveThrough(points, tension = 5) {
 
 // Light mode: deeper progression (dark colors on light bg)
 const WATER_COLORS_LIGHT = [
-  { hours: 0,    color: '#D1FAE5' },
-  { hours: 0.5,  color: '#A7F3D0' },
-  { hours: 2,    color: '#6EE7B7' },
-  { hours: 5,    color: '#34D399' },
-  { hours: 10,   color: '#2DD4BF' },
-  { hours: 25,   color: '#14B8A6' },
-  { hours: 50,   color: '#0D9488' },
-  { hours: 100,  color: '#0F766E' },
-  { hours: 250,  color: '#115E59' },
-  { hours: 500,  color: '#134E4A' },
-  { hours: 1000, color: '#042F2E' },
+  { hours: 0,    color: '#DBEAFE' },
+  { hours: 0.5,  color: '#BFDBFE' },
+  { hours: 2,    color: '#93C5FD' },
+  { hours: 5,    color: '#60A5FA' },
+  { hours: 10,   color: '#3B82F6' },
+  { hours: 25,   color: '#2563EB' },
+  { hours: 50,   color: '#1D4ED8' },
+  { hours: 100,  color: '#1E40AF' },
+  { hours: 250,  color: '#1E3A8A' },
+  { hours: 500,  color: '#172554' },
+  { hours: 1000, color: '#0F172A' },
 ];
 
 // Dark mode: luminous & glowing (bright colors against dark bg)
 const WATER_COLORS_DARK = [
-  { hours: 0,    color: '#064E3B' },   // deep forest (barely visible start)
-  { hours: 0.5,  color: '#065F46' },   // forest
-  { hours: 2,    color: '#047857' },   // emerald
-  { hours: 5,    color: '#059669' },   // bright emerald
-  { hours: 10,   color: '#10B981' },   // vivid green
-  { hours: 25,   color: '#34D399' },   // mint
-  { hours: 50,   color: '#2DD4BF' },   // bright teal
-  { hours: 100,  color: '#5EEAD4' },   // luminous teal
-  { hours: 250,  color: '#6EE7B7' },   // glowing mint
-  { hours: 500,  color: '#A7F3D0' },   // soft glow
-  { hours: 1000, color: '#D1FAE5' },   // white-mint radiance
+  { hours: 0,    color: '#0F172A' },   // deep navy (barely visible start)
+  { hours: 0.5,  color: '#172554' },   // midnight
+  { hours: 2,    color: '#1E3A8A' },   // dark indigo
+  { hours: 5,    color: '#1E40AF' },   // indigo
+  { hours: 10,   color: '#2563EB' },   // vivid blue
+  { hours: 25,   color: '#3B82F6' },   // blue
+  { hours: 50,   color: '#60A5FA' },   // bright blue
+  { hours: 100,  color: '#93C5FD' },   // luminous sky
+  { hours: 250,  color: '#BFDBFE' },   // glowing sky
+  { hours: 500,  color: '#DBEAFE' },   // soft glow
+  { hours: 1000, color: '#EFF6FF' },   // white-blue radiance
 ];
 
 function getColorForHours(h, isDark = false) {
@@ -80,6 +81,10 @@ export default function RiverSVG({ sessions, compact = false, daysToShow }) {
   const [width, setWidth] = useState(0);
   const [tooltip, setTooltip] = useState(null);
   const { isDark } = useTheme();
+  const prefersReducedMotion = useMemo(
+    () => window.matchMedia('(prefers-reduced-motion: reduce)').matches,
+    []
+  );
 
   const rowHeight = compact ? 16 : 26;
   const labelSpace = compact ? 0 : 52;
@@ -106,6 +111,8 @@ export default function RiverSVG({ sessions, compact = false, daysToShow }) {
       const mins = getMinutesForDate(sessions, date);
       runMins += mins;
       const d = new Date(date + 'T12:00:00');
+      const daySessions = sessions.filter(s => s.date === date);
+      const isFog = daySessions.some(s => s.fog === true);
       result.push({
         date, index: i, minutes: mins,
         runningHours: runMins / 60,
@@ -114,6 +121,7 @@ export default function RiverSVG({ sessions, compact = false, daysToShow }) {
         isFirstOfMonth: d.getDate() === 1,
         monthLabel: d.toLocaleDateString('en-US', { month: 'long' }),
         weekLabel: d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+        isFog,
       });
     }
     return result;
@@ -141,14 +149,15 @@ export default function RiverSVG({ sessions, compact = false, daysToShow }) {
   const maxW = riverArea * 0.86;
 
   // Generate the organic river shape
-  const { riverPath, highlightPath, gradientStops, dryDays } = useMemo(() => {
+  const { riverPath, highlightPath, gradientStops, dryDays, fogDays } = useMemo(() => {
     if (days.length === 0 || width === 0) {
-      return { riverPath: '', highlightPath: '', gradientStops: [], dryDays: [] };
+      return { riverPath: '', highlightPath: '', gradientStops: [], dryDays: [], fogDays: [] };
     }
 
     const left = [];
     const right = [];
     const dry = [];
+    const fog = [];
     const jitterAmt = compact ? 0.8 : 2;
 
     // Pinch cap at top
@@ -161,6 +170,9 @@ export default function RiverSVG({ sessions, compact = false, daysToShow }) {
 
       if (day.minutes > 0) {
         halfW = (getWaterWidth(day.minutes) / 100 * maxW) / 2;
+      } else if (day.isFog) {
+        halfW = 1;
+        fog.push(day);
       } else {
         halfW = 1;
         dry.push(day);
@@ -217,7 +229,7 @@ export default function RiverSVG({ sessions, compact = false, daysToShow }) {
     }
     stops.push({ offset: '100%', color: prevColor });
 
-    return { riverPath: path, highlightPath: hlPath, gradientStops: stops, dryDays: dry };
+    return { riverPath: path, highlightPath: hlPath, gradientStops: stops, dryDays: dry, fogDays: fog };
   }, [days, width, centerX, maxW, rowHeight, svgHeight, compact, isDark]);
 
   const handleTap = useCallback((day) => {
@@ -244,7 +256,7 @@ export default function RiverSVG({ sessions, compact = false, daysToShow }) {
   const todayHalfW = todayHasPractice
     ? (getWaterWidth(todayDay.minutes) / 100 * maxW) / 2 + 10
     : 0;
-  const todayColor = todayDay ? getColorForHours(todayDay.runningHours, isDark) : (isDark ? '#065F46' : '#A7F3D0');
+  const todayColor = todayDay ? getColorForHours(todayDay.runningHours, isDark) : (isDark ? '#172554' : '#BFDBFE');
 
   // Flow animation parameters
   const flowStreaks = compact
@@ -264,6 +276,8 @@ export default function RiverSVG({ sessions, compact = false, daysToShow }) {
       height={svgHeight}
       viewBox={`0 0 ${svgWidth} ${svgHeight}`}
       className="block"
+      role="img"
+      aria-label={`Practice activity over the last ${days.length} days`}
     >
       <defs>
         {/* River gradient (deepens over time) */}
@@ -334,7 +348,7 @@ export default function RiverSVG({ sessions, compact = false, daysToShow }) {
       )}
 
       {/* ✨ Flowing water animation — soft light streaks drifting down */}
-      {riverPath && (
+      {riverPath && !prefersReducedMotion && (
         <g clipPath={`url(#${flowClipId})`}>
           {flowStreaks.map((streak, i) => (
             <ellipse
@@ -378,8 +392,31 @@ export default function RiverSVG({ sessions, compact = false, daysToShow }) {
         );
       })}
 
+      {/* Fog day markers — soft mist circles */}
+      {fogDays.map(day => {
+        const y = day.index * rowHeight + rowHeight / 2;
+        return (
+          <circle
+            key={`fog-${day.date}`}
+            cx={centerX}
+            cy={y}
+            r={3}
+            fill="var(--color-dry-bank)"
+            opacity={0.4}
+          />
+        );
+      })}
+
+      {/* 🔵 Today marker — static for reduced motion */}
+      {todayDay && todayDay.isToday && !compact && todayHasPractice && prefersReducedMotion && (
+        <g>
+          <ellipse cx={centerX} cy={todayY} rx={todayHalfW * 0.8} ry={rowHeight * 0.6} fill={todayColor} opacity={0.2} />
+          <circle cx={centerX} cy={todayY} r={3.5} fill="white" opacity={0.8} />
+        </g>
+      )}
+
       {/* 🔵 Today marker — prominent breathing glow with ripples */}
-      {todayDay && todayDay.isToday && !compact && todayHasPractice && (
+      {todayDay && todayDay.isToday && !compact && todayHasPractice && !prefersReducedMotion && (
         <g>
           {/* Expanding ripple ring 1 */}
           <ellipse
@@ -451,8 +488,13 @@ export default function RiverSVG({ sessions, compact = false, daysToShow }) {
         </g>
       )}
 
+      {/* Today marker — dry day, static for reduced motion */}
+      {todayDay && todayDay.isToday && !compact && !todayHasPractice && prefersReducedMotion && (
+        <circle cx={centerX} cy={todayY} r={3.5} fill="var(--color-dry-bank)" opacity={0.5} />
+      )}
+
       {/* Today marker — dry day (gentle invitation pulse) */}
-      {todayDay && todayDay.isToday && !compact && !todayHasPractice && (
+      {todayDay && todayDay.isToday && !compact && !todayHasPractice && !prefersReducedMotion && (
         <g>
           {/* Soft ring pulse */}
           <circle
@@ -583,7 +625,17 @@ export default function RiverSVG({ sessions, compact = false, daysToShow }) {
                 </p>
                 {tooltip.sessions.map(s => (
                   <div key={s.id} className="mt-2 border-t border-dry pt-2">
-                    <span className="text-text-2 text-xs">{formatDuration(s.duration_minutes)}</span>
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-text-2 text-xs">{formatDuration(s.duration_minutes)}</span>
+                      {Array.isArray(s.tags) && s.tags.map(tag => (
+                        <span
+                          key={tag}
+                          className="w-1.5 h-1.5 rounded-full"
+                          style={{ background: TAG_COLORS[tag] || 'var(--color-text-3)' }}
+                          title={tag}
+                        />
+                      ))}
+                    </div>
                     {s.note && <p className="text-text-3 text-xs mt-0.5">{s.note}</p>}
                   </div>
                 ))}
