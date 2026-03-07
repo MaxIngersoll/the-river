@@ -1,5 +1,6 @@
 import { useState, useMemo, useCallback, useRef } from 'react';
 import { PRACTICE_TAGS, getSessionsByDate, today, addDays } from '../utils/storage';
+import GuitarTuner from './GuitarTuner';
 
 // ─── Music Theory Data ───
 
@@ -914,6 +915,9 @@ export default function ShedPage({ sessions = [], onNavigate }) {
         <h1 className="text-xl font-bold text-text">The Dock</h1>
         <p className="text-xs text-text-3 mt-0.5">Your launchpad — reference, tune, play</p>
       </div>
+
+      {/* Guitar Tuner — microphone-based pitch detection */}
+      <GuitarTuner />
 
       {/* The Current — smart practice suggestion */}
       <CurrentCard
