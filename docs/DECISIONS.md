@@ -59,6 +59,26 @@
 | 2026-03-07 | 11 | Mood picker: simple + affects river + celebrates hard days | Competition J Q28. MAX OVERRIDE: Simple emoji picker (Energized/Focused/Struggling/Peaceful/Frustrated). Affects river visuals. KEY: app remembers and celebrates days where practice was hard — "you showed up even when it was tough" is as important as flow days. This is crucial data. |
 | 2026-03-07 | 11 | Practice Intelligence: strengths-based, not weakness-based | Competition J Q29. MAX OVERRIDE: Smarter ranking behind same 3 cards, but STRENGTHS-based — recommend what user has done before, make it easy to continue. "The app knows me" feeling. NOT "you haven't done X in 3 weeks" framing. |
 | 2026-03-07 | 11 | Vercel demo: video hero + Begin button | Competition J Q30. MAX OVERRIDE: 15-second looping video of river in action. Single "Begin" button. Cinematic first impression. |
+| 2026-03-07 | 11 | River speed tied to practice recency | Competition J Q31. Gentle decay — daily practice = faster flow, gaps slow it. Panel 5-1. |
+| 2026-03-07 | 11 | No numeric goals | Competition J Q32. Goals are cages. River reflects effort naturally. No quotas. Panel 3-2-1. |
+| 2026-03-07 | 11 | Session notes: one optional line | Competition J Q33. A whisper, not a journal. One blank text field per session. Panel 5-1. |
+| 2026-03-07 | 11 | Seasonal ambient sounds | Competition J Q34. Sound evolves with season — birds/crickets/wind/silence layered over Petrichor. Panel 4-2. |
+| 2026-03-07 | 11 | Offline-first forever | Competition J Q35. Privacy IS the product. No servers, no accounts. File System API backup as safety net. Panel 4-2. |
+| 2026-03-07 | 11 | Dark mode as true default | Competition J Q36. Dark is the soul of the app. Kanye breaks 3-3 tie. |
+| 2026-03-07 | 11 | No push notifications | Competition J Q37. The river waits, it doesn't text you. Signal Fire for re-engagement only. Panel 4-1-1. |
+| 2026-03-07 | 11 | Keyboard shortcuts: minimal set | Competition J Q38. Space=timer, arrows=tabs. Desktop power users rewarded. Panel 4-2. |
+| 2026-03-07 | 11 | No data viz beyond the river | Competition J Q39. The river IS the visualization. Charts betray the metaphor. Stats page has numbers. Panel 4-2. |
+| 2026-03-07 | 11 | Undo on session delete: 10s toast | Competition J Q40. No modal, no "are you sure." Just undo toast. Unanimous 6-0. |
+| 2026-03-07 | 11 | Loading: minimal breathing river | Competition J Q41. Max: "I agree with Ive and Jobs. I want the breathing room." Subtle river animation on init. Panel 4-2. |
+| 2026-03-07 | 11 | Empty state: poetic invitation | Competition J Q42. "A dry riverbed waiting for rain." Panel 4-2. |
+| 2026-03-07 | 11 | Error messaging: warm and human | Competition J Q43. "Something got tangled in the current" not "Error 500." Panel 5-1. |
+| 2026-03-07 | 11 | Animation timing: context-dependent | Competition J Q44. Interactions=snappy (150ms). Ceremonies=slow (800ms+). Two speeds. Panel 5-1. |
+| 2026-03-07 | 11 | Font base: 16px minimum | Competition J Q45. Prevents iOS zoom. Readability IS design. Panel 5-1. |
+| 2026-03-07 | 11 | FAB position: bottom-right | Competition J Q46. Thumb zone, right-handed majority. Panel 4-2. |
+| 2026-03-07 | 11 | Tab bar: icons + labels always | Competition J Q47. Icons without labels fail accessibility. Panel 5-1. |
+| 2026-03-07 | 11 | Scroll: elastic bounce | Competition J Q48. Expected on iOS. CSS overscroll-behavior. Panel 5-1. |
+| 2026-03-07 | 11 | Page transitions: crossfade 200ms | Competition J Q49. Opacity-only crossfade between tabs. Panel 4-2. |
+| 2026-03-07 | 11 | Touch targets: 44px minimum | Competition J Q50. Apple HIG standard. Unanimous 6-0. |
 
 ---
 
