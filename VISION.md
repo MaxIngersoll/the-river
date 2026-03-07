@@ -283,6 +283,83 @@ Kanye West, Oprah Winfrey, Jony Ive, Steve Jobs, Elon Musk, Linus Torvalds
 12. **Mary Oliver** — Poet of attention and the natural world
 13. **Hayao Miyazaki** — Studio Ghibli, master of quiet wonder
 
+### Full Roster — Max's Direct Picks
+
+**Design & Industrial Design:**
+- Virgil Abloh — fashion, design, bridging disciplines
+- Mark Newson — industrial design, Apple collaborator
+- Naoto Fukasawa — minimalist product design ("without thought")
+- Dieter Rams — the 10 principles of good design
+- Neri Oxman — material ecology, nature-inspired computation
+- Ann Hamilton — large-scale installation art, materiality
+- Soetsu Yanagi — mingei (folk craft) philosophy, beauty in utility
+
+**Music & Sound:**
+- Leonard Cohen — poet-songwriter, devotion to the song
+- T Bone Burnett — music producer, sonic authenticity
+- John Cage — silence, chance, conceptual music
+- Wynton Marsalis — jazz mastery, practice philosophy, music education
+- Laurie Anderson — performance art, technology + art fusion
+
+**Light, Space & Visual Art:**
+- Robert Irwin — perceptual art, light and space movement
+- Olafur Eliasson — immersive environments, light installations
+- Anish Kapoor — void, color, monumental sculpture
+- Carlos Cruz-Diez — kinetic art, color in space
+- Agnes Martin — minimalist painting, meditation through line
+- Tadao Ando — concrete and light architecture, spiritual space
+
+**Psychology, Healing & Inner Work:**
+- Esther Perel — relationships, desire, the quality of being with
+- Bell Hooks — love as practice, radical pedagogy
+- Tara Brach — radical acceptance, mindfulness
+- Glennon Doyle — untaming, authenticity, creative courage
+- Gabor Maté — trauma, compassion, the body's wisdom
+- Bessel van der Kolk — the body keeps the score, trauma research
+- Pema Chödrön — sitting with uncertainty, groundlessness
+- Susan David — emotional agility, psychological flexibility
+
+**Writers & Poets:**
+- Toni Morrison — language as power, narrative identity
+- James Baldwin — truth-telling, moral courage
+- Amanda Gorman — poetry of possibility, generational voice
+- Rainer Maria Rilke — patience, solitude, Letters to a Young Poet
+- Friedrich Nietzsche — eternal return, creating values
+- Wendell Berry — place, practice, attention to land
+
+**Tech, Engineering & Founders:**
+- Bob Iger — Disney, storytelling as business strategy
+- Stewart Brand — Whole Earth, long-term thinking
+- Andrej Karpathy — AI, neural networks, teaching complex ideas
+- Jensen Huang — NVIDIA, patience in building platforms
+- Demis Hassabis — DeepMind, intelligence research
+- Palmer Luckey — VR, hardware craft, conviction
+- Dan Abramov — React core team, developer experience
+- Bryan Cantrill — systems programming, engineering culture
+- Rich Hickey — Clojure, simplicity as design principle
+- DHH — Ruby on Rails, opinionated software
+- Antirez — Redis, elegant minimalism in systems
+- Guillermo Rauch — Vercel/Next.js, frontend deployment
+- Lisa Su — AMD, engineering leadership under pressure
+- Margaret Hamilton — Apollo software, coined "software engineering"
+- Tyler Cowen — economics of creativity, marginal revolution
+- Nadia Asparouhova — open source economics, working in public
+- Kathy Sullivan — astronaut, oceanographer, extreme environments
+
+**Web/CSS/Frontend Craft:**
+- Jen Simmons — CSS Grid pioneer, browser DevTools
+- Sara Soueidan — accessibility & SVG expert
+- Adam Argyle — CSS/UI engineering, Open Props
+
+**Generative & Emergent Systems:**
+- Craig Reynolds — boids, flocking algorithms, emergent behavior
+- Bret Victor — inventing on principle, live coding environments
+
+**Nature & Craft Philosophy:**
+- Robin Wall Kimmerer — braiding sweetgrass, reciprocity with nature
+- Toshi Suzuki — Japanese craft tradition
+- Marie Kondo — joy as organizing principle
+
 ---
 
 ## Accessibility Commitment (Session 11)
