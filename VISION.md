@@ -240,6 +240,12 @@ See `docs/AGENT-PROTOCOL.md` for the full protocol. Key elements:
 
 *Practice apps count your failures. The River remembers your presence.* — Kanye, Session 11
 
+### Virgil's 3% Rule (Session 11)
+
+> *"You only need to change 3% of something to make it new."*
+
+The River is a remix. It knows what it's referencing — Apple Health, meditation apps, every practice tracker that came before. It changed 3%: the river metaphor, the seasons, the anti-guilt philosophy. That 3% made it something completely new. Self-awareness about what you're remixing IS the art. Don't pretend you were born fresh. Acknowledge the references, then transform them.
+
 ### Miyazaki's Principle (Session 11)
 
 > *"Your river does not yet have a stone, or a leaf, or a child. But it has the water. And the water is good."*
