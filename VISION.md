@@ -215,6 +215,41 @@ See `docs/AGENT-PROTOCOL.md` for the full protocol. Key elements:
 
 > "A river doesn't stop to report its progress. It flows, and you check in at the bends." — Dr. Maya Chen, Expert Panel
 
+### The Century Quotes (Q99 — "What does The River do best?")
+> "It makes you WANT to practice, not HAVE to practice." — The Panel, Competition J Q99
+
+> "It's a mirror that makes you look good." — Kanye, Q99
+
+> "It remembers you." — Oprah, Q99
+
+> "It gets out of the way." — Jobs, Q99
+
+> "It's beautiful enough to open for no reason." — Ive, Q99
+
+> "It tracks time efficiently." — Musk, Q99
+
+> "It doesn't crash." — Linus, Q99
+
+---
+
+## The Manifesto (Draft — Q100)
+
+*The River is not a productivity app. It's a place.*
+
+*You bring the music. The River remembers. Over time, your practice becomes a living thing — a river that grows wider, deeper, and more beautiful with every session. There is no score, no guilt, no finish line. Just you, your instrument, and a river that knows you were there.*
+
+---
+
+## Accessibility Commitment (Session 11)
+
+Accessibility is not a feature — it's a foundation. The River commits to:
+- `prefers-reduced-motion` support (Q83, unanimous)
+- Pattern-based colorblind differentiation (Q84)
+- Proper ARIA labels + focus management on all interactive elements (Q85)
+- 44px minimum touch targets (Q50, unanimous)
+- 16px minimum font base (Q45)
+- Consider accessibility in every future design decision
+
 ---
 
 *This document is the first thing any new session should read. Update it. Commit it. Never let context get lost again.*

@@ -99,7 +99,37 @@
 | 2026-03-07 | 11 | Active tab: subtle season-colored glow | Competition J Q68. Soft glow, not underline. Panel 4-2. |
 | 2026-03-07 | 11 | Long-press FAB: radial quick-action menu | Competition J Q69. Timer, Quick Log, Tuner, Metronome. Panel 4-2. |
 | 2026-03-07 | 11 | Pull-to-refresh: river breathes | Competition J Q70. Pull down on Home → fresh breathe animation. Panel 5-1. |
+| 2026-03-07 | 11 | River moods reflect practice patterns | Competition J Q71. Consistent=calm, sporadic=turbulent, gap=still. Panel 5-1. |
+| 2026-03-07 | 11 | Time-of-day greeting | Competition J Q72. "Good morning" / "Late night session?" Warm, subtle. Panel 4-2. |
+| 2026-03-07 | 11 | User's own notes resurface after 50h | Competition J Q73. Your past words become margin notes. "The river becomes a mirror." Panel 4-2. |
+| 2026-03-07 | 11 | River Birthday celebration | Competition J Q74. Special celebration on 1-year anniversary of first session. Unanimous 6-0. Kanye cried. |
+| 2026-03-07 | 11 | Chord fingering numbers: toggleable | Competition J Q75. Default off for clean look, toggle on for learners. Panel 5-1. |
+| 2026-03-07 | 11 | No per-chord history, YES to favorites | Competition J Q76. MAX OVERRIDE: No practice history per chord/progression (Dock is launchpad, not spreadsheet). BUT add favoriting system — favorite scales, progressions, chords for quick access. |
+| 2026-03-07 | 11 | User-creatable progressions | Competition J Q77. Tap chords to build custom sequences. Panel 5-1. |
+| 2026-03-07 | 11 | Chord of the Day | Competition J Q78. Random interesting chord daily. Subtle, optional. Panel 4-2. |
+| 2026-03-07 | 11 | Share cards include river visualization | Competition J Q79. River snapshot as background. "Your river IS your share card." Panel 5-1. |
+| 2026-03-07 | 11 | River Postcards at milestones | Competition J Q80. Beautiful seasonal snapshot, milestones only. Scarcity = value. Panel 4-2. |
+| 2026-03-07 | 11 | Year in Review feature (needs naming) | Competition J Q81. Annual practice summary à la Wrapped — but needs its own name, not copying Spotify. Panel 5-1. Naming competition pending. |
+| 2026-03-07 | 11 | Year in Review: image first, video later | Competition J Q82. Canvas image v1, animated video v2. Panel 3-2-1. |
+| 2026-03-07 | 11 | Reduced motion support | Competition J Q83. prefers-reduced-motion media query. Unanimous 6-0. Not optional — it's respect. |
+| 2026-03-07 | 11 | Colorblind-friendly mode | Competition J Q84. Pattern-based differentiation alongside colors. Panel 5-1. |
+| 2026-03-07 | 11 | Screen reader support: ARIA + focus | Competition J Q85. Proper ARIA labels, focus management on all interactive elements. Panel 5-1. |
+| 2026-03-07 | 11 | Service worker for true offline | Competition J Q86. Workbox-based, cached assets, airplane mode. Panel 5-1. |
+| 2026-03-07 | 11 | IndexedDB: not yet | Competition J Q87. localStorage fine until 5MB. Don't fix what works. Panel tie, Kanye: not yet. |
+| 2026-03-07 | 11 | Performance budget: detect and adapt | Competition J Q88. Auto-degrade on slow devices. Panel 4-2. |
+| 2026-03-07 | 11 | Hidden easter eggs: yes, well-placed | Competition J Q89. "Easter eggs are love letters to your users." Panel 5-1. |
+| 2026-03-07 | 11 | Konami Code: unlocks surprise | Competition J Q90. Fun secret. Panel 4-2. Linus: "...fine." |
+| 2026-03-07 | 11 | Holiday-themed celebrations | Competition J Q91. Subtle seasonal shifts on holidays. Tasteful, not kitschy. Panel 4-2. |
+| 2026-03-07 | 11 | Desktop dashboard: eventually | Competition J Q92. PWA already works. "IMAX for your river." Panel 4-2. |
+| 2026-03-07 | 11 | Community features: not yet | Competition J Q93. Personal first. "The river is YOURS first." Panel tie, Kanye: not yet. |
+| 2026-03-07 | 11 | Celebrate "firsts" | Competition J Q94. First session, first hour, first streak, etc. Sacred. Unanimous 6-0. |
+| 2026-03-07 | 11 | River Legacy: beautiful history document | Competition J Q95. PDF/book at major milestones (1yr, 100h). Panel 5-1. |
+| 2026-03-07 | 11 | 1,000 hours: unique transformation | Competition J Q96. Something that can't be triggered any other way. Panel 5-1. |
+| 2026-03-07 | 11 | Quiet Mode: just the timer | Competition J Q97. Accessible from Settings. Pure practice, no distractions. Panel 4-2. |
+| 2026-03-07 | 11 | Auto-save, not reminders | Competition J Q98. MAX OVERRIDE: Don't remind to save — auto-save at moments and on app close. Seamless data safety. |
+| 2026-03-07 | 11 | The River's purpose (panel quote) | Competition J Q99. "It makes you WANT to practice, not HAVE to." Added to VISION.md. |
+| 2026-03-07 | 11 | 3-sentence manifesto (About page) | Competition J Q100. Jobs: "Three sentences max." Ceremony typeface, river imagery. Panel 5-1. |
 
 ---
 
-*Updated: Session 11 (March 7, 2026)*
+*Updated: Session 11 — THE CENTURY (March 7, 2026)*
