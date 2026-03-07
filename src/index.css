@@ -27,6 +27,7 @@
 
   --font-serif: 'Lora', Georgia, serif;
   --font-sans: 'DM Sans', system-ui, -apple-system, sans-serif;
+  --font-ceremony: 'DM Serif Display', Georgia, serif;
 }
 
 /* ===== Dark mode overrides ===== */
@@ -96,6 +97,19 @@ body {
   -moz-osx-font-smoothing: grayscale;
   -webkit-overflow-scrolling: touch;
   transition: background-color 0.4s ease, color 0.4s ease;
+}
+
+/* ========================================
+   Ceremony typeface — DM Serif Display
+   Used ONLY at threshold moments:
+   Reading ceremony, milestone celebrations,
+   onboarding titles, share cards.
+   Keep it sparing. This font should feel rare.
+   ======================================== */
+.ceremony-text {
+  font-family: var(--font-ceremony);
+  font-weight: 400;
+  font-style: normal;
 }
 
 /* Prevent iOS Safari auto-zoom on input focus */

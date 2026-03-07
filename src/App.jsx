@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
-import { getSessions, addSession, updateSession, deleteSession, getTotalHours } from './utils/storage';
+import { getSessions, addSession, updateSession, deleteSession, getTotalHours, today } from './utils/storage';
 import { checkNewMilestones } from './utils/milestones';
 import { canAddFogDay, addFogDay } from './utils/fogHorn';
 import { getUndeliveredBottle, markBottleDelivered } from './utils/bottleMessages';
@@ -18,8 +18,14 @@ import OnboardingFlow from './components/OnboardingFlow';
 import { SeasonProvider } from './contexts/SeasonContext';
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState('home');
   const [sessions, setSessions] = useState(() => getSessions());
+  // Smart routing: practiced today → Home (reflect), not yet → Dock (act)
+  const [activeTab, setActiveTab] = useState(() => {
+    const initialSessions = getSessions();
+    const todayStr = today();
+    const practicedToday = initialSessions.some(s => s.date === todayStr && !s.fog);
+    return practicedToday ? 'home' : 'shed';
+  });
   const [celebrations, setCelebrations] = useState([]);
   const [pendingReading, setPendingReading] = useState(null);
   const [signalFireNote, setSignalFireNote] = useState(null);
@@ -28,7 +34,12 @@ export default function App() {
   );
 
   // Page transition state
-  const [displayedTab, setDisplayedTab] = useState('home');
+  const [displayedTab, setDisplayedTab] = useState(() => {
+    const initialSessions = getSessions();
+    const todayStr = today();
+    const practicedToday = initialSessions.some(s => s.date === todayStr && !s.fog);
+    return practicedToday ? 'home' : 'shed';
+  });
   const [transitionPhase, setTransitionPhase] = useState('idle');
   const pendingTab = useRef(null);
   const tabChangeRef = useRef(null);

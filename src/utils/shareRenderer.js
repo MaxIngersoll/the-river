@@ -81,9 +81,9 @@ export function renderShareCard(sessions) {
   ctx.fillText('MY RIVER', SIZE / 2, 72);
   ctx.letterSpacing = '0px';
 
-  // Total time — large hero number
+  // Total time — large hero number (ceremony typeface)
   ctx.fillStyle = COLORS.textPrimary;
-  ctx.font = '700 72px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
+  ctx.font = '400 72px "DM Serif Display", Georgia, serif';
   ctx.fillText(formatHours(totalMinutes), SIZE / 2, 148);
 
   // Subtitle
@@ -153,7 +153,7 @@ export function renderShareCard(sessions) {
   const quoteIdx = Math.floor(totalHours * 7) % quotes.length;
 
   ctx.fillStyle = COLORS.textSecondary;
-  ctx.font = 'italic 400 18px Georgia, "Times New Roman", serif';
+  ctx.font = '400 18px "DM Serif Display", Georgia, serif';
   ctx.fillText(quotes[quoteIdx], SIZE / 2, 900);
 
   // ─── Branding ───

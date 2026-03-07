@@ -63,7 +63,7 @@ export default function ReadingCeremony({ reading, answer, onComplete }) {
       >
         {phase === 0 && (
           <>
-            <p className="text-2xl font-bold text-text mb-4">{tierLabel}</p>
+            <p className="ceremony-text text-2xl text-text mb-4">{tierLabel}</p>
             <p className="font-serif italic text-text-2 text-sm mb-8">
               "You said: '{answer}'"
             </p>

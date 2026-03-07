@@ -130,6 +130,7 @@ export function addSession(session) {
     note: session.note || '',
     tags: Array.isArray(session.tags) ? session.tags : [],
     fog: session.fog || false,
+    instrument: session.instrument || 'guitar',
     created_at: new Date().toISOString(),
   };
   data.sessions.push(newSession);

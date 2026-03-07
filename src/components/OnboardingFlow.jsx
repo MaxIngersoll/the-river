@@ -131,7 +131,7 @@ export default function OnboardingFlow({ onComplete }) {
         {/* Heading */}
         {current.heading && (
           <h1
-            className="font-serif text-2xl leading-relaxed mb-6"
+            className="ceremony-text text-2xl leading-relaxed mb-6"
             style={{ color: 'rgba(226, 232, 240, 0.95)' }}
           >
             {current.heading}

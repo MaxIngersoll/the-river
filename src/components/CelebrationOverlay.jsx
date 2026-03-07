@@ -70,7 +70,7 @@ export default function CelebrationOverlay({ milestone, onDismiss, queuePosition
         {milestone.type === 'fog' ? (
           <>
             <div className="text-[72px] mb-6 animate-bounce-in">{'\u{1F32B}\u{FE0F}'}</div>
-            <h2 id="celebration-label" className="text-2xl font-bold text-text mb-2">Rest Day</h2>
+            <h2 id="celebration-label" className="ceremony-text text-2xl text-text mb-2">Rest Day</h2>
             <p className="text-text-2 text-sm mb-8">
               Your streak is safe. The river rests but doesn&apos;t stop.
             </p>
@@ -78,7 +78,7 @@ export default function CelebrationOverlay({ milestone, onDismiss, queuePosition
         ) : milestone.type === 'fog-bottle' ? (
           <>
             <div className="text-[48px] mb-4 animate-bounce-in">{'\u{1F4DC}'}</div>
-            <h2 id="celebration-label" className="text-lg font-bold text-text mb-4">A message found in the river</h2>
+            <h2 id="celebration-label" className="ceremony-text text-lg text-text mb-4">A message found in the river</h2>
             <div className="card p-6 mb-8 text-left">
               <p className="font-serif italic text-text text-lg leading-relaxed">
                 &ldquo;{milestone.message}&rdquo;
@@ -97,7 +97,7 @@ export default function CelebrationOverlay({ milestone, onDismiss, queuePosition
             </div>
 
             {/* Label */}
-            <h2 id="celebration-label" className="text-2xl font-bold text-text mb-2">
+            <h2 id="celebration-label" className="ceremony-text text-2xl text-text mb-2">
               {milestone.label}
             </h2>
 
