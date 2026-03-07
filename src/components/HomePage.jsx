@@ -279,14 +279,12 @@ function TodaySessions({ sessions, onUpdate, onDelete }) {
   const [editNote, setEditNote] = useState('');
   const [editDuration, setEditDuration] = useState('');
   const [editTags, setEditTags] = useState([]);
-  const [confirmDeleteId, setConfirmDeleteId] = useState(null);
 
   const startEdit = useCallback((session) => {
     setEditingId(session.id);
     setEditNote(session.note || '');
     setEditDuration(String(session.duration_minutes));
     setEditTags(Array.isArray(session.tags) ? [...session.tags] : []);
-    setConfirmDeleteId(null);
   }, []);
 
   const saveEdit = useCallback(() => {
@@ -303,18 +301,12 @@ function TodaySessions({ sessions, onUpdate, onDelete }) {
   const cancelEdit = useCallback(() => {
     setEditingId(null);
     setEditNote('');
-    setConfirmDeleteId(null);
   }, []);
 
   const handleDelete = useCallback((id) => {
-    if (confirmDeleteId === id) {
-      onDelete(id);
-      setConfirmDeleteId(null);
-      setEditingId(null);
-    } else {
-      setConfirmDeleteId(id);
-    }
-  }, [confirmDeleteId, onDelete]);
+    onDelete(id);
+    setEditingId(null);
+  }, [onDelete]);
 
   return (
     <div className="card p-4">
@@ -401,13 +393,9 @@ function TodaySessions({ sessions, onUpdate, onDelete }) {
                   <div className="flex-1" />
                   <button
                     onClick={() => handleDelete(s.id)}
-                    className={`px-3 py-1.5 rounded-full text-[11px] font-medium active:scale-[0.95] transition-all ${
-                      confirmDeleteId === s.id
-                        ? 'bg-coral text-white'
-                        : 'text-coral'
-                    }`}
+                    className="px-3 py-1.5 rounded-full text-[11px] font-medium active:scale-[0.95] transition-all text-coral"
                   >
-                    {confirmDeleteId === s.id ? 'Confirm' : 'Delete'}
+                    Delete
                   </button>
                 </div>
               </div>

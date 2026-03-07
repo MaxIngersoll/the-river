@@ -301,19 +301,15 @@ export default function TimerFAB({ onSaveSession, showTabBar = true }) {
         ) : (
           /* Stopped — note + save */
           <div className="w-full max-w-sm animate-fade-in-up">
-            <textarea
+            <input
+              type="text"
               value={note}
               onChange={(e) => setNote(e.target.value)}
               placeholder="What did you work on?"
-              maxLength={280}
-              rows={3}
               aria-label="Session note"
-              className="glass-input w-full px-4 py-3.5 text-sm text-text placeholder-text-3 resize-none"
+              className="glass-input w-full px-4 py-3.5 text-sm text-text placeholder-text-3 mb-3"
               autoFocus
             />
-            <p className="text-text-3 text-xs text-right mt-1.5 mb-3">
-              {note.length}/280
-            </p>
 
             {/* Practice tags */}
             <div className="flex flex-wrap gap-2 mb-4">

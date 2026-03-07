@@ -265,7 +265,6 @@ function SessionHistory({ sessions, onUpdate, onDelete }) {
   const [editNote, setEditNote] = useState('');
   const [editDuration, setEditDuration] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
-  const [confirmDeleteId, setConfirmDeleteId] = useState(null);
 
   const groupedDates = useMemo(() => {
     const filtered = searchQuery.trim()
@@ -293,7 +292,6 @@ function SessionHistory({ sessions, onUpdate, onDelete }) {
     setEditingId(session.id);
     setEditNote(session.note || '');
     setEditDuration(String(session.duration_minutes));
-    setConfirmDeleteId(null);
   }, []);
 
   const saveEdit = useCallback(() => {
@@ -309,18 +307,12 @@ function SessionHistory({ sessions, onUpdate, onDelete }) {
   const cancelEdit = useCallback(() => {
     setEditingId(null);
     setEditNote('');
-    setConfirmDeleteId(null);
   }, []);
 
   const handleDelete = useCallback((id) => {
-    if (confirmDeleteId === id) {
-      if (onDelete) onDelete(id);
-      setConfirmDeleteId(null);
-      setEditingId(null);
-    } else {
-      setConfirmDeleteId(id);
-    }
-  }, [confirmDeleteId, onDelete]);
+    if (onDelete) onDelete(id);
+    setEditingId(null);
+  }, [onDelete]);
 
   if (groupedDates.length === 0) return null;
 
@@ -406,13 +398,9 @@ function SessionHistory({ sessions, onUpdate, onDelete }) {
                         <div className="flex-1" />
                         <button
                           onClick={() => handleDelete(s.id)}
-                          className={`px-3 py-1.5 rounded-full text-[11px] font-medium active:scale-[0.95] transition-all ${
-                            confirmDeleteId === s.id
-                              ? 'bg-coral text-white'
-                              : 'text-coral'
-                          }`}
+                          className="px-3 py-1.5 rounded-full text-[11px] font-medium active:scale-[0.95] transition-all text-coral"
                         >
-                          {confirmDeleteId === s.id ? 'Confirm' : 'Delete'}
+                          Delete
                         </button>
                       </div>
                     </div>

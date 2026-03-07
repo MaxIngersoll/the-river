@@ -679,6 +679,37 @@ html.warm .hero-glow::before {
 }
 
 /* ========================================
+   Undo toast animations
+   ======================================== */
+@keyframes toast-in {
+  from { opacity: 0; transform: translateX(-50%) translateY(16px); }
+  to { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+@keyframes toast-out {
+  from { opacity: 1; transform: translateX(-50%) translateY(0); }
+  to { opacity: 0; transform: translateX(-50%) translateY(16px); }
+}
+
+@keyframes toast-countdown {
+  from { width: 100%; }
+  to { width: 0%; }
+}
+
+.animate-toast-in {
+  animation: toast-in 0.25s ease-out forwards;
+}
+
+.animate-toast-out {
+  animation: toast-out 0.2s ease-in forwards;
+  pointer-events: none;
+}
+
+.animate-toast-countdown {
+  animation: toast-countdown 10s linear forwards;
+}
+
+/* ========================================
    Spring interactions
    ======================================== */
 @keyframes scale-spring {

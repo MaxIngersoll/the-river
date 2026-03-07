@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef, useEffect } from 'react';
+import { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import { getSessions, addSession, updateSession, deleteSession, getTotalHours, today } from './utils/storage';
 import { checkNewMilestones } from './utils/milestones';
 import { canAddFogDay, addFogDay } from './utils/fogHorn';
@@ -161,10 +161,57 @@ export default function App() {
     refreshSessions();
   }, [refreshSessions]);
 
+  // Undo toast: soft-delete with 10s timeout
+  const [pendingDelete, setPendingDelete] = useState(null);
+  const deleteTimerRef = useRef(null);
+
   const handleSessionDelete = useCallback((id) => {
-    deleteSession(id);
-    refreshSessions();
-  }, [refreshSessions]);
+    // Find the session data before hiding it
+    const session = sessions.find(s => s.id === id);
+    if (!session) return;
+
+    // Clear any existing pending delete (commit it immediately)
+    if (deleteTimerRef.current) {
+      clearTimeout(deleteTimerRef.current);
+      deleteTimerRef.current = null;
+    }
+    if (pendingDelete) {
+      deleteSession(pendingDelete.id);
+      refreshSessions();
+    }
+
+    // Soft-delete: store session and start countdown
+    setPendingDelete({ id, session, startedAt: Date.now() });
+    deleteTimerRef.current = setTimeout(() => {
+      deleteSession(id);
+      refreshSessions();
+      setPendingDelete(null);
+      deleteTimerRef.current = null;
+    }, 10000);
+  }, [sessions, pendingDelete, refreshSessions]);
+
+  const handleUndoDelete = useCallback(() => {
+    if (deleteTimerRef.current) {
+      clearTimeout(deleteTimerRef.current);
+      deleteTimerRef.current = null;
+    }
+    setPendingDelete(null);
+  }, []);
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (deleteTimerRef.current) {
+        clearTimeout(deleteTimerRef.current);
+      }
+    };
+  }, []);
+
+  // Filter out the pending-delete session from what children see
+  const visibleSessions = useMemo(() => {
+    if (!pendingDelete) return sessions;
+    return sessions.filter(s => s.id !== pendingDelete.id);
+  }, [sessions, pendingDelete]);
 
   const handleDataCleared = useCallback(() => {
     setSessions([]);
@@ -205,7 +252,7 @@ export default function App() {
         {displayedTab === 'home' && (
           <>
             <HomePage
-              sessions={sessions}
+              sessions={visibleSessions}
               onNavigate={handleTabChange}
               onSessionUpdate={handleSessionUpdate}
               onSessionDelete={handleSessionDelete}
@@ -213,9 +260,9 @@ export default function App() {
               signalFireNote={signalFireNote}
               onSignalFireDismiss={handleSignalFireDismiss}
             />
-            {sessions.length > 0 && (
+            {visibleSessions.length > 0 && (
               <StatsPage
-                sessions={sessions}
+                sessions={visibleSessions}
                 onSessionUpdate={handleSessionUpdate}
                 onSessionDelete={handleSessionDelete}
                 embedded
@@ -225,7 +272,7 @@ export default function App() {
         )}
         {displayedTab === 'log' && (
           <LogPage
-            sessions={sessions}
+            sessions={visibleSessions}
             onLog={handleLog}
             onCelebrate={handleCelebrate}
             onNavigateHome={handleNavigateHome}
@@ -239,7 +286,7 @@ export default function App() {
           </div>
         )}
         {displayedTab === 'shed' && (
-          <ShedPage sessions={sessions} onNavigate={handleTabChange} />
+          <ShedPage sessions={visibleSessions} onNavigate={handleTabChange} />
         )}
           {displayedTab === 'settings' && (
             <SettingsPage
@@ -253,6 +300,11 @@ export default function App() {
         {showTabBar && <TabBar active={activeTab} onChange={handleTabChange} />}
 
         <TimerFAB onSaveSession={handleTimerSave} showTabBar={showTabBar} />
+
+        {/* Undo delete toast */}
+        {pendingDelete && (
+          <UndoToast onUndo={handleUndoDelete} />
+        )}
 
         {celebrations.length > 0 && (
           <CelebrationOverlay
@@ -272,5 +324,56 @@ export default function App() {
         )}
       </div>
     </SeasonProvider>
+  );
+}
+
+// ─── Undo Delete Toast ───
+
+function UndoToast({ onUndo }) {
+  const [dismissing, setDismissing] = useState(false);
+
+  const handleUndo = useCallback(() => {
+    setDismissing(true);
+    setTimeout(() => onUndo(), 200);
+  }, [onUndo]);
+
+  return (
+    <div
+      className={`fixed bottom-24 z-50 ${
+        dismissing ? 'animate-toast-out' : 'animate-toast-in'
+      }`}
+      style={{ left: '50%' }}
+    >
+      <div
+        className="flex items-center gap-4 px-5 py-3 rounded-2xl border border-white/20 overflow-hidden"
+        style={{
+          backdropFilter: 'blur(24px) saturate(180%)',
+          WebkitBackdropFilter: 'blur(24px) saturate(180%)',
+          background: 'rgba(255, 255, 255, 0.10)',
+          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.15)',
+        }}
+      >
+        <span className="text-text text-sm font-medium whitespace-nowrap">
+          Session deleted
+        </span>
+        <button
+          onClick={handleUndo}
+          className="text-sm font-bold whitespace-nowrap active:scale-[0.95] transition-transform"
+          style={{ color: 'var(--color-water-5, #3b82f6)' }}
+        >
+          Undo
+        </button>
+      </div>
+      {/* Countdown progress bar */}
+      <div className="absolute bottom-0 left-0 right-0 h-[2px] overflow-hidden rounded-b-2xl">
+        <div
+          className="h-full rounded-full animate-toast-countdown"
+          style={{
+            background: 'var(--color-water-4, #60a5fa)',
+            opacity: 0.6,
+          }}
+        />
+      </div>
+    </div>
   );
 }
