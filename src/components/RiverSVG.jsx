@@ -11,41 +11,13 @@ import {
   TAG_COLORS,
 } from '../utils/storage';
 import { useTheme } from '../contexts/ThemeContext';
+import { useSeason } from '../contexts/SeasonContext';
+import { useReducedMotion } from '../hooks/useReducedMotion';
 
 // Seeded random for consistent organic jitter
 function seeded(seed) {
   let x = Math.sin(seed * 9301 + 49297) * 49297;
   return x - Math.floor(x);
-}
-
-// ─── Season Engine ───
-// Determines the river's "emotional season" from recent practice patterns
-function detectSeason(sessions) {
-  if (!sessions || sessions.length === 0) return 'spring';
-  const now = new Date();
-  const twoWeeksAgo = new Date(now - 14 * 86400000);
-  const fourWeeksAgo = new Date(now - 28 * 86400000);
-
-  const recent = sessions.filter(s => new Date(s.date + 'T12:00:00') >= twoWeeksAgo && !s.fog);
-  const older = sessions.filter(s => {
-    const d = new Date(s.date + 'T12:00:00');
-    return d >= fourWeeksAgo && d < twoWeeksAgo && !s.fog;
-  });
-
-  const recentMins = recent.reduce((sum, s) => sum + s.duration_minutes, 0);
-  const olderMins = older.reduce((sum, s) => sum + s.duration_minutes, 0);
-  const recentDays = new Set(recent.map(s => s.date)).size;
-
-  // No recent practice = winter (dormancy)
-  if (recentDays === 0) return 'winter';
-  // Coming back after a break = spring (renewal)
-  if (olderMins === 0 && recentMins > 0) return 'spring';
-  // Increasing practice = summer (peak)
-  if (recentMins > olderMins * 1.2 && recentDays >= 5) return 'summer';
-  // Decreasing = autumn (slowing)
-  if (recentMins < olderMins * 0.7) return 'autumn';
-  // Steady = summer
-  return 'summer';
 }
 
 // Season-specific particle configs
@@ -119,13 +91,10 @@ export default function RiverSVG({ sessions, compact = false, daysToShow }) {
   const [width, setWidth] = useState(0);
   const [tooltip, setTooltip] = useState(null);
   const { isDark } = useTheme();
-  const prefersReducedMotion = useMemo(
-    () => window.matchMedia('(prefers-reduced-motion: reduce)').matches,
-    []
-  );
+  const prefersReducedMotion = useReducedMotion();
 
-  // Season detection
-  const season = useMemo(() => detectSeason(sessions), [sessions]);
+  // Season from context (single source of truth — SeasonContext.jsx)
+  const { season } = useSeason();
   const particleConfig = SEASON_PARTICLES[season];
 
   const rowHeight = compact ? 16 : 26;

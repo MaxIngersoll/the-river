@@ -68,20 +68,29 @@ export default function HomePage({ sessions, onNavigate, onSessionUpdate, onSess
 
   // Long-press fog horn handler
   const longPressTimer = useRef(null);
+  const fogHornAvailable = todayMinutes === 0 && !todayIsFog;
   const handlePressStart = useCallback((e) => {
-    if (todayMinutes > 0 || todayIsFog) return; // only on dry days with no practice
+    if (!fogHornAvailable) return; // only on dry days with no practice
     e.preventDefault();
     longPressTimer.current = setTimeout(() => {
       longPressTimer.current = null;
       onFogHorn?.();
     }, 600);
-  }, [todayMinutes, todayIsFog, onFogHorn]);
+  }, [fogHornAvailable, onFogHorn]);
   const handlePressEnd = useCallback(() => {
     if (longPressTimer.current) {
       clearTimeout(longPressTimer.current);
       longPressTimer.current = null;
     }
   }, []);
+  // Keyboard equivalent for fog horn (Enter or Space)
+  const handleFogKeyDown = useCallback((e) => {
+    if (!fogHornAvailable) return;
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      onFogHorn?.();
+    }
+  }, [fogHornAvailable, onFogHorn]);
 
   // Empty state
   if (!hasSessions) {
@@ -175,15 +184,18 @@ export default function HomePage({ sessions, onNavigate, onSessionUpdate, onSess
       {/* Flow status pill — glassy, long-press for fog horn */}
       <div className="flex justify-center mb-8">
         {streak.current > 0 ? (
-          <div
-            className={`flow-pill inline-flex items-center gap-2 px-4 py-1.5 rounded-full select-none ${
+          <button
+            type="button"
+            className={`flow-pill inline-flex items-center gap-2 px-4 py-1.5 rounded-full select-none border-0 cursor-default ${
               todayIsFog ? 'bg-dry/30' : todayMinutes === 0 ? 'bg-amber/15' : 'bg-water-1/20'
             }`}
+            aria-label={fogHornAvailable ? 'Flow status. Long-press or press Enter to log a rest day.' : 'Flow status'}
             onTouchStart={handlePressStart}
             onTouchEnd={handlePressEnd}
             onMouseDown={handlePressStart}
             onMouseUp={handlePressEnd}
             onMouseLeave={handlePressEnd}
+            onKeyDown={handleFogKeyDown}
             onContextMenu={(e) => e.preventDefault()}
           >
             <span className={`w-2 h-2 rounded-full animate-pulse-glow ${
@@ -197,15 +209,18 @@ export default function HomePage({ sessions, onNavigate, onSessionUpdate, onSess
                 : `${streak.current} day flow ${todayMinutes === 0 ? '\u23F3' : streak.current >= 30 ? '\u{1F525}' : streak.current >= 7 ? '\u2728' : ''}`
               }
             </span>
-          </div>
+          </button>
         ) : (
-          <div
-            className="flow-pill-dry inline-flex items-center gap-2 bg-dry/40 px-4 py-1.5 rounded-full select-none"
+          <button
+            type="button"
+            className="flow-pill-dry inline-flex items-center gap-2 bg-dry/40 px-4 py-1.5 rounded-full select-none border-0 cursor-default"
+            aria-label={fogHornAvailable ? 'Flow status. Long-press or press Enter to log a rest day.' : 'Flow status'}
             onTouchStart={handlePressStart}
             onTouchEnd={handlePressEnd}
             onMouseDown={handlePressStart}
             onMouseUp={handlePressEnd}
             onMouseLeave={handlePressEnd}
+            onKeyDown={handleFogKeyDown}
             onContextMenu={(e) => e.preventDefault()}
           >
             <span className="w-2 h-2 rounded-full bg-dry-bank" />
@@ -215,7 +230,7 @@ export default function HomePage({ sessions, onNavigate, onSessionUpdate, onSess
                 : 'Start a new flow'
               }
             </span>
-          </div>
+          </button>
         )}
       </div>
 

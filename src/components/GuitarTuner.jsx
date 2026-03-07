@@ -33,6 +33,7 @@ export default function GuitarTuner() {
   const [allTuned, setAllTuned] = useState(false);
 
   const audioCtxRef = useRef(null);
+  const toneCtxRef = useRef(null);  // Persistent AudioContext for reference tones
   const analyserRef = useRef(null);
   const streamRef = useRef(null);
   const rafRef = useRef(null);
@@ -123,6 +124,7 @@ export default function GuitarTuner() {
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
       if (streamRef.current) streamRef.current.getTracks().forEach(t => t.stop());
       if (audioCtxRef.current) audioCtxRef.current.close();
+      if (toneCtxRef.current) toneCtxRef.current.close();
     };
   }, []);
 
@@ -186,9 +188,15 @@ export default function GuitarTuner() {
     }
   }, [detectedFreq, listening, tuningKey, guideMode, guideStringIdx, tuning]);
 
-  // ── Play Reference Tone ──────────────────────────────
+  // ── Play Reference Tone (reuses a single AudioContext) ──
   const playReferenceTone = useCallback((freq) => {
-    const ctx = new AudioContext();
+    // Lazily create or resume a persistent AudioContext for tones
+    if (!toneCtxRef.current || toneCtxRef.current.state === 'closed') {
+      toneCtxRef.current = new AudioContext();
+    }
+    const ctx = toneCtxRef.current;
+    if (ctx.state === 'suspended') ctx.resume();
+
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
     osc.type = 'sine';
@@ -200,7 +208,6 @@ export default function GuitarTuner() {
     gain.connect(ctx.destination);
     osc.start();
     osc.stop(ctx.currentTime + 1.6);
-    setTimeout(() => ctx.close(), 2000);
   }, []);
 
   // ── Needle angle (cents → degrees, ±50 range → ±90°) ──

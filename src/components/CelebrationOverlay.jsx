@@ -2,10 +2,12 @@ import { useEffect, useState, useRef, useCallback } from 'react';
 import { getQuoteByCategory } from '../utils/quotes';
 import { getMilestoneQuoteCategories } from '../utils/milestones';
 import { useTheme } from '../contexts/ThemeContext';
+import { useReducedMotion } from '../hooks/useReducedMotion';
 
 export default function CelebrationOverlay({ milestone, onDismiss, queuePosition = 1, queueTotal = 1 }) {
   const [visible, setVisible] = useState(false);
   const { isDark } = useTheme();
+  const prefersReducedMotion = useReducedMotion();
   const isFogType = milestone.type === 'fog' || milestone.type === 'fog-bottle';
   const categories = isFogType ? ['persistence', 'growth'] : getMilestoneQuoteCategories(milestone.type);
   const quote = isFogType ? null : getQuoteByCategory(...categories);
@@ -26,10 +28,12 @@ export default function CelebrationOverlay({ milestone, onDismiss, queuePosition
   useEffect(() => {
     requestAnimationFrame(() => setVisible(true));
     startDismissTimer();
-    // Haptic feedback on mobile
-    try { navigator.vibrate?.([50, 30, 80]); } catch {}
+    // Haptic feedback on mobile (skip when reduced motion preferred)
+    if (!prefersReducedMotion) {
+      try { navigator.vibrate?.([50, 30, 80]); } catch {}
+    }
     return () => pauseDismissTimer();
-  }, [startDismissTimer, pauseDismissTimer]);
+  }, [startDismissTimer, pauseDismissTimer, prefersReducedMotion]);
 
   // Escape key to dismiss
   useEffect(() => {

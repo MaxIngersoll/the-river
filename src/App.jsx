@@ -250,7 +250,7 @@ export default function App() {
       <div className="min-h-screen bg-bg pb-16">
         <div className={`page-wrapper ${pageClass}`}>
         {displayedTab === 'home' && (
-          <>
+          <div role="tabpanel" id="tabpanel-home" aria-labelledby="tab-home">
             <HomePage
               sessions={visibleSessions}
               onNavigate={handleTabChange}
@@ -268,25 +268,29 @@ export default function App() {
                 embedded
               />
             )}
-          </>
+          </div>
         )}
         {displayedTab === 'log' && (
-          <LogPage
-            sessions={visibleSessions}
-            onLog={handleLog}
-            onCelebrate={handleCelebrate}
-            onNavigateHome={handleNavigateHome}
-          />
+          <div role="tabpanel" id="tabpanel-log" aria-labelledby="tab-log">
+            <LogPage
+              sessions={visibleSessions}
+              onLog={handleLog}
+              onCelebrate={handleCelebrate}
+              onNavigateHome={handleNavigateHome}
+            />
+          </div>
         )}
         {displayedTab === 'tuner' && (
-          <div className="px-5 pt-12 pb-24 max-w-lg mx-auto animate-fade-in relative z-10">
+          <div role="tabpanel" id="tabpanel-tuner" aria-labelledby="tab-tuner" className="px-5 pt-12 pb-24 max-w-lg mx-auto animate-fade-in relative z-10">
             <h1 className="text-2xl font-bold text-text mb-1">Tuner</h1>
             <p className="text-text-3 text-sm mb-6">Tune up, then play</p>
             <GuitarTuner />
           </div>
         )}
         {displayedTab === 'shed' && (
-          <ShedPage sessions={visibleSessions} onNavigate={handleTabChange} />
+          <div role="tabpanel" id="tabpanel-shed" aria-labelledby="tab-shed">
+            <ShedPage sessions={visibleSessions} onNavigate={handleTabChange} />
+          </div>
         )}
           {displayedTab === 'settings' && (
             <SettingsPage

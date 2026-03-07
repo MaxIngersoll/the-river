@@ -1,4 +1,4 @@
-import { memo } from 'react';
+import { memo, useCallback, useRef } from 'react';
 
 const tabs = [
   {
@@ -48,20 +48,56 @@ const tabs = [
 ];
 
 export default memo(function TabBar({ active, onChange }) {
+  const tabRefs = useRef([]);
+
+  const handleKeyDown = useCallback((e) => {
+    const currentIndex = tabs.findIndex((t) => t.id === active);
+    let nextIndex;
+
+    switch (e.key) {
+      case 'ArrowRight':
+        e.preventDefault();
+        nextIndex = (currentIndex + 1) % tabs.length;
+        break;
+      case 'ArrowLeft':
+        e.preventDefault();
+        nextIndex = (currentIndex - 1 + tabs.length) % tabs.length;
+        break;
+      case 'Home':
+        e.preventDefault();
+        nextIndex = 0;
+        break;
+      case 'End':
+        e.preventDefault();
+        nextIndex = tabs.length - 1;
+        break;
+      default:
+        return;
+    }
+
+    onChange(tabs[nextIndex].id);
+    tabRefs.current[nextIndex]?.focus();
+  }, [active, onChange]);
+
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-30 glass border-t border-card-border safe-bottom" aria-label="Main navigation">
       <p className="text-center text-text-3 px-4 pt-2 pb-0 select-none pointer-events-none" style={{ fontFamily: 'var(--font-serif)', fontSize: '11px', fontStyle: 'italic', opacity: 0.7, letterSpacing: '0.01em' }}>
         Rivers know this: there is no hurry. We shall get there some day.
       </p>
-      <div role="tablist" className="flex justify-around items-center h-[72px] max-w-lg mx-auto">
-        {tabs.map((tab) => {
+      <div role="tablist" className="flex justify-around items-center h-[72px] max-w-lg mx-auto" aria-label="App sections">
+        {tabs.map((tab, index) => {
           const isActive = active === tab.id;
           return (
             <button
               key={tab.id}
+              ref={(el) => { tabRefs.current[index] = el; }}
               role="tab"
               aria-selected={isActive}
+              aria-controls={`tabpanel-${tab.id}`}
+              id={`tab-${tab.id}`}
+              tabIndex={isActive ? 0 : -1}
               onClick={() => onChange(tab.id)}
+              onKeyDown={handleKeyDown}
               className={`relative flex flex-col items-center justify-center gap-0.5 w-20 h-full transition-all duration-200 active:scale-90 ${
                 isActive ? 'text-water-5' : 'text-text-3'
               }`}

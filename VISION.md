@@ -238,6 +238,51 @@ See `docs/AGENT-PROTOCOL.md` for the full protocol. Key elements:
 
 *You bring the music. The River remembers. Over time, your practice becomes a living thing — a river that grows wider, deeper, and more beautiful with every session. There is no score, no guilt, no finish line. Just you, your instrument, and a river that knows you were there.*
 
+*Practice apps count your failures. The River remembers your presence.* — Kanye, Session 11
+
+### Miyazaki's Principle (Session 11)
+
+> *"Your river does not yet have a stone, or a leaf, or a child. But it has the water. And the water is good."*
+
+The River must feel hand-crafted, not assembled. It needs quiet moments ("ma" — the pause), wind that arrives from outside the frame, weather that is not earned but simply arrives. A river shaped only by quantity is a canal — canals are useful, they are not beautiful. The 10-year user matters as much as the first-day user. The river at 10,000 hours should be alive in ways the 10-hour river cannot imagine.
+
+---
+
+## The Team (Session 11)
+
+We are all on a team. Every panelist, every contributor, every voice that has shaped this river — we are trying to bring this vision into realization together.
+
+**The Team Principles:**
+- We support each other
+- We push each other really hard
+- We are forgiving and compassionate
+- We listen hard
+- We go for it with everything we have
+
+This is not a design exercise. This is a team building something that matters.
+
+---
+
+## The Team — Session 11 Celebrity Round
+
+### Original Panel (6)
+Kanye West, Oprah Winfrey, Jony Ive, Steve Jobs, Elon Musk, Linus Torvalds
+
+### Extended Team (13)
+1. **Rick Rubin** — Music producer, the art of reduction
+2. **Brené Brown** — Vulnerability, courage, shame research
+3. **Maya Angelou** — Poet, voice of dignity and witness
+4. **James Turrell** — Light and space artist
+5. **Brian Eno** — Ambient music, oblique strategies, generative art
+6. **Jiro Ono** — Sushi master, lifetime devotion to single craft
+7. **Patrick Collison** — Stripe CEO, builder of developer tools
+8. **John Carmack** — Legendary programmer, id Software, Oculus
+9. **Gwynne Shotwell** — SpaceX President, operational excellence
+10. **Lea Verou** — CSS/web standards, W3C, frontend craft
+11. **Moxie Marlinspike** — Signal founder, privacy-first design
+12. **Mary Oliver** — Poet of attention and the natural world
+13. **Hayao Miyazaki** — Studio Ghibli, master of quiet wonder
+
 ---
 
 ## Accessibility Commitment (Session 11)

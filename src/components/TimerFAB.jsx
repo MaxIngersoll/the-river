@@ -174,7 +174,7 @@ export default function TimerFAB({ onSaveSession, showTabBar = true }) {
     clearTimerStorage();
   }, [elapsed, note, tags, onSaveSession]);
 
-  const handleDiscard = useCallback(() => {
+  const handleNevermind = useCallback(() => {
     setTimerState('idle');
     setStartedAt(null);
     setPausedElapsed(0);
@@ -348,10 +348,10 @@ export default function TimerFAB({ onSaveSession, showTabBar = true }) {
             </button>
 
             <button
-              onClick={handleDiscard}
+              onClick={handleNevermind}
               className="w-full py-3 text-text-3 text-sm font-medium active:scale-[0.97] transition-all"
             >
-              Discard
+              Never mind
             </button>
           </div>
         )}

@@ -12,13 +12,15 @@
     <link rel="manifest" href="/manifest.json" />
     <link rel="icon" type="image/svg+xml" href="/icon.svg" />
     <link rel="apple-touch-icon" sizes="180x180" href="/icon-192.png" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Lora:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:opsz@9..40&display=swap" rel="stylesheet" />
+    <!-- Fonts self-hosted in /public/fonts/ -->
     <title>The River</title>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <div style="display:grid;place-items:center;height:100dvh;background:#0C0A09;color:#D6D3D1;font-family:system-ui">
+        <p style="font-size:14px;letter-spacing:0.1em;text-transform:uppercase">The River</p>
+      </div>
+    </div>
     <script type="module" src="/src/main.jsx"></script>
     <script>
       if ('serviceWorker' in navigator) {
