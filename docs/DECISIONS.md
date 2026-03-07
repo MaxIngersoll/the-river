@@ -131,6 +131,22 @@
 | 2026-03-07 | 11 | 3-sentence manifesto (About page) | Competition J Q100. Jobs: "Three sentences max." Ceremony typeface, river imagery. Panel 5-1. |
 | 2026-03-07 | 11 | Year in Review named "The Reflection" | Naming competition: 60 names from 6 panelists. Winner: Oprah's "The Reflection." Max: "Totally agree with Oprah. Reflection is perfect." When you look into a river, you see yourself looking back. |
 
+| 2026-03-08 | 11 | Rename "Discard" → "Never mind" | Brown: shame-aware language. "Discard" implies your time was worthless. |
+| 2026-03-08 | 11 | Self-host Google Fonts | Moxie: Google Fonts = surveillance endpoint. Fonts now in /public/fonts/. |
+| 2026-03-08 | 11 | WAI-ARIA tab keyboard navigation | Verou: Arrow Left/Right, Home/End. tabIndex roving. tabpanel roles. |
+| 2026-03-08 | 11 | useReducedMotion hook (reactive) | Verou: JS-driven animations respect prefers-reduced-motion in real-time. |
+| 2026-03-08 | 11 | Fog horn keyboard accessible | Verou: Enter/Space triggers fog horn (was long-press only). |
+| 2026-03-08 | 11 | Remove duplicate detectSeason() | Linus: RiverSVG had exact copy of SeasonContext's function. Use useSeason(). |
+| 2026-03-08 | 11 | Reuse AudioContext in GuitarTuner | Carmack: was creating new AudioContext per reference tone. Now one persistent context. |
+| 2026-03-08 | 11 | No-JS branded loading state | Verou: index.html shows "The River" while JS loads, not blank white. |
+| 2026-03-08 | 11 | Miyazaki's Principle added to VISION.md | "A river shaped only by quantity is a canal." Hand-crafted > assembled. |
+| 2026-03-08 | 11 | Team Culture statement established | 19-person advisory panel. Principles: support, push hard, forgive, listen, go for it. |
+| 2026-03-08 | 11 | Tab bar removal → future roadmap | Rubin: "Why does the app have four tabs?" Minimalist navigation for the future. |
+| 2026-03-08 | 11 | Water-timer visualization → future roadmap | Oliver: "A river does not count its own water." Timer as rising water, not clock. |
+| 2026-03-08 | 11 | Turrell Light Initiative launched | Research project: light as primary material in UI. Panel: Bret Victor, Robert Irwin, Makoto Shinkai. |
+| 2026-03-08 | 11 | Mood picker redesign → future panel question | Angelou: current emoji picker too shallow. Needs to capture the ineffable. |
+| 2026-03-08 | 11 | Celebration depth → future panel question | Jiro: app celebrates too often. Depth > frequency. 1000h is when practice begins. |
+
 ---
 
-*Updated: Session 11 — THE CENTURY (March 7, 2026)*
+*Updated: Session 11 — Celebrity Panel Implementation (March 8, 2026)*
