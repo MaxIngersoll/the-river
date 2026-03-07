@@ -660,10 +660,11 @@ function ProgressionStrips({ rootNote, scale, diatonicChords }) {
     return chord.quality === 'major' ? chord.root : `${chord.root}m`;
   }, [diatonicChords]);
 
+  // Highlight the progression (no auto-timer — user starts timer themselves)
+  const [activeProg, setActiveProg] = useState(null);
   const handlePractice = useCallback((prog) => {
-    const chordNames = prog.numerals.map(n => numeralToChord(n)).join(' → ');
-    dispatchTimerStart(`${rootNote} ${prog.name}: ${chordNames}`);
-  }, [rootNote, numeralToChord]);
+    setActiveProg(prev => prev === prog.name ? null : prog.name);
+  }, []);
 
   return (
     <div className="space-y-2">
@@ -680,9 +681,14 @@ function ProgressionStrips({ rootNote, scale, diatonicChords }) {
           </div>
           <button
             onClick={() => handlePractice(prog)}
-            className="shrink-0 w-7 h-7 rounded-full flex items-center justify-center active:scale-90 transition-all"
-            style={{ background: 'linear-gradient(135deg, rgba(59,130,246,0.8), rgba(30,64,175,0.9))' }}
-            aria-label={`Practice ${prog.name} progression`}
+            className={`shrink-0 w-7 h-7 rounded-full flex items-center justify-center active:scale-90 transition-all ${
+              activeProg === prog.name ? 'ring-2 ring-water-4' : ''
+            }`}
+            style={{ background: activeProg === prog.name
+              ? 'linear-gradient(135deg, rgba(59,130,246,0.9), rgba(30,64,175,1))'
+              : 'linear-gradient(135deg, rgba(59,130,246,0.4), rgba(30,64,175,0.5))'
+            }}
+            aria-label={`Highlight ${prog.name} progression`}
           >
             <svg width="10" height="10" viewBox="0 0 24 24" fill="white">
               <polygon points="5,3 19,12 5,21" />
