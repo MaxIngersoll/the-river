@@ -26,6 +26,14 @@ The Efficiency Engineer suggested "No sub-agents for tasks under 30 seconds." Th
 
 ---
 
+**Competition I (Sapphire Sessions) — "Penguin Tuxedo" (FQ5)**
+Facet Queen proposed that the warm theme was a penguin in formal wear. Royal Blue = jacket. Swan Wing = shirt. Quicksand = cufflinks. The one-time toast: "The river has put on its evening wear." Eliminated in Round 1. Won the Wildcard Award. Two pixels of gold border made the final synthesis. The penguin won from beyond the grave.
+
+**Competition I — Depth Charge's "Pressure Gradient" (DC4)**
+Depth Charge proposed that buttons at different "pressures" should animate at different speeds. Deep UI = slow and contemplative. Surface UI = fast and responsive. Nobody would feel this. Nobody. But Depth Charge was on LSD in a planetarium and was CERTAIN about the photic zones of the actual ocean. We love you, Depth Charge.
+
+---
+
 ## Best Agent Quotes
 
 > "The wave symbol you drew with bezier curves looks like a tiny dolphin doing yoga." — Ricky Delgado, Expert Panel
@@ -35,6 +43,12 @@ The Efficiency Engineer suggested "No sub-agents for tasks under 30 seconds." Th
 > "Running a Tier 1 competition for a PDF is like hiring an orchestra to play happy birthday." — The Team Captain, roasting themselves
 
 > "Meanwhile, the Cartographer quietly burns all their maps." — Post-credits scene, Competition G
+
+> "Depth Charge said 'gold is bioluminescence at depth' and I need everyone to sit with how unhinged that is." — Facet Queen, Compliment Roast
+
+> "Pitch Perfect's big innovation was 'just show what it hears.' Incredible. Groundbreaking. Also: literally every guitar tuner app since 2009." — Caliber, Compliment Roast
+
+> "The River wants to listen to your guitar. It promises not to judge." — The Tuner Permission Modal, now actually in the app
 
 ---
 
@@ -46,6 +60,20 @@ The Efficiency Engineer suggested "No sub-agents for tasks under 30 seconds." Th
 **Competition H: The Internal Audit**
 *In an alternate timeline, the Efficiency Engineer became so obsessed with token optimization that they started speaking exclusively in abbreviations. "LGTM. SHIP. NXT." When asked for a celebration, they responded: "JOY." One character. Maximum efficiency. The Team Captain wept.*
 
+**Competition I: The Sapphire Sessions**
+*[Interior: The River's server room. A single server blinks in the dark. A tiny penguin in a tuxedo waddles across the floor.]*
+*PENGUIN: (adjusting gold cufflinks) They didn't pick me, you know.*
+*THE SERVER: I know. But your borders made the cut.*
+*PENGUIN: My borders. TWO PIXELS. That's my legacy.*
+*THE SERVER: Two pixels that changed how every card looks in the warm theme. That's more than most features can say.*
+*PENGUIN: (staring into the blue LED glow) You know what the river quote says? "There is no hurry." I've been waiting since Round 1.*
+*THE SERVER: You were eliminated in Round 1.*
+*PENGUIN: And yet here I am. In the post-credits. In the codebase. In the hearts and minds of—*
+*THE SERVER: Please leave the server room.*
+*PENGUIN: (waddling out) Gold cufflinks. Two pixels. I'll take it.*
+*[The server blinks. In the silence, very faintly: "Rivers know this: there is no hurry."]*
+*[FADE TO ROYAL BLUE #112250]*
+
 ---
 
 ## Running Jokes
@@ -53,8 +81,10 @@ The Efficiency Engineer suggested "No sub-agents for tasks under 30 seconds." Th
 - **ShedPage Line Count Watch:** Currently at 1,170 lines. At this rate, ShedPage will achieve sentience by Session 14 and demand its own tab. Update: it already HAS its own tab. The prophecy begins.
 - **"The River Remembers":** Used whenever we reference a past mistake that led to a good rule. The river always remembers.
 - **Max's Coffee Spit Test:** A celebration isn't good enough unless it could theoretically make Max spit out his coffee. Current success rate: ~15%. We're working on it.
+- **The Penguin:** Eliminated in Round 1 of Competition I. Won the Wildcard Award. Two pixels of gold border made the final synthesis. Now has a post-credits scene. A legend who will never die.
+- **ShedPage Line Count Watch (Update):** Now 1,174 lines after adding the tuner import. The prophecy continues. It grows. It always grows.
 
 ---
 
 *This document is sacred. Treat it with the reverence of a rubber chicken at a board meeting.*
-*Updated: Session 8*
+*Updated: Session 10*

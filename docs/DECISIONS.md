@@ -22,7 +22,13 @@
 | 2026-03-06 | 8 | Season CSS variables cascade app-wide (Thermal Drift) | The river is the weather of the app, not a chart on one page |
 | 2026-03-06 | 8 | Competition tiers: Full / Quick / Flash | Not every feature needs 15 proposals (Competition H audit) |
 | 2026-03-06 | 8 | Bridge Notes for session continuity | Session endings matter as much as starts |
+| 2026-03-07 | 10 | Sapphire Night as third theme (not replacement) | Max: keep dark mode as-is, new warm option |
+| 2026-03-07 | 10 | Gold = user data, Blue = system chrome | "Earned Sapphire" principle: achievement glows, UI stays humble |
+| 2026-03-07 | 10 | pitchy for pitch detection (not ml5 or custom) | 5KB, MIT, zero deps, McLeod method, confidence scores |
+| 2026-03-07 | 10 | Tuner at top of Dock (before CurrentCard) | First thing you see, first thing you need when picking up guitar |
+| 2026-03-07 | 10 | Guide Me default for alternate tunings | New players don't know target notes for DADGAD/Open G |
+| 2026-03-07 | 10 | Milne quote above tab bar (always visible) | Max: "always visible, subtle, elegant." The app's tagline. |
 
 ---
 
-*Updated: Session 8 (March 6, 2026)*
+*Updated: Session 10 (March 7, 2026)*
