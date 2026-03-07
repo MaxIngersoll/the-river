@@ -1,7 +1,7 @@
 # The River — Vision, Feedback & Design Philosophy
 
 > This is a living document. Every session updates it. Every new Claude reads it first.
-> **Last updated:** March 6, 2026
+> **Last updated:** March 7, 2026
 
 ---
 
@@ -31,6 +31,7 @@ It's not a dashboard. It's a *place*. The river metaphor isn't decorative — it
 - **No GitHub-style heatmap calendar.** Max explicitly said no to this.
 - **No gamification traps.** No punishing language, no "you broke your streak," no guilt. The river cools when you're away — it doesn't die.
 - **Commit early, commit often.** Never let significant work accumulate uncommitted. Every feature gets its own commit.
+- **The River identity transcends guitar** — it's for creative practice broadly (guitar-first, instrument-aware).
 - **Update this document.** After every meaningful decision, VISION.md gets updated. After every session, session history gets appended.
 
 ---
@@ -98,6 +99,13 @@ It's not a dashboard. It's a *place*. The river metaphor isn't decorative — it
 - **Milne Quote:** "Rivers know this: there is no hurry." Always visible above tab bar.
 - **The Penguin:** Won the Wildcard Award. Two pixels of gold border. A legend.
 
+### Session 11: Competition J — The Big Questions
+- **Competition J:** Tier 1 philosophical competition — 10 questions about The River's identity and future direction.
+- **5 key decisions:** Audio recording (yes, but subtle — private mirror not performance camera). Ceremony typeface (yes, try it for threshold moments). Keep metronome + chord diagrams, kill ear training + audio recording for now. Vercel soft launch as demo. River identity > guitar identity.
+- **Identity shift:** Max agrees with Kanye — The River is the identity, not guitar. Guitar-first but architecture opens for creative practice broadly.
+- **Deployment:** Soft launch on Vercel. Demo capacity, not promoted. Just get it live.
+- **Feature triage:** Metronome and chord diagrams stay (practice companion). Ear training and audio recording cut from near-term roadmap.
+
 ---
 
 ## Design Competition Protocol
@@ -120,7 +128,7 @@ See `docs/AGENT-PROTOCOL.md` for the full protocol. Key elements:
 
 ---
 
-## Current State (as of March 6, 2026)
+## Current State (as of March 7, 2026)
 
 ### What's Built & Working
 - Full Liquid Glass UI (dark + light modes, blue/indigo palette)
@@ -153,11 +161,14 @@ See `docs/AGENT-PROTOCOL.md` for the full protocol. Key elements:
 - Milne quote whisper above tab bar: "Rivers know this: there is no hurry."
 
 ### What's Next (Priority Order)
-1. Refine chord diagrams based on Competition E synthesis ("The Luthier's Current")
-2. Competition C implementation: Maya's River pitch deck narrative (designed, not built)
-3. Polish: ShedPage.jsx breakup (1,170 lines → sub-components), mobile audit, accessibility
-4. Real device testing: PWA install flow, touch interactions
-5. Max may have new directions — ask before assuming
+1. Vercel soft launch — deploy as demo capacity, get it live with a URL
+2. Ceremony typeface — try a single high-contrast serif for threshold moments (Reading, milestones, onboarding)
+3. Refine chord diagrams based on Competition E synthesis ("The Luthier's Current")
+4. Polish: ShedPage.jsx breakup (1,170 lines → sub-components), mobile audit, accessibility
+5. Architecture: begin opening identity beyond guitar — instrument-aware, creative practice broadly
+6. Competition C implementation: Maya's River pitch deck narrative (designed, not built)
+7. Real device testing: PWA install flow, touch interactions
+8. Max may have new directions — ask before assuming
 
 ### Competition Results
 - **Competition A: The Dock** — WINNER: "The Current" + "The Dock" synthesis. **IMPLEMENTED (Phase 1 + 2).** Renamed Shed→Dock, tuning strip, progressions, proportional frets, CurrentCard, QuickStartCards.
@@ -169,6 +180,7 @@ See `docs/AGENT-PROTOCOL.md` for the full protocol. Key elements:
 - **Competition G: Milestone PDF** — WINNER: "The River Medal" (Goldsmith synthesis). **IMPLEMENTED.** Trophy/diploma style celebration PDF.
 - **Competition H: Internal Audit** — WINNER: Synthesis of 6 improvements + 7-expert panel review. **IMPLEMENTED.** Competition tiers, Bridge Notes, DECISIONS.md, Outtakes Reel, fun protocols, stale doc cleanup.
 - **Competition I: The Sapphire Sessions** — WINNERS: "Earned Sapphire" (colorway), "Quick Chronograph" (tuner), "Tab Bar Whisper" (quote). **IMPLEMENTED.** Sapphire Night theme, guitar tuner, Milne quote.
+- **Competition J: The Big Questions** — Tier 1 philosophical competition. 10 questions on identity and direction. 5 key decisions: audio recording (yes, subtle), ceremony typeface (yes, try it), keep metronome/kill ear training, Vercel demo launch, River > guitar identity. **DECISIONS RECORDED.**
 
 ---
 

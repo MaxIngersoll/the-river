@@ -28,7 +28,12 @@
 | 2026-03-07 | 10 | Tuner at top of Dock (before CurrentCard) | First thing you see, first thing you need when picking up guitar |
 | 2026-03-07 | 10 | Guide Me default for alternate tunings | New players don't know target notes for DADGAD/Open G |
 | 2026-03-07 | 10 | Milne quote above tab bar (always visible) | Max: "always visible, subtle, elegant." The app's tagline. |
+| 2026-03-07 | 11 | Audio recording: YES but subtle | Competition J Q1. Oprah's case won Max over, but Jobs' concern about sacred space is valid. Recording must feel like a private mirror, not a performance camera. Alternatives: Jobs: hard no (destroys sacred space). Oprah: mirror that tells truth kindly. Max: both right, do it subtly. |
+| 2026-03-07 | 11 | Ceremony typeface: YES, try it | Competition J Q2/Topic 4. Ive proposed a single high-contrast serif for threshold moments (Reading, milestones, onboarding). Kanye elevated it. Max willing to try. Alternatives: Musk: "gilding a bicycle." Oprah: "let it breathe." Jobs: neutral. |
+| 2026-03-07 | 11 | Keep metronome, kill ear training + audio recording for now | Competition J. Max agrees The River is a presence app BUT also a practice companion. Key practice resources (metronome, chord diagrams) stay. Ear training and audio recording cut. Alternatives: Jobs: kill metronome too. Max: no, it's a practice companion, not just presence. |
+| 2026-03-07 | 11 | Deploy as demo: Vercel soft launch | Competition J Topic 5. Max agrees with Musk — go live. But in demo capacity, not promoted. Soft launch with URL. Alternatives: Musk: hard launch now. Linus: not without tests. Kanye: design the moment. Max: demo capacity. |
+| 2026-03-07 | 11 | River identity > guitar identity | Competition J Q10. Max agrees with Kanye — The River is the identity, not guitar. Should work for music practice or creative practice holistically. Guitar-first but architecture opens. Alternatives: Jobs: guitar IS the identity. Kanye: River is the iPhone moment. Max: Kanye is right. |
 
 ---
 
-*Updated: Session 10 (March 7, 2026)*
+*Updated: Session 11 (March 7, 2026)*
