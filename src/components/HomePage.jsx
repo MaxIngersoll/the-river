@@ -15,7 +15,7 @@ import { todayIsFogDay } from '../utils/fogHorn';
 import QuoteCard from './QuoteCard';
 import InsightCard from './InsightCard';
 import SignalFireCard from './SignalFireCard';
-import RiverSVG from './RiverSVG';
+
 
 function getGreeting() {
   const h = new Date().getHours();
@@ -246,22 +246,6 @@ export default function HomePage({ sessions, onNavigate, onSessionUpdate, onSess
             <p className="text-text-3 text-[10px] uppercase tracking-wider mt-1">{stat.label}</p>
           </div>
         ))}
-      </div>
-
-      {/* River preview (last 28 days) */}
-      <div
-        className="card p-4 mb-6 cursor-pointer active:scale-[0.98] transition-transform"
-        onClick={() => onNavigate('stats')}
-      >
-        <div className="flex items-center justify-between mb-3">
-          <h3 className="text-text-2 text-xs font-medium uppercase tracking-wider">
-            Last 28 Days
-          </h3>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-text-3">
-            <polyline points="9 18 15 12 9 6" />
-          </svg>
-        </div>
-        <RiverSVG sessions={sessions} compact daysToShow={28} />
       </div>
 
       {/* Signal Fire or Weekly insight */}

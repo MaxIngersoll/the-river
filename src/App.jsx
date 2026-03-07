@@ -12,6 +12,7 @@ import SettingsPage from './components/SettingsPage';
 import CelebrationOverlay from './components/CelebrationOverlay';
 import ReadingCeremony from './components/ReadingCeremony';
 import ShedPage from './components/ShedPage';
+import GuitarTuner from './components/GuitarTuner';
 import TimerFAB from './components/TimerFAB';
 import OnboardingFlow from './components/OnboardingFlow';
 import { SeasonProvider } from './contexts/SeasonContext';
@@ -191,15 +192,25 @@ export default function App() {
       <div className="min-h-screen bg-bg pb-16">
         <div className={`page-wrapper ${pageClass}`}>
         {displayedTab === 'home' && (
-          <HomePage
-            sessions={sessions}
-            onNavigate={handleTabChange}
-            onSessionUpdate={handleSessionUpdate}
-            onSessionDelete={handleSessionDelete}
-            onFogHorn={handleFogHorn}
-            signalFireNote={signalFireNote}
-            onSignalFireDismiss={handleSignalFireDismiss}
-          />
+          <>
+            <HomePage
+              sessions={sessions}
+              onNavigate={handleTabChange}
+              onSessionUpdate={handleSessionUpdate}
+              onSessionDelete={handleSessionDelete}
+              onFogHorn={handleFogHorn}
+              signalFireNote={signalFireNote}
+              onSignalFireDismiss={handleSignalFireDismiss}
+            />
+            {sessions.length > 0 && (
+              <StatsPage
+                sessions={sessions}
+                onSessionUpdate={handleSessionUpdate}
+                onSessionDelete={handleSessionDelete}
+                embedded
+              />
+            )}
+          </>
         )}
         {displayedTab === 'log' && (
           <LogPage
@@ -209,12 +220,12 @@ export default function App() {
             onNavigateHome={handleNavigateHome}
           />
         )}
-        {displayedTab === 'stats' && (
-          <StatsPage
-            sessions={sessions}
-            onSessionUpdate={handleSessionUpdate}
-            onSessionDelete={handleSessionDelete}
-          />
+        {displayedTab === 'tuner' && (
+          <div className="px-5 pt-12 pb-24 max-w-lg mx-auto animate-fade-in relative z-10">
+            <h1 className="text-2xl font-bold text-text mb-1">Tuner</h1>
+            <p className="text-text-3 text-sm mb-6">Tune up, then play</p>
+            <GuitarTuner />
+          </div>
         )}
         {displayedTab === 'shed' && (
           <ShedPage sessions={sessions} onNavigate={handleTabChange} />

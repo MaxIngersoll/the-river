@@ -19,7 +19,7 @@ import RiverSVG from './RiverSVG';
 import ProgressRing from './ProgressRing';
 import ShareCard from './ShareCard';
 
-export default function StatsPage({ sessions, onSessionUpdate, onSessionDelete }) {
+export default function StatsPage({ sessions, onSessionUpdate, onSessionDelete, embedded }) {
   const [showShare, setShowShare] = useState(false);
   const settings = getSettings();
   const hasSessions = sessions.length > 0;
@@ -35,8 +35,9 @@ export default function StatsPage({ sessions, onSessionUpdate, onSessionDelete }
     return { totalMinutes: total, weekStats: week, bests: pb, daysSinceFirst: daysFirst, weekProgress: wp };
   }, [sessions, settings.first_session_date, settings.weekly_goal_minutes]);
 
-  // Empty state
+  // Empty state — skip when embedded (parent handles empty)
   if (!hasSessions) {
+    if (embedded) return null;
     return (
       <div className="px-5 pt-12 pb-24 max-w-lg mx-auto animate-fade-in relative z-10">
         <h1 className="text-2xl font-bold text-text mb-1">Your River</h1>
@@ -65,8 +66,9 @@ export default function StatsPage({ sessions, onSessionUpdate, onSessionDelete }
   }
 
   return (
-    <div className="px-5 pt-12 pb-24 max-w-lg mx-auto animate-fade-in relative z-10">
-      {/* Header */}
+    <div className={embedded ? "px-5 pb-24 max-w-lg mx-auto relative z-10" : "px-5 pt-12 pb-24 max-w-lg mx-auto animate-fade-in relative z-10"}>
+      {/* Header — hidden when embedded in River tab */}
+      {!embedded && (
       <div className="mb-6">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold text-text mb-1">Your River</h1>
@@ -93,6 +95,7 @@ export default function StatsPage({ sessions, onSessionUpdate, onSessionDelete }
           <span>{daysSinceFirst} day{daysSinceFirst !== 1 ? 's' : ''}</span>
         </div>
       </div>
+      )}
 
       {/* Full river visualization */}
       <div className="mb-6">
