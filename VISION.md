@@ -361,6 +361,24 @@ Kanye West, Oprah Winfrey, Jony Ive, Steve Jobs, Elon Musk, Linus Torvalds
 - Craig Reynolds — boids, flocking algorithms, emergent behavior
 - Bret Victor — inventing on principle, live coding environments
 
+**Data Visualization & Creative Coding (River Viz Team):**
+- Ben Fry — co-created Processing, Fathom Information Design, genome visualization
+- Jer Thorp — data as human material, 9/11 Memorial algorithm, NYT data artist
+- Nadieh Bremer — Information is Beautiful awards, organic flowing data art
+- Robert Hodgin (flight404) — particle systems, fluid dynamics, Apple iTunes Visualizer
+- Shirley Wu — Hamilton lyric viz, Film Flowers, D3 + Canvas + WebGL
+- Giorgia Lupi — "Data Humanism," Dear Data project, personal data as handcraft (unanimous #1 pick)
+- Amelia Wattenberger — interactive data essays, React/D3/Canvas, Fullstack D3 author
+- Matt DesLauriers — generative art in JS/WebGL, ships beautiful code in browsers
+- Memo Akten — fluid dynamics + AI art, "Forms" series, emergent motion from data
+- Nicholas Felton — personal annual reports, a decade of life-as-data-art
+- Casey Reas — co-created Processing with Fry, simple rules → complex organic systems
+- Reza Ali — computational design, fluid simulation, particle physics
+- Moritz Stefaner — "Truth & Beauty Operator," organic flowing visualizations
+- Federica Fragapane — information design that looks grown in a garden
+- Elijah Meeks — Netflix data viz practice, Semiotic framework, systems thinking
+- Raven Kwok — algorithmic art, geometric generative systems, Processing/WebGL
+
 **Nature & Craft Philosophy:**
 - Robin Wall Kimmerer — braiding sweetgrass, reciprocity with nature
 - Toshi Suzuki — Japanese craft tradition
