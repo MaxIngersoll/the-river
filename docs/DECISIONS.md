@@ -44,6 +44,22 @@
 | 2026-03-07 | 11 | Celebrity Panel = new default competition format | Competition J Q14. Max: "This is the new standard for us." Celebrity panel with 6 personas + multi-axis scoring is now default for Tier 1. Constraint-based still valid for implementation comps. |
 | 2026-03-07 | 11 | Metronome: keep embedded, add BPM saving | Competition J Q15. Metronome stays embedded in SoundscapePanel. Add BPM progression tracking per session. |
 
+| 2026-03-07 | 11 | Dock references: tabs + search + accordion hybrid | Competition J Q16. Scrollable pill tabs for taxonomy, search bar for power users, accordion collapse within each tab section. Combines Ive's clean taxonomy, Jobs' search-first, Oprah's one-voice focus. |
+| 2026-03-07 | 11 | River objects: Option C trimmed (Jobs' filter) | Competition J Q17. Mix objects (fish/boats/lanterns/jumping fish/lily pads). Only render tags user actually practices. Untagged sessions = the water itself. No legend. |
+| 2026-03-07 | 11 | Quick log: smart default (1 tap) | Competition J Q18. Pre-filled from time-of-day and history. One tap to confirm. Panel consensus (Kanye/Ive/Musk). |
+| 2026-03-07 | 11 | Ceremony typeface: DM Serif Display | Competition J Q19. 20KB, modern, clean serif. Used only at threshold moments. Panel consensus 4-1-1 (Kanye/Jobs/Musk/Linus). |
+| 2026-03-07 | 11 | River writes back: margin note style | Competition J Q20. River-generated reflections use existing margin note system. Same ceremony, same data flow. Panel consensus 5-1. Ive adds: subtle shimmer on Home as discovery hint. |
+| 2026-03-07 | 11 | River sounds: yes, subtle ambient water | Competition J Q21. Water flowing that varies with river width/season. Panel consensus 4-2 (Kanye/Oprah/Ive/Musk). Must be very subtle — never compete with hearing guitar. |
+| 2026-03-07 | 11 | Tags: hybrid (6 core + optional sub-tags) | Competition J Q22. Six pre-set core tags power river objects. Optional sub-tags for personal notes (e.g., Scales > Pentatonic). Panel consensus 4-2. |
+| 2026-03-07 | 11 | Smart routing on launch | Competition J Q23. Practiced today → Home (reflect). Haven't yet → Dock (act). Panel consensus 3-2-1. |
+| 2026-03-07 | 11 | Multi-instrument: defer, add schema field | Competition J Q24. Add `instrument: "guitar"` to session schema now (one line). Defer all UI. Panel consensus. |
+| 2026-03-07 | 11 | Streaks: hide number, show warmth | Competition J Q25. No visible streak count. River warmth/width communicates consistency instead. Panel consensus 3-2-1. |
+| 2026-03-07 | 11 | Share cards: milestone-only with river art | Competition J Q26. Share cards only at milestones. River snapshot as background. Scarcity = value. Panel consensus 4-2. |
+| 2026-03-07 | 11 | Onboarding 4th screen: interactive demo + poetic text | Competition J Q27. MAX OVERRIDE: Combine C+D. Interactive demo (tap to see river grow) WITH poetic descriptions ("A timer that breathes with you. A river that remembers."). Best of both. |
+| 2026-03-07 | 11 | Mood picker: simple + affects river + celebrates hard days | Competition J Q28. MAX OVERRIDE: Simple emoji picker (Energized/Focused/Struggling/Peaceful/Frustrated). Affects river visuals. KEY: app remembers and celebrates days where practice was hard — "you showed up even when it was tough" is as important as flow days. This is crucial data. |
+| 2026-03-07 | 11 | Practice Intelligence: strengths-based, not weakness-based | Competition J Q29. MAX OVERRIDE: Smarter ranking behind same 3 cards, but STRENGTHS-based — recommend what user has done before, make it easy to continue. "The app knows me" feeling. NOT "you haven't done X in 3 weeks" framing. |
+| 2026-03-07 | 11 | Vercel demo: video hero + Begin button | Competition J Q30. MAX OVERRIDE: 15-second looping video of river in action. Single "Begin" button. Cinematic first impression. |
+
 ---
 
 *Updated: Session 11 (March 7, 2026)*
