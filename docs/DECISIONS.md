@@ -79,6 +79,26 @@
 | 2026-03-07 | 11 | Scroll: elastic bounce | Competition J Q48. Expected on iOS. CSS overscroll-behavior. Panel 5-1. |
 | 2026-03-07 | 11 | Page transitions: crossfade 200ms | Competition J Q49. Opacity-only crossfade between tabs. Panel 4-2. |
 | 2026-03-07 | 11 | Touch targets: 44px minimum | Competition J Q50. Apple HIG standard. Unanimous 6-0. |
+| 2026-03-07 | 11 | River memory: golden milestone markers | Competition J Q51. Subtle golden shimmer where milestones were hit. Panel 5-1. |
+| 2026-03-07 | 11 | New river = thin trickle with mist | Competition J Q52. Never show emptiness, show potential. Panel 4-2. |
+| 2026-03-07 | 11 | River responds to time of day | Competition J Q53. Dawn colors morning, deep indigo night. Panel 4-2. |
+| 2026-03-07 | 11 | River sound syncs with visual speed | Competition J Q54. Tight audiovisual coupling. Panel 5-1. |
+| 2026-03-07 | 11 | Per-tag BPM memory in metronome | Competition J Q55. Scales at 120, songs at 80 — it remembers. Panel 5-1. |
+| 2026-03-07 | 11 | Longest session PB: celebrate, don't display | Competition J Q56. Acknowledge when broken, not a constant metric. Panel 4-2. |
+| 2026-03-07 | 11 | Practice suggestions: stable with daily rotation | Competition J Q57. Stability builds trust, gentle rotation keeps it alive. Panel 4-2. |
+| 2026-03-07 | 11 | Timer micro-messages: ultra-subtle, stealthy | Competition J Q58. MAX OVERRIDE: Agrees with Jobs/Linus. Milestones at 15m/30m/45m/1h but ONLY visible if you look. Never pulls attention from practice. Stealthy, not interruptive. |
+| 2026-03-07 | 11 | Session log: infinite scroll + month headers | Competition J Q59. Time-grouped, collapsible. Panel 5-1. |
+| 2026-03-07 | 11 | Export: JSON primary + CSV secondary | Competition J Q60. JSON is data, CSV is sharing. Panel 4-2. |
+| 2026-03-07 | 11 | Total hours: visible on Home, not hero | Competition J Q61. Small elegant number, not the centerpiece. Panel 4-2. |
+| 2026-03-07 | 11 | Backup health: subtle green dot in Settings | Competition J Q62. Never anxious, just informative. Panel 5-1. |
+| 2026-03-07 | 11 | Seasons cascade through ENTIRE UI | Competition J Q63. Max: "I love this idea of the app having weather and variation. Great one, Kanye." Card backgrounds, text colors, icon tints all shift with season. THE WEATHER OF THE APP. Panel 5-1. |
+| 2026-03-07 | 11 | Celebrations: river-themed (not confetti) | Competition J Q64. Splashes, golden fish, rising water. "Confetti is for birthday apps." Panel 4-2. |
+| 2026-03-07 | 11 | Milne quote: fixed forever | Competition J Q65. "Rivers know this: there is no hurry." That IS the quote. Panel 4-2. Kanye: "Change it and I walk." |
+| 2026-03-07 | 11 | Theme picker: visual preview cards | Competition J Q66. Three thumbnail cards in Settings. Panel 5-1. |
+| 2026-03-07 | 11 | Session save: river absorbs with ripple | Competition J Q67. "The river drinks your practice." Ripple from center outward. Unanimous 6-0. |
+| 2026-03-07 | 11 | Active tab: subtle season-colored glow | Competition J Q68. Soft glow, not underline. Panel 4-2. |
+| 2026-03-07 | 11 | Long-press FAB: radial quick-action menu | Competition J Q69. Timer, Quick Log, Tuner, Metronome. Panel 4-2. |
+| 2026-03-07 | 11 | Pull-to-refresh: river breathes | Competition J Q70. Pull down on Home → fresh breathe animation. Panel 5-1. |
 
 ---
 

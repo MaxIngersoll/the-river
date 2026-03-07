@@ -26,6 +26,7 @@ It's not a dashboard. It's a *place*. The river metaphor isn't decorative — it
 - **Deep blue/indigo palette** — Inspired by Apple Health's Sleep/Mindfulness. Nocturnal. The quiet hours when musicians actually practice.
 - **Apple-quality feel** — Not Apple copycat. But the same level of care. Think: Apple Health, Linear, Notion.
 - **Poetic, not clinical** — Serif fonts for quotes. River metaphors everywhere. "Your river begins with one drop."
+- **The app has weather** — Seasons don't just tint the river; they cascade through the ENTIRE UI. Card backgrounds, text colors, icon tints, ambient sounds all shift with the season engine. The app feels like a living place with weather, not a static tool. (Session 11, Q63 — Max: "I love this idea. Great one, Kanye.")
 
 ### Non-Negotiables
 - **No GitHub-style heatmap calendar.** Max explicitly said no to this.
