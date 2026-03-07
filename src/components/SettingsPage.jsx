@@ -12,6 +12,7 @@ import {
   exportRiverData,
   previewImport,
   mergeImport,
+  getStorageHealth,
 } from '../utils/storage';
 import { useTheme } from '../contexts/ThemeContext';
 
@@ -24,17 +25,14 @@ const THEME_OPTIONS = [
 ];
 
 export default function SettingsPage({ sessions, onBack, onDataCleared }) {
+  const storageHealth = useMemo(() => getStorageHealth(), [sessions]);
   const storageEstimate = useMemo(() => {
-    try {
-      const data = getData();
-      const bytes = new Blob([JSON.stringify(data)]).size;
-      if (bytes < 1024) return `${bytes} B`;
-      if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-      return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
-    } catch {
-      return null;
-    }
-  }, [sessions]);
+    const { bytes } = storageHealth;
+    if (bytes === 0) return null;
+    if (bytes < 1024) return `${bytes} B`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+  }, [storageHealth]);
 
   const [settings, setSettings] = useState(() => getSettings());
   const [customGoal, setCustomGoal] = useState('');
@@ -259,7 +257,10 @@ export default function SettingsPage({ sessions, onBack, onDataCleared }) {
             </div>
           )}
           <div className="flex justify-between text-sm">
-            <span className="text-text-2">Storage used</span>
+            <span className="text-text-2 flex items-center gap-1.5">
+              Storage used
+              <span className={`w-1.5 h-1.5 rounded-full ${storageHealth.ok ? (storageHealth.pctFull > 80 ? 'bg-amber-400' : 'bg-green-500/60') : 'bg-red-400'}`} title={storageHealth.ok ? `${storageHealth.pctFull}% of 5MB` : 'Data may be corrupted'} />
+            </span>
             <span className="text-text font-semibold">{storageEstimate || '—'}</span>
           </div>
         </div>

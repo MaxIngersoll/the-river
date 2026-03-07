@@ -1,4 +1,7 @@
-const CACHE = 'river-v2';
+// Shotwell: "Where's the versioning strategy?"
+// Bump this on every deploy. Old caches auto-purge on activate.
+const SW_VERSION = '3';
+const CACHE = `river-v${SW_VERSION}`;
 const OFFLINE_URL = '/offline.html';
 
 // Assets to precache on install

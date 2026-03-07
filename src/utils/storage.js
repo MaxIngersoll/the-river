@@ -109,6 +109,20 @@ export function getData() {
   return loadData() || getDefaultData();
 }
 
+// Shotwell: "If localStorage corrupts, how do you know?"
+export function getStorageHealth() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return { ok: true, sessions: 0, bytes: 0, pctFull: 0 };
+    const bytes = new Blob([raw]).size;
+    const data = JSON.parse(raw);
+    const sessions = Array.isArray(data.sessions) ? data.sessions.length : 0;
+    return { ok: true, sessions, bytes, pctFull: Math.round((bytes / 5_000_000) * 100) };
+  } catch {
+    return { ok: false, error: 'corrupt', sessions: 0, bytes: 0, pctFull: 0 };
+  }
+}
+
 export function setData(data) {
   saveData(data);
 }
