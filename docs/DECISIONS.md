@@ -33,6 +33,16 @@
 | 2026-03-07 | 11 | Keep metronome, kill ear training + audio recording for now | Competition J. Max agrees The River is a presence app BUT also a practice companion. Key practice resources (metronome, chord diagrams) stay. Ear training and audio recording cut. Alternatives: Jobs: kill metronome too. Max: no, it's a practice companion, not just presence. |
 | 2026-03-07 | 11 | Deploy as demo: Vercel soft launch | Competition J Topic 5. Max agrees with Musk — go live. But in demo capacity, not promoted. Soft launch with URL. Alternatives: Musk: hard launch now. Linus: not without tests. Kanye: design the moment. Max: demo capacity. |
 | 2026-03-07 | 11 | River identity > guitar identity | Competition J Q10. Max agrees with Kanye — The River is the identity, not guitar. Should work for music practice or creative practice holistically. Guitar-first but architecture opens. Alternatives: Jobs: guitar IS the identity. Kanye: River is the iPhone moment. Max: Kanye is right. |
+| 2026-03-07 | 11 | Dock = practice launchpad (not reference library) | Competition J Q6. Dock identity is practice launchpad — context-aware launch into sessions, not a reference library you browse. |
+| 2026-03-07 | 11 | FAB morphs contextually + cool morph animation | Competition J Q7. FAB shows timer normally, morphs to contextual actions (metronome, tuner) during practice. Both states. Morph animation must be distinctive. |
+| 2026-03-07 | 11 | Tag analytics = living river scene (fish, boats, objects) | Competition J Q8. Max rejected all options. Instead: actual objects in the river (fish, boats, etc.) representing practice tag distribution. No legend, no charts. Just a beautiful scene that grows richer as you practice more things. |
+| 2026-03-07 | 11 | Onboarding: add 4th explanatory screen | Competition J Q9. The Witness onboarding gets a 4th screen explaining what The River actually does (not just the metaphor). |
+| 2026-03-07 | 11 | Auto backup via File System Access API | Competition J Q10. Automatic periodic backup to user's file system. No manual export needed. |
+| 2026-03-07 | 11 | Haptics: yes but restrained | Competition J Q11. Use navigator.vibrate() at key interaction moments. Don't overdo it. |
+| 2026-03-07 | 11 | 50h+: ALL FOUR evolution paths | Competition J Q12. After 50 hours: new ceremonies + user-generated margin notes + River writes back + more margin notes. All four paths, not just one. |
+| 2026-03-07 | 11 | Swipe nav + pull-down quick log (both) | Competition J Q13. Horizontal swipe between tabs AND pull-down bottom sheet for quick session logging. Both gestures. |
+| 2026-03-07 | 11 | Celebrity Panel = new default competition format | Competition J Q14. Max: "This is the new standard for us." Celebrity panel with 6 personas + multi-axis scoring is now default for Tier 1. Constraint-based still valid for implementation comps. |
+| 2026-03-07 | 11 | Metronome: keep embedded, add BPM saving | Competition J Q15. Metronome stays embedded in SoundscapePanel. Add BPM progression tracking per session. |
 
 ---
 

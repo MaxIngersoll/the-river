@@ -41,7 +41,8 @@ After every commit: one-line celebration.
 
 ## Design Competition Protocol
 - See `docs/AGENT-PROTOCOL.md` for the full protocol
-- Use constraint-based personas (NOT attitude-based)
+- **Celebrity Panel** is the NEW DEFAULT for Tier 1 competitions (6 personas, multi-axis scoring, debates)
+- Constraint-based personas still valid for Tier 1 implementation competitions
 - Include Wildcard Award (most creative) + Comedy Award (funniest)
 - Proposals: 150 words max. If you can't pitch it in 150 words, you don't understand it yet.
 - Build architecture first, compete on design details only

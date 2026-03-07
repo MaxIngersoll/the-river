@@ -101,23 +101,28 @@ It's not a dashboard. It's a *place*. The river metaphor isn't decorative — it
 
 ### Session 11: Competition J — The Big Questions
 - **Competition J:** Tier 1 philosophical competition — 10 questions about The River's identity and future direction.
-- **5 key decisions:** Audio recording (yes, but subtle — private mirror not performance camera). Ceremony typeface (yes, try it for threshold moments). Keep metronome + chord diagrams, kill ear training + audio recording for now. Vercel soft launch as demo. River identity > guitar identity.
+- **5 key decisions (batch 1):** Audio recording (yes, but subtle — private mirror not performance camera). Ceremony typeface (yes, try it for threshold moments). Keep metronome + chord diagrams, kill ear training + audio recording for now. Vercel soft launch as demo. River identity > guitar identity.
+- **10 key decisions (batch 2):** Dock = practice launchpad. FAB morphs contextually (cool animation). Tag analytics = living river scene with actual objects (fish, boats — NO legend, no charts). Onboarding gets 4th screen. Auto backup via File System Access API. Haptics (yes, restrained). After 50h: ALL FOUR evolution paths. Swipe nav + pull-down quick log (both). Celebrity Panel = new default competition format. Metronome stays embedded + BPM saving.
 - **Identity shift:** Max agrees with Kanye — The River is the identity, not guitar. Guitar-first but architecture opens for creative practice broadly.
 - **Deployment:** Soft launch on Vercel. Demo capacity, not promoted. Just get it live.
 - **Feature triage:** Metronome and chord diagrams stay (practice companion). Ear training and audio recording cut from near-term roadmap.
+- **Competition format:** Celebrity Panel (6 personas, multi-axis scoring, debates) is now the NEW DEFAULT for Tier 1 competitions. Max: *"This is the new standard for us."*
+- **Creative breakthrough (Q8):** Max rejected all presented options for tag analytics. Instead invented: actual objects in the river (fish, boats, etc.) that represent practice distribution — creating a beautiful scene, not a chart. No legend. Just a living river that tells its own story.
 
 ---
 
 ## Design Competition Protocol
 
 ### Competition Tiers (choose the right size)
-- **Tier 1 (Full):** 3 personas x 5 proposals, 5-round bracket. For major features.
+- **Tier 1 (Full):** Celebrity Panel format (6 personas, multi-axis scoring, debates) — NEW DEFAULT
+- **Tier 1 (Alt):** Constraint-based personas (3 x 5 proposals, 5-round bracket) — for implementation comps
 - **Tier 2 (Quick):** 3 personas x 1 proposal, 2 rounds. For medium features.
 - **Tier 3 (Flash):** No competition. Just build it. For small fixes.
 
 ### Culture Protocol
 See `docs/AGENT-PROTOCOL.md` for the full protocol. Key elements:
-- Constraint-based personas (not attitude-based)
+- Celebrity Panel is default Tier 1 (Session 11 decision)
+- Constraint-based personas still valid for implementation-focused competitions
 - Wildcard Award (most creative) + Comedy Award (funniest)
 - **Codenames & catchphrases** for every persona
 - **Post-credits scenes** after every competition (added to `docs/OUTTAKES.md`)

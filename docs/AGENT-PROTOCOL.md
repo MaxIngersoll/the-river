@@ -236,6 +236,35 @@ Log these in the meeting notes. After the project, compile them into process rec
 
 ---
 
+## Competition Formats
+
+### Standard Format (Constraint-Based Personas)
+The original format. 3 constraint-based personas (e.g., Hydrologist, Minimalist, Luthier), each generating 5 proposals. 5-round bracket with structured feedback. Best for implementation-focused competitions where divergent design solutions are needed.
+
+### Celebrity Panel Format (NEW STANDARD — Session 11)
+**This is now the default format for Tier 1 competitions.** Introduced in Competition J: "Big Dog's Gotta Eat."
+
+6 real-world celebrity personas with specialized judging axes:
+| Persona | Role | Scores On |
+|---------|------|-----------|
+| Kanye West | Creative Director (elevated, can veto) | Vision — cultural iconic-ness |
+| Oprah Winfrey | User Empathy Champion | Empathy — serves the human |
+| Johnny Ive | Design Arbiter | Craft — elevated, not just functional |
+| Steve Jobs | Product Strategist | Focus — sharper, not wider |
+| Elon Musk | Systems Engineer | Leverage — 10x efficiency or reach |
+| Linus Torvalds | Code Quality Judge | Integrity — codebase trustworthiness |
+
+**Rounds:** Roundtable → Pitch → Panel Review (Compliment Roast) → Debate → Synthesis
+**Special rules:** Kanye gets Creative Director veto/elevate powers. Majority can overrule his vetoes. Ties broken by Kanye.
+**Why it works:** Max: *"I'm loving this new celebrity panel format. It's so good. This is the new standard for us."* The personas bring instant personality, the multi-axis scoring prevents groupthink, and the debates generate philosophical questions that shape the product's identity — not just its features.
+
+**When to use which:**
+- **Celebrity Panel** (default Tier 1): Strategic decisions, roadmaps, identity questions, feature prioritization
+- **Constraint-Based** (Tier 1 alt): Implementation competitions where you need divergent visual/technical solutions
+- **Tier 2 Quick** and **Tier 3 Flash**: Unchanged — use for medium and small features respectively
+
+---
+
 ## Version History
 
 | Version | Date | Change |
@@ -243,6 +272,7 @@ Log these in the meeting notes. After the project, compile them into process rec
 | 1.0 | 2026-03-06 | Initial protocol |
 | 1.1 | 2026-03-06 | Added Team Culture section, warmth anti-patterns, meeting shoutouts |
 | 2.0 | 2026-03-06 | Competition H audit: codenames/catchphrases, post-credits scenes, Compliment Roast, Moment of Absurdity, contemplative pause, constructive dissent, OUTTAKES.md |
+| 3.0 | 2026-03-07 | Celebrity Panel Format as new default Tier 1 standard (Competition J) |
 
 ---
 
