@@ -3,10 +3,11 @@ import { createContext, useContext, useState, useEffect, useCallback } from 'rea
 import { getSavedTheme, saveTheme, resolveTheme, applyTheme } from '../utils/theme';
 
 const ThemeContext = createContext({
-  theme: 'system',      // user preference: 'light' | 'dark' | 'system'
-  effective: 'light',   // resolved: 'light' | 'dark'
+  theme: 'system',      // user preference: 'light' | 'dark' | 'warm' | 'system'
+  effective: 'light',   // resolved: 'light' | 'dark' | 'warm'
   setTheme: () => {},
   isDark: false,
+  isWarm: false,
 });
 
 export function ThemeProvider({ children }) {
@@ -42,7 +43,13 @@ export function ThemeProvider({ children }) {
   }, [theme]);
 
   return (
-    <ThemeContext.Provider value={{ theme, effective, setTheme, isDark: effective === 'dark' }}>
+    <ThemeContext.Provider value={{
+      theme,
+      effective,
+      setTheme,
+      isDark: effective === 'dark' || effective === 'warm',
+      isWarm: effective === 'warm',
+    }}>
       {children}
     </ThemeContext.Provider>
   );

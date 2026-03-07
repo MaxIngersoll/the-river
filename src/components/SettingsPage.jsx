@@ -19,6 +19,7 @@ const GOAL_PRESETS = [60, 120, 180, 300, 420, 600];
 const THEME_OPTIONS = [
   { value: 'light', label: 'Light', icon: '☀️' },
   { value: 'dark', label: 'Dark', icon: '🌙' },
+  { value: 'warm', label: 'Sapphire', icon: '💎' },
   { value: 'system', label: 'Auto', icon: '⚙️' },
 ];
 

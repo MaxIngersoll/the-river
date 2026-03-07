@@ -55,6 +55,32 @@ html.dark {
   --color-text-3: #78716C;
 }
 
+/* ===== Sapphire Night — warm dark theme ===== */
+html.warm {
+  --color-bg: #112250;
+  --color-card: rgba(224, 197, 143, 0.06);
+  --color-card-border: rgba(224, 197, 143, 0.12);
+  --color-card-highlight: rgba(245, 240, 233, 0.15);
+
+  --color-water-1: #1a3068;
+  --color-water-2: #2a4d88;
+  --color-water-3: #3c507d;
+  --color-water-4: #7c94b8;
+  --color-water-5: #94acd0;
+
+  --color-dry: rgba(217, 203, 194, 0.08);
+  --color-dry-bank: #7c6f64;
+
+  --color-coral: #E0C58F;
+  --color-lavender: #94acd0;
+  --color-forest: #8fbc8f;
+  --color-amber: #E0C58F;
+
+  --color-text: #F5F0E9;
+  --color-text-2: #D9CBC2;
+  --color-text-3: #7C94B8;
+}
+
 html, body, #root {
   height: 100%;
   margin: 0;
@@ -105,6 +131,13 @@ html.dark #root::before {
     radial-gradient(ellipse 60% 50% at 30% 15%, rgba(59, 130, 246, 0.10) 0%, transparent 60%),
     radial-gradient(ellipse 50% 40% at 75% 75%, rgba(37, 99, 235, 0.07) 0%, transparent 50%),
     radial-gradient(ellipse 40% 30% at 50% 45%, rgba(96, 165, 250, 0.05) 0%, transparent 40%);
+}
+
+html.warm #root::before {
+  background:
+    radial-gradient(ellipse 60% 50% at 30% 15%, rgba(60, 80, 125, 0.15) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 40% at 75% 75%, rgba(224, 197, 143, 0.06) 0%, transparent 50%),
+    radial-gradient(ellipse 40% 30% at 50% 45%, rgba(42, 77, 136, 0.08) 0%, transparent 40%);
 }
 
 /* ========================================
@@ -297,6 +330,37 @@ html.dark .card::after {
   );
 }
 
+/* Sapphire Night — Liquid Gold glass */
+html.warm .card {
+  backdrop-filter: blur(40px) saturate(170%) brightness(1.15);
+  -webkit-backdrop-filter: blur(40px) saturate(170%) brightness(1.15);
+  border-top: 1px solid rgba(224, 197, 143, 0.30);
+  border-bottom: 1px solid rgba(60, 80, 125, 0.20);
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.25),
+    0 8px 32px rgba(0, 0, 0, 0.15),
+    inset 0 1px 0 rgba(245, 240, 233, 0.10);
+}
+
+html.warm .card::before {
+  background: linear-gradient(
+    90deg,
+    transparent 5%,
+    rgba(245, 240, 233, 0.08) 20%,
+    rgba(224, 197, 143, 0.14) 50%,
+    rgba(245, 240, 233, 0.08) 80%,
+    transparent 95%
+  );
+}
+
+html.warm .card::after {
+  background: linear-gradient(
+    180deg,
+    rgba(224, 197, 143, 0.04) 0%,
+    transparent 100%
+  );
+}
+
 /* ========================================
    Glass Tab Bar — Liquid Glass style
    ======================================== */
@@ -344,6 +408,24 @@ html.dark .glass::before {
     rgba(255, 255, 255, 0.08) 30%,
     rgba(255, 255, 255, 0.15) 50%,
     rgba(255, 255, 255, 0.08) 70%,
+    transparent
+  );
+}
+
+html.warm .glass {
+  background: rgba(224, 197, 143, 0.06);
+  backdrop-filter: blur(50px) saturate(170%) brightness(1.15);
+  -webkit-backdrop-filter: blur(50px) saturate(170%) brightness(1.15);
+  border-color: rgba(224, 197, 143, 0.10);
+}
+
+html.warm .glass::before {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(224, 197, 143, 0.06) 30%,
+    rgba(224, 197, 143, 0.12) 50%,
+    rgba(224, 197, 143, 0.06) 70%,
     transparent
   );
 }
@@ -478,7 +560,11 @@ html.dark .glass-input:focus {
 html.dark input[type="number"],
 html.dark input[type="date"],
 html.dark textarea,
-html.dark select {
+html.dark select,
+html.warm input[type="number"],
+html.warm input[type="date"],
+html.warm textarea,
+html.warm select {
   color-scheme: dark;
 }
 
@@ -565,6 +651,17 @@ html.dark .hero-glow::before {
   );
   width: 280px;
   height: 280px;
+}
+
+html.warm .hero-glow::before {
+  background: radial-gradient(
+    circle,
+    rgba(224, 197, 143, 0.15) 0%,
+    rgba(60, 80, 125, 0.08) 40%,
+    transparent 70%
+  );
+  width: 260px;
+  height: 260px;
 }
 
 /* ========================================

@@ -49,6 +49,9 @@ const tabs = [
 export default memo(function TabBar({ active, onChange }) {
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-30 glass border-t border-card-border safe-bottom" aria-label="Main navigation">
+      <p className="text-center text-text-3 px-4 pt-2 pb-0 select-none pointer-events-none" style={{ fontFamily: 'var(--font-serif)', fontSize: '11px', fontStyle: 'italic', opacity: 0.7, letterSpacing: '0.01em' }}>
+        Rivers know this: there is no hurry. We shall get there some day.
+      </p>
       <div role="tablist" className="flex justify-around items-center h-[72px] max-w-lg mx-auto">
         {tabs.map((tab) => {
           const isActive = active === tab.id;
