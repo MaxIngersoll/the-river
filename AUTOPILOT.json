@@ -1,6 +1,6 @@
 {
-  "version": 7,
-  "last_updated": "2026-03-08T10:30:00Z",
+  "version": 8,
+  "last_updated": "2026-03-08T10:40:00Z",
   "paused": false,
   "dry_run": false,
   "locked_by": null,
@@ -11,7 +11,7 @@
   "worktree_path": ".claude/worktrees/musing-nightingale",
   "last_commit": "7215963",
 
-  "human_summary": "Wave 1 + Wave 2 done (13 features shipped). AUTOPILOT v7 with team-reviewed task list — killed 2 dead tasks, added 3 quick wins, sharpened all descriptions with implementation notes. 6 tasks queued, total ~62 min. Night shift ready.",
+  "human_summary": "Wave 1+2 done (13 features). AUTOPILOT v8: grilled by Jobs/Rubin/Miyazaki/Ive/Rams (25 Qs). Consolidated to 4 quality systems. Ink-depth needs per-theme ranges. Circadian success = invisible. 6 tasks queued (~62 min). Code fixes: ripple 400→350ms, removed 3 unused CSS vars.",
 
   "uncommitted_files": null,
   "current_task": null,
@@ -21,8 +21,8 @@
     {"id": "wave1-elastic-scroll", "description": "Enable elastic bounce scroll (Q48, change overscroll-behavior)", "estimated_min": 2, "wave": 1, "files_likely": ["src/index.css"]},
     {"id": "wave1-fab-weight", "description": "FAB font weight from riverWeight — add to SeasonContext value, consume in TimerFAB. Floor 300, cap 600.", "estimated_min": 10, "wave": 1, "files_likely": ["src/components/TimerFAB.jsx", "src/contexts/SeasonContext.jsx"]},
     {"id": "wave1-season-tab-glow", "description": "Active tab gets season-colored glow using existing --season-hue CSS var (Q68)", "estimated_min": 15, "wave": 1, "files_likely": ["src/components/TabBar.jsx", "src/index.css"]},
-    {"id": "wave4-circadian-glass", "description": "Subtle warm/cool glass tint from time of day. Sine curve ±5% hue shift. Compute on mount + visibilitychange. 2 CSS vars.", "estimated_min": 15, "wave": 4, "files_likely": ["src/contexts/SeasonContext.jsx", "src/index.css"]},
-    {"id": "wave4-ink-saturation", "description": "UI chrome text opacity deepens with practice hours. --ink-depth 0.85-1.0. WCAG AA floor. User content unaffected.", "estimated_min": 15, "wave": 4, "files_likely": ["src/contexts/SeasonContext.jsx", "src/index.css"]}
+    {"id": "wave4-circadian-glass", "description": "Subtle warm/cool glass tint from time of day. Sine curve ±5% hue shift. Compute on mount + visibilitychange. 2 CSS vars. SUCCESS CRITERIA: if user notices the shift, it's too much — reduce by 50% (Rubin).", "estimated_min": 15, "wave": 4, "files_likely": ["src/contexts/SeasonContext.jsx", "src/index.css"]},
+    {"id": "wave4-ink-saturation", "description": "UI chrome text opacity deepens with practice hours. Per-theme ranges: dark 0.75-1.0, light 0.88-1.0 (Ive). WCAG AA floor. User content unaffected. Test at 10h/50h/100h/500h.", "estimated_min": 15, "wave": 4, "files_likely": ["src/contexts/SeasonContext.jsx", "src/index.css"]}
   ],
 
   "completed": [
@@ -48,25 +48,21 @@
     {"time": "2026-03-08T04:30Z", "tasks": ["save-ripple", "space-shortcut", "dao-de-jing-fix"], "commits": 1},
     {"time": "2026-03-08T04:45Z", "tasks": ["bottom-sheet", "quick-log"], "commits": 1},
     {"time": "2026-03-08T09:50Z", "tasks": ["mood-picker", "autopilot-v5"], "commits": 2},
-    {"time": "2026-03-08T10:10Z", "tasks": ["autopilot-v6", "consultant-frequency"], "commits": 2}
+    {"time": "2026-03-08T10:10Z", "tasks": ["autopilot-v6", "consultant-frequency"], "commits": 2},
+    {"time": "2026-03-08T10:40Z", "tasks": ["autopilot-v7-feature-review", "autopilot-v8-grill-synthesis", "ripple-350ms", "css-var-cleanup"], "commits": 1}
   ],
 
   "build_gate": {
     "required_before_commit": true,
     "steps": [
       "npm run build (exit code 0 = pass)",
+      "Check JS bundle size < 420KB raw / 125KB gzip (Jobs: build gate catches drift, not just failure)",
       "Verify key elements: hero stat, tab bar (4 tabs), FAB visible",
-      "No React errors in console (Vite websocket errors OK)"
+      "No React errors in console (Vite websocket errors OK)",
+      "Take screenshot, save to docs/overnight-screenshots/ with commit hash (Ive: visual morning review)"
     ],
-    "on_failure": "git stash, save hash to stash_archive, log failure, move to next_task"
-  },
-
-  "bundle_budget": {
-    "js_raw_max_kb": 420,
-    "js_gzip_max_kb": 125,
-    "current_js_raw_kb": 384,
-    "current_js_gzip_kb": 114,
-    "on_exceeded": "Code-split or reject. Log in session_log."
+    "on_failure": "git stash, save hash to stash_archive, log failure, move to next_task",
+    "current_bundle": {"js_raw_kb": 384, "js_gzip_kb": 114}
   },
 
   "stash_archive": [],
@@ -85,11 +81,16 @@
     "branch_pattern": "autopilot/YYYY-MM-DD",
     "branch_commands": "git fetch origin; if git show-ref --verify refs/remotes/origin/autopilot/$(date +%Y-%m-%d) 2>/dev/null; then git checkout autopilot/$(date +%Y-%m-%d) && git pull; else git checkout -b autopilot/$(date +%Y-%m-%d) main; fi",
     "overnight_log_file": "docs/overnight-log.md",
-    "overnight_log_format": "Reverse chronological. TLDR at top: what shipped, what broke, what's next. Link commits. Details below.",
+    "overnight_log_format": "TLDR (3 bullets: shipped/broke/next) + git log --oneline. Screenshots in docs/overnight-screenshots/. Morning TODO: actionable items for next session (Jobs: not prose, TODOs).",
     "use_vite_preview_not_dev": true,
     "kill_server_after_screenshot": true,
-    "overnight_quality_system": "Pace-layered: every build = bundle delta check (0 tokens). Every commit = 25-word structured assertion (30 tokens). End of session = 100-word summary (150 tokens). Morning report with one expert review of entire night's work.",
-    "live_consultant_system": "Every 2 min, margin note format: emoji + name + verb + observation. Max 25 words. 35 tokens each. Theater preserved for Max.",
+    "quality_systems_consolidated": {
+      "_note": "Rams: 4 systems, no more. Culture is in the constraints, not the checking.",
+      "1_build_gate": "Build + bundle + snapshot + screenshot. Catches machine-detectable problems.",
+      "2_margin_notes_live_only": "After each file write (Jobs: work-driven, not clock-driven). Domain label + observation, max 25 words. e.g. '🎨 CSS: animation conflicts with transform on drag'. No persona names (Rams+Miyazaki: honest).",
+      "3_overnight_log": "TLDR + git log + screenshots. Morning TODO with actionable items.",
+      "4_panic_recovery": "See panic_recovery object. Error handling, not quality."
+    },
     "progressive_context": true,
     "context_load_order": ["AUTOPILOT.json", "CLAUDE.md", "files_likely from current task", "HANDOFF.md only if needed"]
   }

@@ -185,7 +185,7 @@ export default function TimerFAB({ onSaveSession, onQuickLog, showTabBar = true 
     const minutes = Math.max(1, Math.round(elapsed / 60000));
     haptics.save();
     setShowRipple(true);
-    // Let ripple play, then save + collapse
+    // Let ripple play, then save + collapse (350ms — Ive: 80% of motion in first 250ms with ease-ripple)
     setTimeout(() => {
       setShowRipple(false);
       onSaveSession({ duration_minutes: minutes, note: note.trim(), tags, mood });
@@ -204,7 +204,7 @@ export default function TimerFAB({ onSaveSession, onQuickLog, showTabBar = true 
       setMood(null);
       setCuriosity('');
       clearTimerStorage();
-    }, 400);
+    }, 350);
   }, [elapsed, note, tags, curiosity, onSaveSession]);
 
   const handleNevermind = useCallback(() => {

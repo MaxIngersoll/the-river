@@ -110,6 +110,15 @@ It's not a dashboard. It's a *place*. The river metaphor isn't decorative — it
 - **Competition format:** Celebrity Panel (6 personas, multi-axis scoring, debates) is now the NEW DEFAULT for Tier 1 competitions. Max: *"This is the new standard for us."*
 - **Creative breakthrough (Q8):** Max rejected all presented options for tag analytics. Instead invented: actual objects in the river (fish, boats, etc.) that represent practice distribution — creating a beautiful scene, not a chart. No legend. Just a living river that tells its own story.
 
+### Session 12: AUTOPILOT & The Craft of Culture
+- **13 features shipped** this session: save ripple, Space shortcut, animation constants, Dao De Jing fix, BottomSheet, QuickLog, MoodPicker, long-press FAB, plus AUTOPILOT v4-v8
+- **AUTOPILOT system designed:** Machine-readable state file for overnight autonomous building. Iterated through 8 versions with input from 15+ experts across 3 rounds.
+- **Consultant system reimagined from ground up:** 15 team nominees + 13 outside experts (28-person panel). Final synthesis: "Living Margin Notes" (live sessions, work-driven not clock-driven, domain labels not persona names) + pace-layered checks (overnight). Consolidated to 4 quality systems (Rams).
+- **Grilled by 5 vision masters:** Jobs (25 questions about necessity), Rubin (removal as art), Miyazaki (where is the craft?), Ive (obsessive detail on feel), Rams (as little design as possible). 16 concrete improvements applied.
+- **Max's key insight:** *"The team and Claude are also craftspeople. We're crafting this culture, which are the constraints that make this happen."* — The culture IS the craft. The consultants aren't overhead; they're the wobble in the potter's bowl.
+- **Task categorization:** 32 autonomous tasks (~14hr) vs 20 needs-Max tasks (~37hr). The big creative features inherently need Max. Overnight handles the "thousand small touches."
+- **Code fixes from grill:** Ripple delay 400→350ms (Ive), removed 3 unused CSS vars (Rubin), ink-depth per-theme ranges (Ive), circadian success = invisible (Rubin).
+
 ---
 
 ## Design Competition Protocol
@@ -134,12 +143,15 @@ See `docs/AGENT-PROTOCOL.md` for the full protocol. Key elements:
 
 ---
 
-## Current State (as of March 7, 2026)
+## Current State (as of March 8, 2026)
 
 ### What's Built & Working
 - Full Liquid Glass UI (dark + light modes, blue/indigo palette)
 - Timer FAB (start/pause/stop/save with localStorage persistence)
 - Timer integration: external start via CustomEvent bridge (`river-start-timer`)
+- Space key start/pause/resume (Session 12)
+- Save ripple animation with 350ms delay (Session 12)
+- Long-press FAB → Quick Log (Session 12)
 - Soundscape panel (rain + metronome with Web Audio API)
 - Share cards (canvas-based 1080x1080 with native share)
 - Reading Ceremony (margin notes surface at 10/25/50h)
@@ -149,12 +161,14 @@ See `docs/AGENT-PROTOCOL.md` for the full protocol. Key elements:
 - Message in a Bottle (past encouragement delivered on fog days)
 - Celebration overlay (milestones, fog days, bottles)
 - Error boundary, offline support, PWA
+- Haptics utility with feature detection (Session 12)
 - 32+ milestones across hours/streak/sessions
 - The Dock: tuning strip, progressions, proportional frets, CAGED, Circle of Fifths
 - The Dock: CurrentCard (practice intelligence), QuickStartCards (Continue/Explore/Challenge)
 - The Dock: dynamic chord fingering diagrams (SVG, 35+ open voicings, barre computation, interval colors)
 - The Dock: "Practice This" flow — play buttons on progressions + Flow button on CurrentCard
 - Season ambient system: SeasonContext + data-season CSS + 4-season ambient gradients
+- Consequential UI: river weight + card border-radius from total hours (Session 12)
 - Living River: soul line, seasonal particles, season engine (RiverSVG.jsx)
 - Onboarding flow: The Witness (3 screens — not a productivity app, a witness, river birth)
 - River Archive: merge-based import with preview, vault health indicator, _meta export header
@@ -165,6 +179,10 @@ See `docs/AGENT-PROTOCOL.md` for the full protocol. Key elements:
 - Sapphire Night warm theme (third theme option, deep navy + gold accents, Liquid Gold glass)
 - Guitar Tuner: pitchy McLeod pitch detection, chronograph dial, Quick Tune + Guide Me, 5 tunings
 - Milne quote whisper above tab bar: "Rivers know this: there is no hurry."
+- BottomSheet primitive: gesture-dismissible, spring-animated (Session 12)
+- QuickLog: duration presets + tags + mood + note via BottomSheet (Session 12)
+- MoodPicker: 4 weather icons (sun/cloud/rain/wind), ARIA radiogroup (Session 12)
+- AUTOPILOT v8: overnight autonomous building system, 8 iterations, 15+ expert reviews (Session 12)
 
 ### What's Next (Priority Order)
 1. Vercel soft launch — deploy as demo capacity, get it live with a URL

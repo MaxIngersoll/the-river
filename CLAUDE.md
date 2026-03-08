@@ -48,14 +48,36 @@ After every commit: one-line celebration.
 - Build architecture first, compete on design details only
 - Culture: radical encouragement, bring personality, try scary ideas, send love, celebrate milestones
 
-## MANDATORY: Consultant Check-Ins
-During LIVE implementation work (with Max present), bring in a relevant expert consultant every ~5 minutes of active work.
-- Choose a consultant whose expertise matches what you're currently building (e.g., animation expert for CSS transitions, React expert for component architecture, design expert for UI decisions)
-- The consultant reviews what you just built and gives 1-2 actionable course corrections
-- Apply their feedback immediately before continuing
-- Consultants can be real experts (Carmack, Abramov, Verou, etc.) or domain-appropriate specialists
-- Log each check-in briefly: who you consulted, what they said, what you changed
-- In OVERNIGHT/AUTONOMOUS mode: NO consultants. The build gate is the quality control. Don't waste tokens on theater.
+## MANDATORY: Quality Systems (4 total — Rams: no more, no less)
+
+### System 1: Build Gate (every commit)
+- `npm run build` passes (exit 0)
+- JS bundle < 420KB raw / 125KB gzip
+- Snapshot: hero stat, tab bar (4 tabs), FAB visible
+- No React errors in console
+- Screenshot saved to `docs/overnight-screenshots/`
+- On failure: `git stash`, save hash, move to next task
+
+### System 2: Margin Notes (LIVE sessions only)
+- Triggered after each file write (work-driven, not clock-driven — Jobs)
+- Format: domain label + observation, max 25 words
+- Example: `🎨 CSS: animation conflicts with transform on drag — use separate property`
+- Example: `⚡ Perf: this useEffect runs every render — add dependency array`
+- Use domain labels (🎨 CSS, ⚡ Perf, ⚛️ React, ♿ A11y), NOT persona names (Rams+Miyazaki: honest)
+- Apply feedback immediately before continuing
+
+### System 3: Overnight Log
+- TLDR (3 bullets: what shipped, what broke, what's next)
+- `git log --oneline` of all commits
+- Screenshots in `docs/overnight-screenshots/`
+- Morning TODO: actionable items for next session
+
+### System 4: Panic Recovery
+- See `AUTOPILOT.json` panic_recovery for all recovery procedures
+- This is error handling, not quality — but it keeps the system running
+
+### Culture Note
+The team culture IS the craft. The constraints that shape implementation (competitions, check-ins, debate rounds) are what give the code its wobble — the hand-made quality. In autonomous mode, the culture lives in the task descriptions, acceptance criteria, and architectural patterns. The overnight builder inherits the team's constraints even when no one is watching.
 
 ## Token Discipline
 - Quick-reject weak proposals (don't write paragraph feedback for obvious rejects)
