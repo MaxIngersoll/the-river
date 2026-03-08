@@ -3,6 +3,7 @@ import { getQuoteByCategory } from '../utils/quotes';
 import { getMilestoneQuoteCategories } from '../utils/milestones';
 import { useTheme } from '../contexts/ThemeContext';
 import { useReducedMotion } from '../hooks/useReducedMotion';
+import { haptics } from '../utils/haptics';
 
 export default function CelebrationOverlay({ milestone, onDismiss, queuePosition = 1, queueTotal = 1 }) {
   const [visible, setVisible] = useState(false);
@@ -30,7 +31,7 @@ export default function CelebrationOverlay({ milestone, onDismiss, queuePosition
     startDismissTimer();
     // Haptic feedback on mobile (skip when reduced motion preferred)
     if (!prefersReducedMotion) {
-      try { navigator.vibrate?.([50, 30, 80]); } catch {}
+      haptics.milestone();
     }
     return () => pauseDismissTimer();
   }, [startDismissTimer, pauseDismissTimer, prefersReducedMotion]);

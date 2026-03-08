@@ -16,6 +16,7 @@ import GuitarTuner from './components/GuitarTuner';
 import TimerFAB from './components/TimerFAB';
 import OnboardingFlow from './components/OnboardingFlow';
 import { SeasonProvider } from './contexts/SeasonContext';
+import { haptics } from './utils/haptics';
 
 export default function App() {
   const [sessions, setSessions] = useState(() => getSessions());
@@ -65,7 +66,7 @@ export default function App() {
     const currentSessions = getSessions();
     const { allowed } = canAddFogDay(currentSessions);
     if (!allowed) return;
-    try { navigator.vibrate?.([40, 20, 60]); } catch {}
+    haptics.fogHorn();
     addFogDay();
     const updated = getSessions();
     setSessions(updated);
