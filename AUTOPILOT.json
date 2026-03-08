@@ -1,6 +1,6 @@
 {
-  "version": 6,
-  "last_updated": "2026-03-08T10:10:00Z",
+  "version": 7,
+  "last_updated": "2026-03-08T10:30:00Z",
   "paused": false,
   "dry_run": false,
   "locked_by": null,
@@ -11,17 +11,18 @@
   "worktree_path": ".claude/worktrees/musing-nightingale",
   "last_commit": "7215963",
 
-  "human_summary": "Wave 1 + Wave 2 done (13 features shipped). AUTOPILOT v6 battle-tested by 15 experts across 3 rounds. App: 384KB JS, 114KB gzip, zero errors. Night shift starts tonight at midnight.",
+  "human_summary": "Wave 1 + Wave 2 done (13 features shipped). AUTOPILOT v7 with team-reviewed task list — killed 2 dead tasks, added 3 quick wins, sharpened all descriptions with implementation notes. 6 tasks queued, total ~62 min. Night shift ready.",
 
   "uncommitted_files": null,
   "current_task": null,
 
   "next_tasks": [
-    {"id": "wave1-fab-weight", "description": "FAB font weight changes with practice hours", "estimated_min": 20, "wave": 1, "files_likely": ["src/components/TimerFAB.jsx", "src/contexts/SeasonContext.jsx"]},
-    {"id": "wave3-visual-grammar", "description": "Document how data maps to visual properties", "estimated_min": 45, "wave": 3, "files_likely": ["docs/visual-grammar.md"]},
-    {"id": "wave3-temporal-resonance", "description": "Data model for mood, energy, schedule fields", "estimated_min": 60, "wave": 3, "files_likely": ["src/utils/storage.js", "docs/data-schema.md"]},
-    {"id": "wave4-circadian-glass", "description": "Warm/cool tint based on time of day", "estimated_min": 30, "wave": 4, "files_likely": ["src/contexts/SeasonContext.jsx", "src/index.css"]},
-    {"id": "wave4-ink-saturation", "description": "Text darkness increases with practice depth", "estimated_min": 30, "wave": 4, "files_likely": ["src/contexts/SeasonContext.jsx", "src/index.css"]}
+    {"id": "wave1-dark-default", "description": "Set dark mode as true default (Q36, 1-line change)", "estimated_min": 5, "wave": 1, "files_likely": ["src/contexts/ThemeContext.jsx"]},
+    {"id": "wave1-elastic-scroll", "description": "Enable elastic bounce scroll (Q48, change overscroll-behavior)", "estimated_min": 2, "wave": 1, "files_likely": ["src/index.css"]},
+    {"id": "wave1-fab-weight", "description": "FAB font weight from riverWeight — add to SeasonContext value, consume in TimerFAB. Floor 300, cap 600.", "estimated_min": 10, "wave": 1, "files_likely": ["src/components/TimerFAB.jsx", "src/contexts/SeasonContext.jsx"]},
+    {"id": "wave1-season-tab-glow", "description": "Active tab gets season-colored glow using existing --season-hue CSS var (Q68)", "estimated_min": 15, "wave": 1, "files_likely": ["src/components/TabBar.jsx", "src/index.css"]},
+    {"id": "wave4-circadian-glass", "description": "Subtle warm/cool glass tint from time of day. Sine curve ±5% hue shift. Compute on mount + visibilitychange. 2 CSS vars.", "estimated_min": 15, "wave": 4, "files_likely": ["src/contexts/SeasonContext.jsx", "src/index.css"]},
+    {"id": "wave4-ink-saturation", "description": "UI chrome text opacity deepens with practice hours. --ink-depth 0.85-1.0. WCAG AA floor. User content unaffected.", "estimated_min": 15, "wave": 4, "files_likely": ["src/contexts/SeasonContext.jsx", "src/index.css"]}
   ],
 
   "completed": [
@@ -87,7 +88,8 @@
     "overnight_log_format": "Reverse chronological. TLDR at top: what shipped, what broke, what's next. Link commits. Details below.",
     "use_vite_preview_not_dev": true,
     "kill_server_after_screenshot": true,
-    "no_consultants_in_autonomous_mode": true,
+    "overnight_quality_system": "Pace-layered: every build = bundle delta check (0 tokens). Every commit = 25-word structured assertion (30 tokens). End of session = 100-word summary (150 tokens). Morning report with one expert review of entire night's work.",
+    "live_consultant_system": "Every 2 min, margin note format: emoji + name + verb + observation. Max 25 words. 35 tokens each. Theater preserved for Max.",
     "progressive_context": true,
     "context_load_order": ["AUTOPILOT.json", "CLAUDE.md", "files_likely from current task", "HANDOFF.md only if needed"]
   }
