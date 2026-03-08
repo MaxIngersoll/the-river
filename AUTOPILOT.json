@@ -1,6 +1,6 @@
 {
-  "version": 9,
-  "last_updated": "2026-03-08T14:30:00Z",
+  "version": 10,
+  "last_updated": "2026-03-08T15:00:00Z",
   "paused": false,
   "dry_run": false,
   "locked_by": null,
@@ -11,12 +11,21 @@
   "worktree_path": ".claude/worktrees/musing-nightingale",
   "last_commit": "fbe32cb",
 
-  "human_summary": "18 features shipped total. Session 13: elastic scroll, FAB weight, season tab glow, circadian glass, ink saturation. All build gates pass. Bundle: 385KB/114KB gzip. Continuer SKILL.md fixed for tonight. next_tasks queue empty — needs new tasks.",
+  "human_summary": "19 features shipped total. Session 13 afternoon: Laozi fix, PWA polish, 5 features. 8 new tasks queued for autonomous run. Continuer fixed and tested (9/9 pass). Bundle: 385KB/114KB gzip.",
 
   "uncommitted_files": null,
   "current_task": null,
 
-  "next_tasks": [],
+  "next_tasks": [
+    {"id": "ceremony-typeface", "description": "Apply DM Serif Display (.ceremony-text class) at threshold moments: ReadingCeremony.jsx headings, CelebrationOverlay.jsx milestone text, OnboardingFlow.jsx titles. The font is already loaded in index.css. Just add className='ceremony-text' to the right elements. Keep it RARE — this font should feel special.", "estimated_min": 15, "files_likely": ["src/components/ReadingCeremony.jsx", "src/components/CelebrationOverlay.jsx", "src/components/OnboardingFlow.jsx"]},
+    {"id": "page-transitions-tune", "description": "Tune page transitions to 200ms crossfade (Q49). Currently 150ms exit + 300ms enter in index.css. Change to: exit 150ms (keep), enter 200ms. Update the page-enter-anim keyframe duration.", "estimated_min": 5, "files_likely": ["src/index.css"]},
+    {"id": "touch-target-audit", "description": "Audit all interactive elements for 44px minimum touch targets (Q50). Check: TabBar buttons, tag pills in TimerFAB, theme toggle options, mood picker icons, settings buttons. Add min-h-[44px] min-w-[44px] or padding where needed. Do NOT change visual appearance — only increase hit areas.", "estimated_min": 20, "files_likely": ["src/components/TabBar.jsx", "src/components/TimerFAB.jsx", "src/components/MoodPicker.jsx", "src/components/SettingsPage.jsx"]},
+    {"id": "total-hours-home", "description": "Show total practice hours on HomePage as a subtle stat below the main hero (Q61). Use useSeason().totalHours. Format as 'Xh total' in text-text-3 text-xs. Position below the river chart, above the session cards. Keep it quiet — informational, not heroic.", "estimated_min": 15, "files_likely": ["src/components/HomePage.jsx"]},
+    {"id": "export-json-csv", "description": "Add data export in Settings (Q60). Primary: JSON (full session array from localStorage). Secondary: CSV (date, duration_minutes, tags joined by semicolons, mood, note). Add two buttons to SettingsPage.jsx: 'Export JSON' and 'Export CSV'. Use Blob + URL.createObjectURL + click-to-download pattern. No server needed.", "estimated_min": 20, "files_likely": ["src/components/SettingsPage.jsx", "src/utils/storage.js"]},
+    {"id": "backup-health-dot", "description": "Add subtle green dot in Settings showing backup health (Q62). Show a small green circle next to 'Data' section if localStorage has sessions. Show amber if sessions exist but no export has ever been done (check localStorage key 'river-last-export'). Set that key's value to ISO timestamp when user exports.", "estimated_min": 15, "files_likely": ["src/components/SettingsPage.jsx"]},
+    {"id": "progressive-mood", "description": "MoodPicker should only appear after the user's 3rd session (Rubin: progressive disclosure). In TimerFAB.jsx, check sessions count from storage. If fewer than 3 completed sessions, don't render the MoodPicker component in the stopped state. Import getSessions from storage.js and check length on mount.", "estimated_min": 10, "files_likely": ["src/components/TimerFAB.jsx", "src/utils/storage.js"]},
+    {"id": "splash-screen-ios", "description": "Add apple-touch-startup-image meta tags to index.html for iPhone splash screens. Generate splash images as inline SVGs with dark background (#0C0A09) and 'The River' text centered in DM Serif Display. Cover at minimum: iPhone 15 Pro (1179x2556), iPhone 14 (1170x2532), iPhone SE (750x1334). Add the meta tags with media queries for each device size.", "estimated_min": 20, "files_likely": ["index.html"]}
+  ],
 
   "completed": [
     {"id": "wave0-haptics", "shipped": "2026-03-08T04:15Z"},
