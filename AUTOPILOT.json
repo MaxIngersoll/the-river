@@ -1,0 +1,68 @@
+{
+  "version": 4,
+  "last_updated": "2026-03-08T09:35:00Z",
+  "paused": false,
+
+  "status": "mid_task",
+  "working_branch": "claude/musing-nightingale",
+  "worktree_path": ".claude/worktrees/musing-nightingale",
+  "last_commit": "2f85566",
+
+  "human_summary": "Wave 1 and half of Wave 2 done. Bottom Sheet + Quick Log shipped. MoodPicker 90% wired — just needs rendering in QuickLog JSX. 5 commits pushed today. App runs clean, zero console errors.",
+
+  "uncommitted_files": {
+    "modified": ["src/components/QuickLog.jsx", "src/components/TimerFAB.jsx", "src/utils/storage.js"],
+    "new": ["src/components/MoodPicker.jsx", "AUTOPILOT.json"],
+    "safe_to_commit": true,
+    "notes": "MoodPicker 90% wired. QuickLog needs MoodPicker rendered in JSX and mood reset on close."
+  },
+
+  "current_task": {
+    "id": "wave2-mood-picker",
+    "description": "Finish MoodPicker: render <MoodPicker selected={mood} onSelect={setMood} /> in QuickLog between tags and note. Reset mood in handleClose.",
+    "files_to_edit": ["src/components/QuickLog.jsx"],
+    "what_remains": "Add MoodPicker JSX + reset mood in handleClose + build + commit + push"
+  },
+
+  "next_tasks": [
+    "wave1-fab-weight: FAB font weight changes with practice hours (20min)",
+    "wave3-visual-grammar: Document how data maps to visual properties (45min)",
+    "wave3-temporal-resonance: Data model for mood, energy, schedule fields (60min)"
+  ],
+
+  "completed": [
+    "wave0-haptics", "wave0-reduced-motion",
+    "wave1-save-ripple", "wave1-space-shortcut", "wave1-animation-constants",
+    "wave1-empty-state", "wave1-warm-typography", "wave1-earned-border-radius",
+    "wave2-bottom-sheet", "wave2-quick-log",
+    "consequential-river-level-rise", "consequential-cooling-glass"
+  ],
+
+  "session_log": [
+    {"time": "2026-03-08T04:00Z", "tasks": ["river-level-rise", "cooling-glass"], "commits": 1},
+    {"time": "2026-03-08T04:15Z", "tasks": ["warm-typography", "earned-border-radius", "haptics"], "commits": 2},
+    {"time": "2026-03-08T04:30Z", "tasks": ["save-ripple", "space-shortcut", "dao-de-jing-fix"], "commits": 1},
+    {"time": "2026-03-08T04:45Z", "tasks": ["bottom-sheet", "quick-log"], "commits": 1}
+  ],
+
+  "build_gate": {
+    "required_before_commit": true,
+    "steps": ["npm run build must pass", "preview screenshot — verify app renders", "no React errors in console"],
+    "on_failure": "git checkout . on failed files, log failure in session_log, move to next_task"
+  },
+
+  "panic_recovery": {
+    "build_fails": "git stash, move to next_task, leave note in session_log",
+    "worktree_missing": "git worktree add .claude/worktrees/musing-nightingale claude/musing-nightingale",
+    "merge_conflicts": "git checkout --theirs on conflicts, rebuild, note in session_log",
+    "dirty_state_unclear": "git diff > /tmp/river-rescue.patch && git checkout . && note patch location"
+  },
+
+  "overnight_config": {
+    "create_fresh_branch": true,
+    "branch_pattern": "autopilot/YYYY-MM-DD",
+    "overnight_log_file": "docs/overnight-log.md",
+    "progressive_context": true,
+    "context_load_order": ["AUTOPILOT.json", "CLAUDE.md", "then HANDOFF.md only if needed"]
+  }
+}

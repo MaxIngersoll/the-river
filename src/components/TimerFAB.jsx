@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { useTheme } from '../contexts/ThemeContext';
 import { PRACTICE_TAGS } from '../utils/storage';
 import { haptics } from '../utils/haptics';
+import MoodPicker from './MoodPicker';
 import SoundscapePanel from './SoundscapePanel';
 
 function formatTimer(ms) {
@@ -69,6 +70,7 @@ export default function TimerFAB({ onSaveSession, onQuickLog, showTabBar = true 
   const [expanded, setExpanded] = useState(false);
   const [note, setNote] = useState('');
   const [tags, setTags] = useState([]);
+  const [mood, setMood] = useState(null);
   const [curiosity, setCuriosity] = useState('');
   const intervalRef = useRef(null);
 
@@ -186,7 +188,7 @@ export default function TimerFAB({ onSaveSession, onQuickLog, showTabBar = true 
     // Let ripple play, then save + collapse
     setTimeout(() => {
       setShowRipple(false);
-      onSaveSession({ duration_minutes: minutes, note: note.trim(), tags });
+      onSaveSession({ duration_minutes: minutes, note: note.trim(), tags, mood });
       // Store curiosity prompt for next session
       if (curiosity.trim()) {
         localStorage.setItem('river-curiosity', curiosity.trim());
@@ -199,6 +201,7 @@ export default function TimerFAB({ onSaveSession, onQuickLog, showTabBar = true 
       setExpanded(false);
       setNote('');
       setTags([]);
+      setMood(null);
       setCuriosity('');
       clearTimerStorage();
     }, 400);
@@ -212,6 +215,7 @@ export default function TimerFAB({ onSaveSession, onQuickLog, showTabBar = true 
     setExpanded(false);
     setNote('');
     setTags([]);
+    setMood(null);
     setCuriosity('');
     clearTimerStorage();
   }, []);
@@ -395,6 +399,11 @@ export default function TimerFAB({ onSaveSession, onQuickLog, showTabBar = true 
                   </button>
                 );
               })}
+            </div>
+
+            {/* Mood — 4 weather icons, no labels */}
+            <div className="mb-4">
+              <MoodPicker selected={mood} onSelect={setMood} />
             </div>
 
             <input

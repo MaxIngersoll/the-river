@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react';
 import BottomSheet from './BottomSheet';
+import MoodPicker from './MoodPicker';
 import { addSession, today, formatDuration, PRACTICE_TAGS, TAG_COLORS } from '../utils/storage';
 import { haptics } from '../utils/haptics';
 
@@ -9,6 +10,7 @@ export default function QuickLog({ open, onClose, onLog }) {
   const [selectedPreset, setSelectedPreset] = useState(null);
   const [note, setNote] = useState('');
   const [tags, setTags] = useState([]);
+  const [mood, setMood] = useState(null);
 
   const handleSave = useCallback(() => {
     if (!selectedPreset) return;
@@ -19,6 +21,7 @@ export default function QuickLog({ open, onClose, onLog }) {
       duration_minutes: selectedPreset,
       note: note.trim(),
       tags,
+      mood,
     });
 
     onLog(session);
@@ -27,13 +30,15 @@ export default function QuickLog({ open, onClose, onLog }) {
     setSelectedPreset(null);
     setNote('');
     setTags([]);
+    setMood(null);
     onClose();
-  }, [selectedPreset, note, tags, onLog, onClose]);
+  }, [selectedPreset, note, tags, mood, onLog, onClose]);
 
   const handleClose = useCallback(() => {
     setSelectedPreset(null);
     setNote('');
     setTags([]);
+    setMood(null);
     onClose();
   }, [onClose]);
 
@@ -87,6 +92,11 @@ export default function QuickLog({ open, onClose, onLog }) {
             </button>
           );
         })}
+      </div>
+
+      {/* Mood — weather icons */}
+      <div className="mb-4">
+        <MoodPicker selected={mood} onSelect={setMood} />
       </div>
 
       {/* Note */}

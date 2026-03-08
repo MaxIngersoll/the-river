@@ -143,6 +143,7 @@ export function addSession(session) {
     duration_minutes: session.duration_minutes,
     note: session.note || '',
     tags: Array.isArray(session.tags) ? session.tags : [],
+    mood: session.mood || null,
     fog: session.fog || false,
     instrument: session.instrument || 'guitar',
     created_at: new Date().toISOString(),
