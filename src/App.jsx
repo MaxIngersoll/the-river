@@ -224,6 +224,27 @@ export default function App() {
     if (note) setSignalFireNote(note);
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Cooling Glass — warmth tracks presence
+  useEffect(() => {
+    const lastVisit = localStorage.getItem('river-last-visit');
+    const now = Date.now();
+    let warmth = 1.0;
+
+    if (lastVisit) {
+      const hoursSince = (now - parseInt(lastVisit, 10)) / (1000 * 60 * 60);
+      if (hoursSince > 7 * 24) warmth = 0.2;        // 7+ days → cold
+      else if (hoursSince > 24) warmth = 0.4;        // 1-7 days → cooled
+      else if (hoursSince > 1) warmth = 0.7;         // 1-24 hours → slightly cooled
+      else warmth = 1.0;                              // 0-1 hours → full warmth
+    }
+
+    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    document.documentElement.style.setProperty('--glass-warmth', warmth);
+    document.documentElement.style.setProperty('--glass-warmth-instant', prefersReduced ? '1' : '0');
+
+    localStorage.setItem('river-last-visit', now.toString());
+  }, []);
+
   useEffect(() => {
     setDisplayedTab(activeTab);
   }, [activeTab]);

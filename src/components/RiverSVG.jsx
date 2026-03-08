@@ -85,6 +85,15 @@ function getColorForHours(h, isDark = false) {
   return palette[0].color;
 }
 
+// Calculate river level rise from total practice hours
+function calculateRiverLevel(sessions) {
+  const totalMinutes = sessions.reduce((sum, s) => sum + s.duration_minutes, 0);
+  const totalHours = totalMinutes / 60;
+  // Early hours more impactful: square root easing
+  // ~0.5px rise per hour, capped at 100px (200 hours)
+  return Math.min(Math.sqrt(totalHours) * 0.5 * Math.sqrt(totalHours), 100);
+}
+
 export default function RiverSVG({ sessions, compact = false, daysToShow }) {
   const containerRef = useRef(null);
   const scrollRef = useRef(null);
@@ -92,6 +101,9 @@ export default function RiverSVG({ sessions, compact = false, daysToShow }) {
   const [tooltip, setTooltip] = useState(null);
   const { isDark } = useTheme();
   const prefersReducedMotion = useReducedMotion();
+
+  // River level rise from accumulated practice
+  const riverLevel = calculateRiverLevel(sessions);
 
   // Season from context (single source of truth — SeasonContext.jsx)
   const { season } = useSeason();
@@ -300,6 +312,10 @@ export default function RiverSVG({ sessions, compact = false, daysToShow }) {
       className="block"
       role="img"
       aria-label={`Practice activity over the last ${days.length} days`}
+      style={{
+        transform: `translateY(-${riverLevel}px)`,
+        transition: prefersReducedMotion ? 'none' : 'transform 2s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+      }}
     >
       <defs>
         {/* River gradient (deepens over time) */}
