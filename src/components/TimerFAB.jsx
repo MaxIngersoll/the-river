@@ -1,6 +1,7 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useTheme } from '../contexts/ThemeContext';
 import { useSeason } from '../contexts/SeasonContext';
+import { useReducedMotion } from '../hooks/useReducedMotion';
 import { PRACTICE_TAGS } from '../utils/storage';
 import { haptics } from '../utils/haptics';
 import MoodPicker from './MoodPicker';
@@ -20,6 +21,29 @@ function formatTimerCompact(ms) {
   const m = Math.floor(totalSec / 60);
   const s = totalSec % 60;
   return `${m}:${String(s).padStart(2, '0')}`;
+}
+
+// Split timer into parts for separate colon rendering (pulsing colon effect)
+function formatTimerParts(ms) {
+  const totalSec = Math.floor(ms / 1000);
+  const h = Math.floor(totalSec / 3600);
+  const m = Math.floor((totalSec % 3600) / 60);
+  const s = totalSec % 60;
+  const pad = (n) => String(n).padStart(2, '0');
+  if (h > 0) {
+    return [
+      { type: 'digits', value: String(h) },
+      { type: 'colon', value: ':' },
+      { type: 'digits', value: pad(m) },
+      { type: 'colon', value: ':' },
+      { type: 'digits', value: pad(s) },
+    ];
+  }
+  return [
+    { type: 'digits', value: pad(m) },
+    { type: 'colon', value: ':' },
+    { type: 'digits', value: pad(s) },
+  ];
 }
 
 const TIMER_STORAGE_KEY = 'river-active-timer';
@@ -46,6 +70,7 @@ function clearTimerStorage() {
 export default function TimerFAB({ onSaveSession, onQuickLog, showTabBar = true }) {
   const { isDark } = useTheme();
   const { riverWeight = 300 } = useSeason();
+  const prefersReduced = useReducedMotion();
 
   // Visual viewport offset for iOS keyboard
   const [viewportOffset, setViewportOffset] = useState(0);
@@ -74,6 +99,7 @@ export default function TimerFAB({ onSaveSession, onQuickLog, showTabBar = true 
   const [tags, setTags] = useState([]);
   const [mood, setMood] = useState(null);
   const [curiosity, setCuriosity] = useState('');
+  const [showSaveFlow, setShowSaveFlow] = useState(false);
   const intervalRef = useRef(null);
 
   // Restore timer from localStorage on mount
@@ -99,9 +125,30 @@ export default function TimerFAB({ onSaveSession, onQuickLog, showTabBar = true 
       setElapsed(saved.pausedElapsed);
       if (saved.note) setNote(saved.note);
       if (Array.isArray(saved.tags)) setTags(saved.tags);
+      setShowSaveFlow(true); // Skip pride moment on restore — user already saw it
       setExpanded(true);
     }
   }, []);
+
+  // Progressive color deepening — river deepens as you practice (Jen: drama through time)
+  const timerDepthColor = useMemo(() => {
+    if (timerState === 'idle') return 'var(--color-text)';
+    if (timerState === 'stopped' && showSaveFlow) return 'var(--color-text)';
+    const minutes = elapsed / 60000;
+    if (minutes >= 30) return 'var(--color-water-5)';
+    if (minutes >= 15) return 'var(--color-water-4)';
+    if (minutes >= 5) return 'var(--color-water-3)';
+    return 'var(--color-water-2)';
+  }, [elapsed, timerState, showSaveFlow]);
+
+  // Pulsing colon — heartbeat that calms over time (Wroblewski: 1Hz→0.5Hz)
+  const colonPulsing = timerState === 'running' && elapsed >= 5 * 60 * 1000;
+  const colonPulseDuration = useMemo(() => {
+    if (!colonPulsing) return 1;
+    const minutes = elapsed / 60000;
+    const t = Math.min(1, Math.max(0, (minutes - 5) / 25));
+    return 1 + t; // 1s at 5min → 2s at 30min
+  }, [colonPulsing, elapsed]);
 
   // Tick interval
   useEffect(() => {
@@ -163,8 +210,12 @@ export default function TimerFAB({ onSaveSession, onQuickLog, showTabBar = true 
     setTimerState('stopped');
     setElapsed(finalElapsed);
     setPausedElapsed(finalElapsed);
+    setShowSaveFlow(false); // Pride phase first — hold the number (Miner: 800ms pride moment)
     persistTimer({ timerState: 'stopped', startedAt: null, pausedElapsed: finalElapsed, note, tags });
-  }, [timerState, pausedElapsed, startedAt, note, tags]);
+    // After pride moment, reveal save flow
+    const delay = prefersReduced ? 0 : 800;
+    setTimeout(() => setShowSaveFlow(true), delay);
+  }, [timerState, pausedElapsed, startedAt, note, tags, prefersReduced]);
 
   // Space key to start/pause/resume timer (guard: skip when in inputs)
   useEffect(() => {
@@ -205,6 +256,7 @@ export default function TimerFAB({ onSaveSession, onQuickLog, showTabBar = true 
       setTags([]);
       setMood(null);
       setCuriosity('');
+      setShowSaveFlow(false);
       clearTimerStorage();
     }, 350);
   }, [elapsed, note, tags, curiosity, onSaveSession]);
@@ -219,6 +271,7 @@ export default function TimerFAB({ onSaveSession, onQuickLog, showTabBar = true 
     setTags([]);
     setMood(null);
     setCuriosity('');
+    setShowSaveFlow(false);
     clearTimerStorage();
   }, []);
 
@@ -309,19 +362,51 @@ export default function TimerFAB({ onSaveSession, onQuickLog, showTabBar = true 
           {timerState === 'stopped' && 'Session complete'}
         </div>
 
-        {/* Timer display */}
+        {/* Timer display — Lora running, DM Serif stopped (Ive/Jen synthesis) */}
         <div className="text-center mb-12">
-          <p className="text-text-3 text-xs font-medium uppercase tracking-widest mb-4">
-            {timerState === 'stopped' ? 'Session Complete' : timerState === 'paused' ? 'Paused' : 'Practicing'}
-          </p>
           <div className="hero-glow">
             <h1
-              className="font-bold text-text leading-none tracking-tight"
-              style={{ fontSize: '72px', fontVariantNumeric: 'tabular-nums' }}
+              className={`leading-none tracking-tight ${
+                timerState === 'stopped' ? 'ceremony-text animate-timer-settle' : ''
+              }`}
+              style={{
+                fontSize: '80px',
+                fontFamily: timerState === 'stopped' ? undefined : 'var(--font-serif)',
+                fontWeight: 400,
+                fontVariantNumeric: 'tabular-nums',
+                letterSpacing: '-0.02em',
+                color: timerDepthColor,
+                transition: 'color 2s ease',
+              }}
             >
-              {formatTimer(elapsed)}
+              {formatTimerParts(elapsed).map((part, i) =>
+                part.type === 'colon' ? (
+                  <span
+                    key={i}
+                    className={colonPulsing ? 'animate-colon-pulse' : ''}
+                    style={colonPulsing ? {
+                      animationDuration: `${colonPulseDuration}s`,
+                      display: 'inline-block',
+                    } : {
+                      opacity: timerState === 'paused' ? 0 : 1,
+                      transition: 'opacity 0.3s ease',
+                      display: 'inline-block',
+                    }}
+                  >
+                    {part.value}
+                  </span>
+                ) : (
+                  <span key={i}>{part.value}</span>
+                )
+              )}
             </h1>
           </div>
+          {/* Subtle state indicator — only when paused (Rams: respect their intelligence) */}
+          {timerState === 'paused' && (
+            <p className="text-text-3 text-xs font-medium uppercase tracking-widest mt-4 animate-fade-in">
+              Paused
+            </p>
+          )}
         </div>
 
         {/* Soundscape controls */}
@@ -365,21 +450,25 @@ export default function TimerFAB({ onSaveSession, onQuickLog, showTabBar = true 
               </svg>
             </button>
           </div>
-        ) : (
-          /* Stopped — note + save */
-          <div className="w-full max-w-sm animate-fade-in-up">
+        ) : showSaveFlow ? (
+          /* Save flow — staggered entrance (Miner: journal page, not form) */
+          <div className="w-full max-w-sm">
             <input
               type="text"
               value={note}
               onChange={(e) => setNote(e.target.value)}
               placeholder="What did you work on?"
               aria-label="Session note"
-              className="glass-input w-full px-4 py-3.5 text-sm text-text placeholder-text-3 mb-3"
+              className="glass-input w-full px-4 py-3.5 text-sm text-text placeholder-text-3 mb-3 animate-fade-in-up"
+              style={{ opacity: 0, animationDelay: '0ms', animationFillMode: 'forwards' }}
               autoFocus
             />
 
-            {/* Practice tags */}
-            <div className="flex flex-wrap gap-2 mb-4">
+            {/* Practice tags — 120ms stagger */}
+            <div
+              className="flex flex-wrap gap-2 mb-4 animate-fade-in-up"
+              style={{ opacity: 0, animationDelay: '120ms', animationFillMode: 'forwards' }}
+            >
               {PRACTICE_TAGS.map((tag) => {
                 const active = tags.includes(tag);
                 return (
@@ -403,8 +492,11 @@ export default function TimerFAB({ onSaveSession, onQuickLog, showTabBar = true 
               })}
             </div>
 
-            {/* Mood — 4 weather icons, no labels */}
-            <div className="mb-4">
+            {/* Mood — 200ms stagger */}
+            <div
+              className="mb-4 animate-fade-in-up"
+              style={{ opacity: 0, animationDelay: '200ms', animationFillMode: 'forwards' }}
+            >
               <MoodPicker selected={mood} onSelect={setMood} />
             </div>
 
@@ -414,13 +506,17 @@ export default function TimerFAB({ onSaveSession, onQuickLog, showTabBar = true 
               onChange={(e) => setCuriosity(e.target.value)}
               placeholder="What are you curious about next?"
               aria-label="Curiosity for next session"
-              className="glass-input w-full px-4 py-3.5 text-sm text-text placeholder-text-3/50 italic mb-4"
+              className="glass-input w-full px-4 py-3.5 text-sm text-text placeholder-text-3/50 italic mb-4 animate-fade-in-up"
+              style={{ opacity: 0, animationDelay: '260ms', animationFillMode: 'forwards' }}
             />
 
             <button
               onClick={handleSave}
-              className="relative w-full text-white font-semibold py-4 rounded-full text-base active:scale-[0.97] transition-all mb-3 overflow-hidden"
+              className="relative w-full text-white font-semibold py-4 rounded-full text-base active:scale-[0.97] transition-all mb-3 overflow-hidden animate-fade-in-up"
               style={{
+                opacity: 0,
+                animationDelay: '320ms',
+                animationFillMode: 'forwards',
                 background: 'linear-gradient(135deg, rgba(59,130,246,0.9), rgba(30,64,175,0.95))',
                 boxShadow: '0 4px 20px rgba(59,130,246,0.3), inset 0 1px 0 rgba(255,255,255,0.2)',
               }}
@@ -441,12 +537,13 @@ export default function TimerFAB({ onSaveSession, onQuickLog, showTabBar = true 
 
             <button
               onClick={handleNevermind}
-              className="w-full py-3 text-text-3 text-sm font-medium active:scale-[0.97] transition-all"
+              className="w-full py-3 text-text-3 text-sm font-medium active:scale-[0.97] transition-all animate-fade-in-up"
+              style={{ opacity: 0, animationDelay: '380ms', animationFillMode: 'forwards' }}
             >
               Never mind
             </button>
           </div>
-        )}
+        ) : null /* Pride phase — timer number visible, save flow hidden */}
       </div>
     );
   }
