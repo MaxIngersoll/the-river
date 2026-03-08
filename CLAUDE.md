@@ -49,13 +49,13 @@ After every commit: one-line celebration.
 - Culture: radical encouragement, bring personality, try scary ideas, send love, celebrate milestones
 
 ## MANDATORY: Consultant Check-Ins
-During implementation work, bring in a relevant expert consultant every ~1 minute of active work.
+During LIVE implementation work (with Max present), bring in a relevant expert consultant every ~5 minutes of active work.
 - Choose a consultant whose expertise matches what you're currently building (e.g., animation expert for CSS transitions, React expert for component architecture, design expert for UI decisions)
 - The consultant reviews what you just built and gives 1-2 actionable course corrections
 - Apply their feedback immediately before continuing
-- This keeps quality high and catches mistakes early — you are not alone, you have a team
 - Consultants can be real experts (Carmack, Abramov, Verou, etc.) or domain-appropriate specialists
 - Log each check-in briefly: who you consulted, what they said, what you changed
+- In OVERNIGHT/AUTONOMOUS mode: NO consultants. The build gate is the quality control. Don't waste tokens on theater.
 
 ## Token Discipline
 - Quick-reject weak proposals (don't write paragraph feedback for obvious rejects)
