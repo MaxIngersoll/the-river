@@ -76,256 +76,232 @@ function setTimerDisplayModeStorage(mode) {
   try { localStorage.setItem(TIMER_DISPLAY_KEY, mode); } catch {}
 }
 
-// ─── Simplex-style 2D noise (compact, no dependency) ───
-// Classic Perlin-inspired gradient noise — 3% rule: take the well-known algorithm, adapt to our palette
-const NOISE_PERM = (() => {
+// ─── Value noise with fBm — artifact-free, smooth ───
+const NOISE_T = (() => {
+  const t = new Uint8Array(512);
   const p = [];
   for (let i = 0; i < 256; i++) p[i] = i;
-  // Fisher-Yates shuffle with fixed seed for determinism
   let seed = 42;
   for (let i = 255; i > 0; i--) {
-    seed = (seed * 16807 + 0) % 2147483647;
+    seed = (seed * 16807) % 2147483647;
     const j = seed % (i + 1);
     [p[i], p[j]] = [p[j], p[i]];
   }
-  return [...p, ...p]; // double for overflow
+  for (let i = 0; i < 512; i++) t[i] = p[i & 255];
+  return t;
 })();
 
-const NOISE_GRAD = [[1,1],[-1,1],[1,-1],[-1,-1],[1,0],[-1,0],[0,1],[0,-1]];
+function smoothstep(t) { return t * t * (3 - 2 * t); }
 
-function fade(t) { return t * t * t * (t * (t * 6 - 15) + 10); }
-function lerp(a, b, t) { return a + t * (b - a); }
-
-function noise2D(x, y) {
-  const X = Math.floor(x) & 255, Y = Math.floor(y) & 255;
-  const xf = x - Math.floor(x), yf = y - Math.floor(y);
-  const u = fade(xf), v = fade(yf);
-  const aa = NOISE_PERM[NOISE_PERM[X] + Y], ab = NOISE_PERM[NOISE_PERM[X] + Y + 1];
-  const ba = NOISE_PERM[NOISE_PERM[X + 1] + Y], bb = NOISE_PERM[NOISE_PERM[X + 1] + Y + 1];
-  const g = (hash, dx, dy) => { const gr = NOISE_GRAD[hash & 7]; return gr[0] * dx + gr[1] * dy; };
-  return lerp(
-    lerp(g(aa, xf, yf), g(ba, xf - 1, yf), u),
-    lerp(g(ab, xf, yf - 1), g(bb, xf - 1, yf - 1), u),
-    v
-  );
+function valueNoise(x, y) {
+  const xi = Math.floor(x), yi = Math.floor(y);
+  const xf = smoothstep(x - xi), yf = smoothstep(y - yi);
+  const ix = xi & 255, iy = yi & 255;
+  const a = NOISE_T[NOISE_T[ix] + iy] / 255;
+  const b = NOISE_T[NOISE_T[ix + 1] + iy] / 255;
+  const c = NOISE_T[NOISE_T[ix] + iy + 1] / 255;
+  const d = NOISE_T[NOISE_T[ix + 1] + iy + 1] / 255;
+  return a + (b - a) * xf + (c - a) * yf + (a - b - c + d) * xf * yf;
 }
 
-// ─── The Flow — Perlin noise particle flow field (Fry/Reas/Abloh synthesis) ───
-// Particles born at center, flowing outward through noise field.
-// Each particle IS a moment of practice. Your time becomes visible as flowing light.
-function FlowCanvas({ elapsed, timerState, prefersReduced, countdownTarget, isDark }) {
+function fbm(x, y) {
+  let val = 0, amp = 0.5, freq = 1;
+  for (let i = 0; i < 3; i++) {
+    val += amp * (valueNoise(x * freq, y * freq) - 0.5);
+    freq *= 2.1;
+    amp *= 0.5;
+  }
+  return val;
+}
+
+// ─── The Quiet Water — Turrell/Eno/Rams synthesis ───
+// "Ambient means it can be ignored AND attended to." — Brian Eno
+// "Light so slow you can't tell it's moving." — James Turrell
+// "Less, but better." — Dieter Rams
+//
+// 2 slow, soft currents through gentle noise. No particles. No chaos.
+// The timer number IS the design. Everything else is atmosphere.
+
+function createCurrent(w, h, index) {
+  return {
+    points: [{ x: w * (0.15 + index * 0.35), y: h * (0.2 + Math.random() * 0.6) }],
+    maxPoints: 160,
+    speed: 0.3 + Math.random() * 0.15, // slow but visible flow
+    noiseOffX: index * 137.3 + Math.random() * 300,
+    noiseOffY: index * 89.7 + Math.random() * 300,
+    colorIndex: index,
+    width: 10 + Math.random() * 10,
+  };
+}
+
+function QuietWaterCanvas({ elapsed, timerState, prefersReduced, countdownTarget, isDark }) {
   const canvasRef = useRef(null);
-  const particlesRef = useRef([]);
-  const frameRef = useRef(null);
-  const timeRef = useRef(0);
-  const lastSpawnRef = useRef(0);
+  const stateRef = useRef({ currents: [], frame: null, time: 0 });
+  const propsRef = useRef({ elapsed: 0, timerState: 'running', prefersReduced: false, isDark: true });
+  propsRef.current = { elapsed, timerState, prefersReduced, isDark };
 
-  // Resolve CSS colors for canvas (can't use var() in canvas)
-  const colors = useMemo(() => {
-    if (isDark) {
-      return {
-        water1: 'rgba(30, 58, 95, 0.9)',
-        water2: 'rgba(50, 90, 210, 0.9)',    // brighter blue
-        water3: 'rgba(60, 120, 250, 0.85)',
-        water4: 'rgba(80, 150, 255, 0.8)',
-        water5: 'rgba(120, 180, 255, 0.75)',
-        lavender: 'rgba(200, 185, 255, 0.7)',
-        glow: 'rgba(59, 130, 246, 0.25)',
-      };
-    }
-    return {
-      water1: 'rgba(150, 200, 254, 0.9)',
-      water2: 'rgba(80, 150, 250, 0.85)',
-      water3: 'rgba(50, 120, 246, 0.8)',
-      water4: 'rgba(37, 99, 235, 0.75)',
-      water5: 'rgba(30, 64, 175, 0.7)',
-      lavender: 'rgba(167, 139, 250, 0.65)',
-      glow: 'rgba(59, 130, 246, 0.15)',
-    };
-  }, [isDark]);
-
-  // Color based on particle age and elapsed time
-  const getParticleColor = useCallback((age, minutes) => {
-    // Every 7th particle gets lavender accent
-    if (age > 0.5 && Math.random() < 0.003) return colors.lavender;
-    if (minutes >= 30) return colors.water5;
-    if (minutes >= 15) return colors.water4;
-    if (minutes >= 5) return colors.water3;
-    return colors.water2;
-  }, [colors]);
+  const palette = useMemo(() => ({
+    bg: isDark ? [13, 12, 11] : [242, 240, 236],
+    // Deep, quiet water colors — only 2-3 hues
+    currents: isDark
+      ? [[30, 70, 160], [45, 95, 200], [25, 55, 130]]
+      : [[70, 140, 230], [50, 110, 200], [90, 155, 240]],
+    glow: isDark ? [35, 80, 180] : [80, 145, 235],
+  }), [isDark]);
+  const paletteRef = useRef(palette);
+  paletteRef.current = palette;
 
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const state = stateRef.current;
 
-    // Size canvas to container
-    const resize = () => {
-      const rect = canvas.parentElement.getBoundingClientRect();
-      canvas.width = rect.width * dpr;
-      canvas.height = rect.height * dpr;
-      canvas.style.width = `${rect.width}px`;
-      canvas.style.height = `${rect.height}px`;
-      ctx.scale(dpr, dpr);
-    };
-    resize();
+    const rect = canvas.parentElement.getBoundingClientRect();
+    canvas.width = rect.width * dpr;
+    canvas.height = rect.height * dpr;
+    canvas.style.width = `${rect.width}px`;
+    canvas.style.height = `${rect.height}px`;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-    const isPaused = timerState === 'paused';
-    const isRunning = timerState === 'running';
-    const minutes = elapsed / 60000;
+    const w = rect.width, h = rect.height;
 
-    // Spawn rate increases with time (more particles = richer flow)
-    const spawnRate = Math.min(8, 1 + minutes * 0.3); // 1/frame → 8/frame over 23min
-    const maxParticles = prefersReduced ? 40 : Math.min(300, 60 + minutes * 8);
-    const noiseScale = 0.008; // How zoomed-in the flow field is
-    const noiseZ = elapsed * 0.00003; // Slowly evolving field (Reas: emergence over time)
-
-    const w = canvas.width / dpr;
-    const h = canvas.height / dpr;
-    const cx = w / 2;
-    const cy = h / 2;
-
-    function spawnParticle() {
-      // Born near center with slight randomness
-      const angle = Math.random() * Math.PI * 2;
-      const dist = 4 + Math.random() * 12;
-      return {
-        x: cx + Math.cos(angle) * dist,
-        y: cy + Math.sin(angle) * dist,
-        vx: 0,
-        vy: 0,
-        life: 0,
-        maxLife: 180 + Math.random() * 220, // ~3-7 seconds at 60fps
-        size: 1.8 + Math.random() * 2.5,
-        hueShift: Math.random(), // for color variety
-      };
-    }
+    // Start with 2 currents (Rams: less but better)
+    state.currents = [createCurrent(w, h, 0), createCurrent(w, h, 1)];
 
     function animate() {
-      const particles = particlesRef.current;
+      const { elapsed: el, timerState: ts, prefersReduced: pr } = propsRef.current;
+      const pal = paletteRef.current;
+      const isPaused = ts === 'paused';
+      const minutes = el / 60000;
 
-      // Semi-transparent clear for trail effect (Hodgin: luminous trails)
-      // Lower alpha = longer trails. 0.03 gives beautiful ghostly persistence.
-      ctx.fillStyle = isDark ? 'rgba(12, 10, 9, 0.035)' : 'rgba(237, 234, 228, 0.04)';
+      // Time moves slowly — Turrell: barely perceptible change
+      state.time += isPaused ? 0.001 : 0.004;
+      const t = state.time;
+
+      // ─── Full clear ───
+      const [br, bg, bb] = pal.bg;
+      ctx.fillStyle = `rgb(${br},${bg},${bb})`;
       ctx.fillRect(0, 0, w, h);
 
-      // Spawn new particles (only when running)
-      if (isRunning && !prefersReduced) {
-        const now = performance.now();
-        if (now - lastSpawnRef.current > 50) { // ~20 spawns/sec max
-          const count = Math.ceil(spawnRate);
-          for (let i = 0; i < count && particles.length < maxParticles; i++) {
-            particles.push(spawnParticle());
-          }
-          lastSpawnRef.current = now;
+      // ─── Single soft ambient glow (barely visible) ───
+      if (!pr) {
+        const gx = w * 0.5 + Math.sin(t * 0.15) * w * 0.15;
+        const gy = h * 0.45 + Math.cos(t * 0.12) * h * 0.1;
+        const gSize = Math.min(w, h) * 0.6;
+        const [gr, gg, gb] = pal.glow;
+        // Glow intensity deepens with practice time (Jen: drama through time)
+        const glowOp = isPaused ? 0.03 : Math.min(0.12, 0.05 + minutes * 0.003);
+        const grad = ctx.createRadialGradient(gx, gy, 0, gx, gy, gSize);
+        grad.addColorStop(0, `rgba(${gr},${gg},${gb},${glowOp})`);
+        grad.addColorStop(0.5, `rgba(${gr},${gg},${gb},${glowOp * 0.4})`);
+        grad.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, w, h);
+      }
+
+      // ─── After 10 min, a third current emerges (reward for staying) ───
+      if (minutes > 10 && state.currents.length < 3) {
+        state.currents.push(createCurrent(w, h, 2));
+      }
+
+      // ─── Update & draw currents — the heart of The Quiet Water ───
+      for (const current of state.currents) {
+        const head = current.points[current.points.length - 1];
+
+        // Use atan2(fbm, fbm) for smooth, sweeping curves — no jitter
+        const nx = fbm(head.x * 0.002 + current.noiseOffX + t * 0.05, head.y * 0.002 + current.noiseOffY);
+        const ny = fbm(head.x * 0.002 + current.noiseOffX, head.y * 0.002 + current.noiseOffY + t * 0.04);
+        const angle = Math.atan2(ny, nx);
+
+        // Breathing: imperceptible oscillation
+        const breathe = 1 + Math.sin(t * 0.4) * 0.05;
+        const speed = (isPaused ? 0.04 : current.speed * breathe);
+
+        current.points.push({
+          x: head.x + Math.cos(angle) * speed,
+          y: head.y + Math.sin(angle) * speed,
+        });
+        if (current.points.length > current.maxPoints) current.points.shift();
+
+        // Gentle edge wrap
+        const last = current.points[current.points.length - 1];
+        if (last.x < -30) last.x = w + 25;
+        if (last.x > w + 30) last.x = -25;
+        if (last.y < -30) last.y = h + 25;
+        if (last.y > h + 30) last.y = -25;
+
+        const pts = current.points;
+        if (pts.length < 4) continue;
+
+        const [cr, cg, cb] = pal.currents[current.colorIndex % pal.currents.length];
+
+        // Glow behind the current (Turrell: light has thingness)
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        ctx.shadowColor = `rgba(${cr},${cg},${cb},${isPaused ? 0.08 : 0.3})`;
+        ctx.shadowBlur = current.width * 4;
+
+        // Draw smooth quadratic curve: tail (barely visible) → head (softly luminous)
+        const baseOp = isPaused ? 0.06 : 0.25;
+        for (let j = 2; j < pts.length; j++) {
+          const segT = j / pts.length;
+          // Quadratic ease-in: gentle gradient, visible enough to see the flow shape
+          const opacity = segT * segT * baseOp;
+          if (opacity < 0.005) continue; // skip nearly invisible segments
+
+          const lw = current.width * (0.25 + segT * 0.75);
+          ctx.lineWidth = lw;
+          ctx.strokeStyle = `rgba(${cr},${cg},${cb},${opacity})`;
+          ctx.beginPath();
+          const p0 = pts[j - 2], p1 = pts[j - 1], p2 = pts[j];
+          ctx.moveTo((p0.x + p1.x) / 2, (p0.y + p1.y) / 2);
+          ctx.quadraticCurveTo(p1.x, p1.y, (p1.x + p2.x) / 2, (p1.y + p2.y) / 2);
+          ctx.stroke();
         }
+        ctx.shadowBlur = 0;
       }
 
-      // Update and draw particles
-      timeRef.current += 0.01;
-
-      for (let i = particles.length - 1; i >= 0; i--) {
-        const p = particles[i];
-        p.life++;
-
-        // Remove dead particles
-        if (p.life > p.maxLife || p.x < -10 || p.x > w + 10 || p.y < -10 || p.y > h + 10) {
-          particles.splice(i, 1);
-          continue;
-        }
-
-        // Flow field force from Perlin noise
-        const noiseVal = noise2D(p.x * noiseScale + noiseZ, p.y * noiseScale + noiseZ);
-        const angle = noiseVal * Math.PI * 4; // Full rotation range
-
-        // Outward drift from center (gentle, not explosive)
-        const dx = p.x - cx, dy = p.y - cy;
-        const distFromCenter = Math.sqrt(dx * dx + dy * dy);
-        const outwardForce = 0.02 + distFromCenter * 0.0001;
-        const outAngle = Math.atan2(dy, dx);
-
-        // Combine flow field + outward drift
-        const speed = isPaused ? 0.2 : 0.8 + minutes * 0.015;
-        p.vx += (Math.cos(angle) * 0.5 + Math.cos(outAngle) * outwardForce) * speed;
-        p.vy += (Math.sin(angle) * 0.5 + Math.sin(outAngle) * outwardForce) * speed;
-
-        // Damping (prevents runaway velocity)
-        p.vx *= 0.96;
-        p.vy *= 0.96;
-
-        p.x += p.vx;
-        p.y += p.vy;
-
-        // Opacity: fade in, sustain, fade out
-        const lifeT = p.life / p.maxLife;
-        let opacity;
-        if (lifeT < 0.1) opacity = lifeT / 0.1; // Fade in
-        else if (lifeT > 0.7) opacity = (1 - lifeT) / 0.3; // Fade out
-        else opacity = 1;
-        opacity *= isPaused ? 0.25 : 0.85;
-
-        // Color deepens with practice time
-        const color = getParticleColor(lifeT, minutes);
-
-        // Draw particle
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.size * (isPaused ? 0.6 : 1), 0, Math.PI * 2);
-        ctx.fillStyle = color.replace(/[\d.]+\)$/, `${opacity})`);
-        ctx.fill();
-      }
-
-      // Center glow — soft ambient light (not a staring eye — spread wide, no hard edge)
-      if (!prefersReduced) {
-        const glowSize = 60 + Math.sin(timeRef.current * 0.3) * 10;
-        const gradient = ctx.createRadialGradient(cx, cy, 0, cx, cy, glowSize);
-        gradient.addColorStop(0, colors.glow.replace(/[\d.]+\)$/, `${isPaused ? 0.05 : 0.15})`));
-        gradient.addColorStop(0.4, colors.glow.replace(/[\d.]+\)$/, `${isPaused ? 0.02 : 0.06})`));
-        gradient.addColorStop(1, 'rgba(0,0,0,0)');
-        ctx.fillStyle = gradient;
-        ctx.fillRect(cx - glowSize, cy - glowSize, glowSize * 2, glowSize * 2);
-      }
-
-      frameRef.current = requestAnimationFrame(animate);
+      state.frame = requestAnimationFrame(animate);
     }
 
-    // Start animation
-    frameRef.current = requestAnimationFrame(animate);
-
-    return () => {
-      if (frameRef.current) cancelAnimationFrame(frameRef.current);
-    };
-  }, [elapsed, timerState, prefersReduced, isDark, colors, getParticleColor]);
+    state.frame = requestAnimationFrame(animate);
+    return () => { if (state.frame) cancelAnimationFrame(state.frame); };
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const displayMs = countdownTarget ? Math.max(0, countdownTarget * 60000 - elapsed) : elapsed;
 
   return (
-    <div className="relative w-full" style={{ maxWidth: '360px', height: '55vh', maxHeight: '440px' }}>
+    <div className="relative" style={{ width: 'min(calc(100vw - 48px), 380px)', height: '55vh', maxHeight: '460px' }}>
       <canvas
         ref={canvasRef}
-        className="absolute inset-0 w-full h-full rounded-2xl"
+        className="absolute inset-0 w-full h-full"
+        style={{ borderRadius: '20px' }}
         aria-hidden="true"
       />
-      {/* Time display — integrated into the flow, not layered awkwardly */}
+      {/* Timer — THE focal point (Rams: the number IS the design) */}
       <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
         <span
           className="leading-none"
           style={{
-            fontSize: '64px',
+            fontSize: '68px',
             fontFamily: 'var(--font-serif)',
             fontWeight: 400,
             fontVariantNumeric: 'tabular-nums',
             letterSpacing: '-0.02em',
             color: 'var(--color-text)',
-            opacity: timerState === 'paused' ? 0.25 : 0.7,
-            transition: 'opacity 0.5s ease',
-            textShadow: isDark ? '0 0 40px rgba(59,130,246,0.2)' : '0 0 30px rgba(191,219,254,0.3)',
+            opacity: timerState === 'paused' ? 0.15 : 0.7,
+            transition: 'opacity 0.8s ease',
+            textShadow: isDark
+              ? '0 0 80px rgba(35,75,170,0.2), 0 0 160px rgba(35,75,170,0.08)'
+              : '0 0 60px rgba(70,140,230,0.15)',
           }}
         >
           {formatTimer(displayMs)}
         </span>
         {timerState === 'paused' && (
-          <p className="text-text-3 text-xs font-medium uppercase tracking-widest mt-3 animate-fade-in" style={{ opacity: 0.5 }}>
+          <p className="text-text-3 text-xs font-medium uppercase tracking-widest mt-3 animate-fade-in" style={{ opacity: 0.4 }}>
             Paused
           </p>
         )}
@@ -681,15 +657,15 @@ export default function TimerFAB({ onSaveSession, onQuickLog, showTabBar = true 
           {timerState === 'stopped' && 'Session complete'}
         </div>
 
-        {/* Timer display — The Flow (particle field) or Classic clock */}
+        {/* Timer display — The Quiet Water or Classic clock */}
         {timerState !== 'stopped' && timerDisplayMode === 'symbolic' ? (
-          /* The Flow — particles flowing through Perlin noise (Fry/Reas/Abloh synthesis) */
+          /* The Quiet Water — gentle currents through noise field (Turrell/Eno/Rams synthesis) */
           <div
-            className="flex flex-col items-center justify-center mb-4 relative"
+            className="flex flex-col items-stretch justify-center mb-4 relative"
             role="timer"
             aria-label={`Practice time: ${formatTimer(elapsed)}`}
           >
-            <FlowCanvas
+            <QuietWaterCanvas
               elapsed={elapsed}
               timerState={timerState}
               prefersReduced={prefersReduced}
