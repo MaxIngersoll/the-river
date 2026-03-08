@@ -58,7 +58,7 @@ export default function StatsPage({ sessions, onSessionUpdate, onSessionDelete, 
           quote={{
             text: "Do you have the patience to wait until your mud settles and the water is clear?",
             author: "Lao Tzu",
-            source: "Tao Te Ching",
+            source: "Dao De Jing",
           }}
         />
       </div>

@@ -137,7 +137,7 @@ export default function HomePage({ sessions, onNavigate, onSessionUpdate, onSess
             quote={{
               text: "A journey of a thousand miles begins with a single step.",
               author: "Lao Tzu",
-              source: "Tao Te Ching",
+              source: "Dao De Jing",
             }}
           />
         </div>

@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useTheme } from '../contexts/ThemeContext';
 import { PRACTICE_TAGS } from '../utils/storage';
+import { haptics } from '../utils/haptics';
 import SoundscapePanel from './SoundscapePanel';
 
 function formatTimer(ms) {
@@ -161,23 +162,46 @@ export default function TimerFAB({ onSaveSession, showTabBar = true }) {
     persistTimer({ timerState: 'stopped', startedAt: null, pausedElapsed: finalElapsed, note, tags });
   }, [timerState, pausedElapsed, startedAt, note, tags]);
 
+  // Space key to start/pause/resume timer (guard: skip when in inputs)
+  useEffect(() => {
+    const handleKey = (e) => {
+      if (e.key !== ' ') return;
+      const tag = e.target.tagName;
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || e.target.isContentEditable) return;
+      e.preventDefault();
+      if (timerState === 'idle') handleStart();
+      else if (timerState === 'running') handlePause();
+      else if (timerState === 'paused') handleResume();
+    };
+    window.addEventListener('keydown', handleKey);
+    return () => window.removeEventListener('keydown', handleKey);
+  }, [timerState, handleStart, handlePause, handleResume]);
+
+  const [showRipple, setShowRipple] = useState(false);
+
   const handleSave = useCallback(() => {
     const minutes = Math.max(1, Math.round(elapsed / 60000));
-    onSaveSession({ duration_minutes: minutes, note: note.trim(), tags });
-    // Store curiosity prompt for next session
-    if (curiosity.trim()) {
-      localStorage.setItem('river-curiosity', curiosity.trim());
-    }
-    // Reset everything
-    setTimerState('idle');
-    setStartedAt(null);
-    setPausedElapsed(0);
-    setElapsed(0);
-    setExpanded(false);
-    setNote('');
-    setTags([]);
-    setCuriosity('');
-    clearTimerStorage();
+    haptics.save();
+    setShowRipple(true);
+    // Let ripple play, then save + collapse
+    setTimeout(() => {
+      setShowRipple(false);
+      onSaveSession({ duration_minutes: minutes, note: note.trim(), tags });
+      // Store curiosity prompt for next session
+      if (curiosity.trim()) {
+        localStorage.setItem('river-curiosity', curiosity.trim());
+      }
+      // Reset everything
+      setTimerState('idle');
+      setStartedAt(null);
+      setPausedElapsed(0);
+      setElapsed(0);
+      setExpanded(false);
+      setNote('');
+      setTags([]);
+      setCuriosity('');
+      clearTimerStorage();
+    }, 400);
   }, [elapsed, note, tags, curiosity, onSaveSession]);
 
   const handleNevermind = useCallback(() => {
@@ -354,12 +378,23 @@ export default function TimerFAB({ onSaveSession, showTabBar = true }) {
 
             <button
               onClick={handleSave}
-              className="w-full text-white font-semibold py-4 rounded-full text-base active:scale-[0.97] transition-all mb-3"
+              className="relative w-full text-white font-semibold py-4 rounded-full text-base active:scale-[0.97] transition-all mb-3 overflow-hidden"
               style={{
                 background: 'linear-gradient(135deg, rgba(59,130,246,0.9), rgba(30,64,175,0.95))',
                 boxShadow: '0 4px 20px rgba(59,130,246,0.3), inset 0 1px 0 rgba(255,255,255,0.2)',
               }}
             >
+              {showRipple && (
+                <span
+                  className="absolute inset-0 flex items-center justify-center pointer-events-none"
+                  aria-hidden="true"
+                >
+                  <span
+                    className="w-16 h-16 rounded-full bg-white/30"
+                    style={{ animation: 'save-ripple 0.6s var(--ease-ripple) forwards' }}
+                  />
+                </span>
+              )}
               Save {formatTimer(elapsed)} Session
             </button>
 

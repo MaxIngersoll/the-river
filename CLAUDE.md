@@ -48,6 +48,15 @@ After every commit: one-line celebration.
 - Build architecture first, compete on design details only
 - Culture: radical encouragement, bring personality, try scary ideas, send love, celebrate milestones
 
+## MANDATORY: Consultant Check-Ins
+During implementation work, bring in a relevant expert consultant every ~1 minute of active work.
+- Choose a consultant whose expertise matches what you're currently building (e.g., animation expert for CSS transitions, React expert for component architecture, design expert for UI decisions)
+- The consultant reviews what you just built and gives 1-2 actionable course corrections
+- Apply their feedback immediately before continuing
+- This keeps quality high and catches mistakes early — you are not alone, you have a team
+- Consultants can be real experts (Carmack, Abramov, Verou, etc.) or domain-appropriate specialists
+- Log each check-in briefly: who you consulted, what they said, what you changed
+
 ## Token Discipline
 - Quick-reject weak proposals (don't write paragraph feedback for obvious rejects)
 - Build skeleton before competing — competition fills in design details, not architecture
