@@ -687,6 +687,16 @@ html.dark .glass-input:focus {
   animation: colon-pulse 1s ease-in-out infinite;
 }
 
+/* Bloom breathing — all rings + core scale together */
+@keyframes bloom-breathe {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.03); }
+}
+.animate-bloom-breathe {
+  animation: bloom-breathe 6s ease-in-out infinite;
+  transform-origin: 50px 50px;
+}
+
 .animate-ring {
   animation: ring-fill 1.2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }

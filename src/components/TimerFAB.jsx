@@ -98,86 +98,151 @@ function catmullRomPath(points) {
   return d;
 }
 
-// The Living River — symbolic timer visualization (Miner/Ive competition synthesis)
-function RiverDropSVG({ elapsed, timerState }) {
-  const maxMs = 60 * 60 * 1000; // 60 min full descent
-  const progress = Math.min(elapsed / maxMs, 0.95);
+// The Bloom — concentric rings emanating from luminous core (Fry/Reas synthesis)
+function BloomSVG({ elapsed, timerState, prefersReduced, countdownTarget }) {
+  const isPaused = timerState === 'paused';
+  const isStopped = timerState === 'stopped';
 
-  // Generate trail points — max 40 for performance
-  const numPoints = Math.max(2, Math.min(40, Math.floor(progress * 42) + 2));
-  const points = [];
-  for (let i = 0; i < numPoints; i++) {
-    const t = i / (numPoints - 1);
-    const y = 5 + t * progress * 90; // Trail extends to drop position
-    const jitter = getTrailJitter(i);
-    const x = 50 + jitter * 15; // Center ±15%
-    points.push({ x, y });
+  // Generate rings — one every 12 seconds, expanding outward from center
+  const ringInterval = 12000;
+  const totalPossible = Math.floor(elapsed / ringInterval) + 1;
+
+  const rings = [];
+  for (let i = 0; i < totalPossible; i++) {
+    const birthTime = i * ringInterval;
+    const age = (elapsed - birthTime) / 1000;
+    if (age < 0) continue;
+
+    const maxAge = 420; // 7 min to reach max radius
+    const ageT = Math.min(1, age / maxAge);
+
+    // Radius: 3 at birth → 45 at max age
+    const baseR = 3 + ageT * 42;
+    // Organic wobble — each ring has unique personality (Reas: "systems and emergence")
+    const wobble = Math.sin(i * 2.7 + 0.5) * 1.2 + Math.cos(i * 1.3) * 0.6;
+    const r = baseR + wobble;
+
+    // Opacity: bright when young (0.6), fades outward (0.05)
+    const opacity = Math.max(0.05, 0.6 - ageT * 0.55);
+    if (opacity <= 0.05) continue;
+
+    // Stroke width: thick young → thin old
+    const strokeWidth = Math.max(0.3, 1.8 - ageT * 1.5);
+
+    // Color: inner water-2, outer water-4, every 4th ring = lavender (Jen: "chromatic bloom")
+    let color;
+    if (i % 4 === 0 && i > 0) {
+      color = 'var(--color-lavender)';
+    } else if (ageT < 0.3) {
+      color = 'var(--color-water-2)';
+    } else if (ageT < 0.6) {
+      color = 'var(--color-water-3)';
+    } else {
+      color = 'var(--color-water-4)';
+    }
+
+    rings.push({ r, strokeWidth, opacity, color, key: i });
   }
 
-  const dropPoint = points[points.length - 1];
-  const pathD = catmullRomPath(points);
+  // Performance cap: 40 most visible rings
+  const visibleRings = rings.slice(-40);
 
-  // Color deepens with time — water-2→water-5
+  // Core color deepens with time
   const minutes = elapsed / 60000;
-  const color = minutes >= 30 ? 'var(--color-water-5)'
+  const coreColor = minutes >= 30 ? 'var(--color-water-5)'
     : minutes >= 15 ? 'var(--color-water-4)'
     : minutes >= 5 ? 'var(--color-water-3)'
     : 'var(--color-water-2)';
 
-  const isPaused = timerState === 'paused';
+  // Mini clock: show remaining (countdown) or elapsed (count-up)
+  const displayMs = countdownTarget ? Math.max(0, countdownTarget * 60000 - elapsed) : elapsed;
 
   return (
     <svg
       viewBox="0 0 100 100"
       className="w-full"
-      style={{ maxWidth: '280px', height: '50vh', maxHeight: '380px' }}
+      style={{ maxWidth: '360px', height: '55vh', maxHeight: '440px' }}
       preserveAspectRatio="xMidYMid meet"
       aria-hidden="true"
     >
       <defs>
-        <filter id="river-drop-glow">
-          <feGaussianBlur stdDeviation="1.5" result="blur" />
+        <filter id="bloom-halo">
+          <feGaussianBlur stdDeviation="5" />
+        </filter>
+        <filter id="bloom-glow">
+          <feGaussianBlur stdDeviation="2" result="blur" />
           <feMerge>
             <feMergeNode in="blur" />
             <feMergeNode in="SourceGraphic" />
           </feMerge>
         </filter>
-        <linearGradient id="river-trail-grad" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor={color} stopOpacity="0.05" />
-          <stop offset="50%" stopColor={color} stopOpacity={isPaused ? 0.12 : 0.35} />
-          <stop offset="100%" stopColor={color} stopOpacity={isPaused ? 0.15 : 0.6} />
-        </linearGradient>
       </defs>
 
-      {/* Ambient trail glow — wider, softer */}
-      <path
-        d={pathD}
-        fill="none"
-        stroke={color}
-        strokeWidth="6"
-        strokeLinecap="round"
-        opacity={isPaused ? 0.02 : 0.06}
-      />
+      {/* Breathing wrapper — all elements breathe together (Fry: 6s cycle, calming) */}
+      <g className={!isPaused && !prefersReduced ? 'animate-bloom-breathe' : ''}>
 
-      {/* Trail — the river being born */}
-      <path
-        d={pathD}
-        fill="none"
-        stroke="url(#river-trail-grad)"
-        strokeWidth="2"
-        strokeLinecap="round"
-      />
+        {/* Rings — expanding outward from center */}
+        {visibleRings.map((ring) => (
+          <circle
+            key={ring.key}
+            cx="50" cy="50"
+            r={ring.r}
+            fill="none"
+            stroke={ring.color}
+            strokeWidth={ring.strokeWidth}
+            opacity={isPaused ? ring.opacity * 0.3 : isStopped ? Math.min(1, ring.opacity * 1.4) : ring.opacity}
+            style={{ transition: 'opacity 0.5s ease' }}
+          />
+        ))}
 
-      {/* Drop — luminous point descending */}
-      <circle
-        cx={dropPoint.x}
-        cy={dropPoint.y}
-        r={isPaused ? 2 : 2.5}
-        fill={color}
-        filter="url(#river-drop-glow)"
-        opacity={isPaused ? 0.4 : 1}
-        style={{ transition: 'all 0.5s ease' }}
-      />
+        {/* Core — 3 layers: halo, aura, white center (Ive: "glow like a star") */}
+        <circle cx="50" cy="50" r="8" fill={coreColor} opacity={isPaused ? 0.04 : 0.12} filter="url(#bloom-halo)" />
+        <circle cx="50" cy="50" r="4" fill={coreColor} opacity={isPaused ? 0.15 : 0.5} filter="url(#bloom-glow)" />
+        <circle cx="50" cy="50" r="2" fill="white" opacity={isPaused ? 0.25 : 0.85} />
+
+        {/* Ripples from core — only when running (Reas: "emergence") */}
+        {!isPaused && !isStopped && !prefersReduced && (
+          <>
+            <circle cx="50" cy="50" r="2" fill="none" stroke={coreColor} strokeWidth="0.4">
+              <animate attributeName="r" from="2" to="14" dur="3s" repeatCount="indefinite" />
+              <animate attributeName="opacity" from="0.45" to="0" dur="3s" repeatCount="indefinite" />
+            </circle>
+            <circle cx="50" cy="50" r="2" fill="none" stroke={coreColor} strokeWidth="0.4">
+              <animate attributeName="r" from="2" to="14" dur="3s" begin="1.5s" repeatCount="indefinite" />
+              <animate attributeName="opacity" from="0.45" to="0" dur="3s" begin="1.5s" repeatCount="indefinite" />
+            </circle>
+          </>
+        )}
+      </g>
+
+      {/* Mini clock — always visible (Wroblewski: "don't make the user guess") */}
+      <text
+        x="50" y="95"
+        textAnchor="middle"
+        style={{
+          fontSize: '3.8px',
+          fontFamily: 'var(--font-sans)',
+          fontVariantNumeric: 'tabular-nums',
+          fill: 'var(--color-text-3)',
+          opacity: 0.4,
+        }}
+      >
+        {formatTimer(displayMs)}
+      </text>
+      {elapsed < 8000 && (
+        <text
+          x="50" y="98.5"
+          textAnchor="middle"
+          style={{
+            fontSize: '2.2px',
+            fontFamily: 'var(--font-sans)',
+            fill: 'var(--color-text-3)',
+            opacity: 0.25,
+          }}
+        >
+          tap for fullscreen time
+        </text>
+      )}
     </svg>
   );
 }
@@ -217,6 +282,7 @@ export default function TimerFAB({ onSaveSession, onQuickLog, showTabBar = true 
   const [showSaveFlow, setShowSaveFlow] = useState(false);
   const [timerDisplayMode, setTimerDisplayModeState] = useState(getTimerDisplayMode);
   const [showClockPeek, setShowClockPeek] = useState(false);
+  const [countdownTarget, setCountdownTarget] = useState(null); // null = count-up, number = minutes
   const clockPeekRef = useRef(null);
   const intervalRef = useRef(null);
 
@@ -390,6 +456,7 @@ export default function TimerFAB({ onSaveSession, onQuickLog, showTabBar = true 
     setMood(null);
     setCuriosity('');
     setShowSaveFlow(false);
+    setCountdownTarget(null);
     clearTimerStorage();
   }, []);
 
@@ -416,6 +483,17 @@ export default function TimerFAB({ onSaveSession, onQuickLog, showTabBar = true 
       if (clockPeekRef.current) clearTimeout(clockPeekRef.current);
     };
   }, []);
+
+  // Auto-stop when countdown reaches zero
+  useEffect(() => {
+    if (countdownTarget && timerState === 'running') {
+      const remaining = countdownTarget * 60000 - elapsed;
+      if (remaining <= 0) {
+        haptics.save();
+        handleStop();
+      }
+    }
+  }, [countdownTarget, elapsed, timerState, handleStop]);
 
   const isActive = timerState !== 'idle';
 
@@ -518,14 +596,14 @@ export default function TimerFAB({ onSaveSession, onQuickLog, showTabBar = true 
 
         {/* Timer display — Symbolic river or Classic clock */}
         {timerState !== 'stopped' && timerDisplayMode === 'symbolic' ? (
-          /* The Living River — symbolic timer (Miner/Ive competition synthesis) */
+          /* The Bloom — concentric rings from luminous core (Fry/Reas synthesis) */
           <div
-            className="flex flex-col items-center justify-center mb-6 relative"
+            className="flex flex-col items-center justify-center mb-4 relative"
             onClick={handleClockPeek}
             role="timer"
             aria-label={`Practice time: ${formatTimer(elapsed)}`}
           >
-            <RiverDropSVG elapsed={elapsed} timerState={timerState} />
+            <BloomSVG elapsed={elapsed} timerState={timerState} prefersReduced={prefersReduced} countdownTarget={countdownTarget} />
             {/* Clock peek overlay — tap to reveal for 3s */}
             {showClockPeek && (
               <div className="absolute inset-0 flex items-center justify-center animate-fade-in">
@@ -540,7 +618,7 @@ export default function TimerFAB({ onSaveSession, onQuickLog, showTabBar = true 
                     textShadow: '0 0 40px rgba(59,130,246,0.3)',
                   }}
                 >
-                  {formatTimer(elapsed)}
+                  {formatTimer(countdownTarget ? Math.max(0, countdownTarget * 60000 - elapsed) : elapsed)}
                 </span>
               </div>
             )}
@@ -595,6 +673,28 @@ export default function TimerFAB({ onSaveSession, onQuickLog, showTabBar = true 
                 Paused
               </p>
             )}
+          </div>
+        )}
+
+        {/* Timer mode — count-up or countdown (Fogg: "make it tiny") */}
+        {timerState !== 'stopped' && (
+          <div className="flex items-center gap-1.5 mb-4">
+            {[null, 15, 25, 45, 60].map((mins) => (
+              <button
+                key={mins ?? 'up'}
+                onClick={(e) => { e.stopPropagation(); setCountdownTarget(mins); }}
+                className={`px-2.5 py-1 rounded-full text-xs transition-all ${
+                  countdownTarget === mins
+                    ? 'text-white font-semibold'
+                    : 'text-text-3/40'
+                }`}
+                style={countdownTarget === mins ? {
+                  background: 'linear-gradient(135deg, rgba(59,130,246,0.6), rgba(30,64,175,0.7))',
+                } : undefined}
+              >
+                {mins ? `${mins}m` : '\u221E'}
+              </button>
+            ))}
           </div>
         )}
 
