@@ -246,6 +246,14 @@ See `docs/AGENT-PROTOCOL.md` for the full protocol. Key elements:
 
 The River is a remix. It knows what it's referencing — Apple Health, meditation apps, every practice tracker that came before. It changed 3%: the river metaphor, the seasons, the anti-guilt philosophy. That 3% made it something completely new. Self-awareness about what you're remixing IS the art. Don't pretend you were born fresh. Acknowledge the references, then transform them.
 
+### Cohen's Vow (Session 11)
+
+> *"This app is trying to protect something fragile — the reason people pick up a guitar when no one is watching. Most software would monetize that reason. This one is trying to honor it. That's a vow. Don't break it chasing the other 107 decisions."*
+
+### Ando's Breath (Session 11)
+
+The app should open and pause — a single breath — before anything is interactive. You arrive. Then the river receives you. All sacred thresholds are misread as obstacles at first.
+
 ### Miyazaki's Principle (Session 11)
 
 > *"Your river does not yet have a stone, or a leaf, or a child. But it has the water. And the water is good."*

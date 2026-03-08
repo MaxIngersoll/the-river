@@ -147,6 +147,15 @@
 | 2026-03-08 | 11 | Mood picker redesign → future panel question | Angelou: current emoji picker too shallow. Needs to capture the ineffable. |
 | 2026-03-08 | 11 | Celebration depth → future panel question | Jiro: app celebrates too often. Depth > frequency. 1000h is when practice begins. |
 
+| 2026-03-08 | 11 | Rename The Dock → "Ready" | Team Delta vote. Eno proposed. Max chose it. The practice launchpad. |
+| 2026-03-08 | 11 | Context-aware Ready (Omakase mode) | Wynton + Jiro: Ready should know what you need today based on history/time/recency. |
+| 2026-03-08 | 11 | Living Chord Diagrams | Jiro + Fukasawa: chords should have emotional temperature. G major = bright. E minor = contemplative. |
+| 2026-03-08 | 11 | The Oblique Dock | Eno + Virgil: one surprise card every visit. A gift from outside your history. |
+| 2026-03-08 | 11 | Ando's Breath — opening pause | App opens and waits a breath before interactive. Sacred threshold. |
+| 2026-03-08 | 11 | River must encode real data | Fry: current speed = recency, depth = session length, turbulence = tags, color = time of day. |
+| 2026-03-08 | 11 | First Experience initiative launched | 4-person team (Lupi, Wattenberger, Martin, Perel). Solve the empty room. |
+| 2026-03-08 | 11 | 7 active team assignments | River Viz, First Experience, River Real Work, Shipping Pipeline, Omakase, Living Chords, Oblique Dock. |
+
 ---
 
-*Updated: Session 11 — Celebrity Panel Implementation (March 8, 2026)*
+*Updated: Session 11 — Subcommittee Reports + Team Assignments (March 8, 2026)*
