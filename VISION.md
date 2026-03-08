@@ -314,6 +314,10 @@ Kanye West, Oprah Winfrey, Jony Ive, Steve Jobs, Elon Musk, Linus Torvalds
 - John Cage — silence, chance, conceptual music
 - Wynton Marsalis — jazz mastery, practice philosophy, music education
 - Laurie Anderson — performance art, technology + art fusion
+- Sam Aaron — Sonic Pi creator, live-coded music, generative sound (Sound Audit panelist)
+- Ge Wang — ChucK language creator, Stanford computer music, Smule co-founder (Sound Audit panelist)
+- Holly Herndon — ML-driven composition, vocal-computational music, AI "Spawn" (Sound Audit panelist)
+- Hans Zimmer — film composer (Inception, Interstellar, Dune), emotional architecture through sound (Sound Audit panelist)
 
 **Light, Space & Visual Art:**
 - Robert Irwin — perceptual art, light and space movement
