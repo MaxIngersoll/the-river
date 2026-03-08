@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# auto-build.sh v2 — Infrastructure for The River's autonomous builder
+# auto-build.sh v2.1 — Infrastructure for The River's autonomous builder
+# v2.1 fixes: shell injection, cleanup trap scoping, bundle parse warning, task ID validation
 #
 # DESIGN PRINCIPLES (from 5-expert reliability review):
 #   1. LLM does creative work only — this script owns ALL infrastructure
@@ -40,6 +41,7 @@ BUNDLE_RAW_LIMIT=420  # KB
 BUNDLE_GZIP_LIMIT=125 # KB
 MAX_TASK_ATTEMPTS=2    # skip task after this many failures
 CIRCUIT_BREAKER_LIMIT=3
+_THIS_INVOCATION_HOLDS_LOCK=false  # Only true after cmd_lock succeeds
 
 # ─── Helpers ─────────────────────────────────────────────────────────────────
 timestamp() { date -u +"%Y-%m-%dT%H:%M:%SZ"; }
@@ -90,9 +92,11 @@ cleanup() {
   local exit_code=$?
   cd "$WORKTREE" 2>/dev/null || true
 
-  # Clear lock in AUTOPILOT.json (best effort)
-  if command -v python3 &>/dev/null && [ -f "$AUTOPILOT" ]; then
-    python3 -c "
+  # Only clear lock if THIS invocation acquired it (Fix: H3 — don't clobber
+  # another builder's lock when running read-only commands like status/preflight)
+  if [ "$_THIS_INVOCATION_HOLDS_LOCK" = "true" ]; then
+    if command -v python3 &>/dev/null && [ -f "$AUTOPILOT" ]; then
+      python3 -c "
 import json, sys
 try:
     with open('$AUTOPILOT', 'r') as f:
@@ -104,10 +108,11 @@ try:
 except Exception as e:
     print(f'Warning: could not clear lock: {e}', file=sys.stderr)
 " 2>/dev/null
+    fi
   fi
 
-  # Update heartbeat with exit status
-  if [ -n "$HEARTBEAT_FILE" ]; then
+  # Update heartbeat with exit status (only if we were doing real work)
+  if [ "$_THIS_INVOCATION_HOLDS_LOCK" = "true" ] && [ -n "$HEARTBEAT_FILE" ]; then
     echo "{\"time\":\"$(timestamp)\",\"status\":\"exited\",\"exit_code\":$exit_code}" > "$HEARTBEAT_FILE" 2>/dev/null
   fi
 
@@ -268,6 +273,11 @@ with open('$AUTOPILOT', 'w') as f:
     f.write('\n')
 print('LOCKED_OK: acquired at {}'.format(now_str))
 "
+  local lock_exit=$?
+  if [ $lock_exit -eq 0 ]; then
+    _THIS_INVOCATION_HOLDS_LOCK=true
+  fi
+  return $lock_exit
 }
 
 cmd_unlock() {
@@ -327,6 +337,11 @@ cmd_complete_task() {
   # Usage: auto-build.sh complete_task <task_id>
   local task_id="$1"
   [ -z "$task_id" ] && die "task_id required"
+
+  # Fix M5: Validate task_id is safe for Python interpolation (kebab-case only)
+  if ! echo "$task_id" | grep -qE '^[a-z0-9][a-z0-9-]*$'; then
+    die "Invalid task_id format: '$task_id' (must be kebab-case: a-z, 0-9, hyphens)"
+  fi
 
   _ensure_worktree
   _ensure_python
@@ -408,6 +423,10 @@ cmd_build_gate() {
       echo "BUNDLE_TOO_LARGE: ${JS_SIZE}kB > ${BUNDLE_RAW_LIMIT}kB limit"
       return 1
     fi
+  else
+    # Fix M3: Warn when Vite output format is unrecognizable rather than silently passing
+    echo "BUNDLE_SIZE_UNKNOWN: could not parse JS bundle size from build output"
+    echo "  (build passed but size gate is blind — verify dist/ manually)"
   fi
 
   if [ -n "$GZIP_SIZE" ]; then
@@ -417,6 +436,8 @@ cmd_build_gate() {
       echo "BUNDLE_GZIP_TOO_LARGE: ${GZIP_SIZE}kB > ${BUNDLE_GZIP_LIMIT}kB limit"
       return 1
     fi
+  else
+    echo "GZIP_SIZE_UNKNOWN: could not parse gzip size from build output"
   fi
 
   cmd_heartbeat "build_gate: passed"
@@ -484,16 +505,25 @@ cmd_record_failure() {
   local task_id="${1:-unknown}"
   local error_msg="${2:-unspecified error}"
 
+  # Validate task_id: reject special characters that could break Python interpolation
+  if echo "$task_id" | grep -qE "['\"\`\\\\]"; then
+    echo "INVALID_TASK_ID: contains unsafe characters: $task_id" >&2
+    task_id="sanitized"
+  fi
+
   _ensure_worktree
   _ensure_python
 
   # Log the failure
   _log_to_file "failure" "$task_id" "$error_msg"
 
-  python3 -c "
-import json, sys
+  # Fix H2: Pass error_msg via env var to avoid shell injection in Python
+  RIVER_ERROR_MSG="$error_msg" python3 -c "
+import json, os, sys
 
 task_id = '$task_id'
+error_msg = os.environ.get('RIVER_ERROR_MSG', 'unspecified error')[:200]
+
 with open('$AUTOPILOT', 'r') as f:
     data = json.load(f)
 
@@ -505,7 +535,7 @@ data['consecutive_failures'] = failures
 for t in data.get('next_tasks', []):
     if t.get('id') == task_id:
         t['attempts'] = t.get('attempts', 0) + 1
-        t['last_error'] = '''$error_msg'''[:200]
+        t['last_error'] = error_msg
         break
 
 if failures >= $CIRCUIT_BREAKER_LIMIT:
@@ -621,7 +651,7 @@ case "${1:-help}" in
   heartbeat)      shift; cmd_heartbeat "$@" ;;
   status)         cmd_status ;;
   help)
-    echo "auto-build.sh v2 — The River's autonomous builder infrastructure"
+    echo "auto-build.sh v2.1 — The River's autonomous builder infrastructure"
     echo ""
     echo "Commands:"
     echo "  preflight              Validate worktree, node, npm, git, JSON"

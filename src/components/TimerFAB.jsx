@@ -76,174 +76,261 @@ function setTimerDisplayModeStorage(mode) {
   try { localStorage.setItem(TIMER_DISPLAY_KEY, mode); } catch {}
 }
 
-// Smooth organic jitter for river trail meander
-function getTrailJitter(i) {
-  return Math.sin(i * 0.7) * 0.6 + Math.sin(i * 1.3 + 2.1) * 0.3 + Math.sin(i * 2.7 + 5.3) * 0.1;
+// ─── Simplex-style 2D noise (compact, no dependency) ───
+// Classic Perlin-inspired gradient noise — 3% rule: take the well-known algorithm, adapt to our palette
+const NOISE_PERM = (() => {
+  const p = [];
+  for (let i = 0; i < 256; i++) p[i] = i;
+  // Fisher-Yates shuffle with fixed seed for determinism
+  let seed = 42;
+  for (let i = 255; i > 0; i--) {
+    seed = (seed * 16807 + 0) % 2147483647;
+    const j = seed % (i + 1);
+    [p[i], p[j]] = [p[j], p[i]];
+  }
+  return [...p, ...p]; // double for overflow
+})();
+
+const NOISE_GRAD = [[1,1],[-1,1],[1,-1],[-1,-1],[1,0],[-1,0],[0,1],[0,-1]];
+
+function fade(t) { return t * t * t * (t * (t * 6 - 15) + 10); }
+function lerp(a, b, t) { return a + t * (b - a); }
+
+function noise2D(x, y) {
+  const X = Math.floor(x) & 255, Y = Math.floor(y) & 255;
+  const xf = x - Math.floor(x), yf = y - Math.floor(y);
+  const u = fade(xf), v = fade(yf);
+  const aa = NOISE_PERM[NOISE_PERM[X] + Y], ab = NOISE_PERM[NOISE_PERM[X] + Y + 1];
+  const ba = NOISE_PERM[NOISE_PERM[X + 1] + Y], bb = NOISE_PERM[NOISE_PERM[X + 1] + Y + 1];
+  const g = (hash, dx, dy) => { const gr = NOISE_GRAD[hash & 7]; return gr[0] * dx + gr[1] * dy; };
+  return lerp(
+    lerp(g(aa, xf, yf), g(ba, xf - 1, yf), u),
+    lerp(g(ab, xf, yf - 1), g(bb, xf - 1, yf - 1), u),
+    v
+  );
 }
 
-// Catmull-Rom spline → SVG cubic bezier path
-function catmullRomPath(points) {
-  if (points.length < 2) return '';
-  if (points.length === 2) {
-    return `M ${points[0].x} ${points[0].y} L ${points[1].x} ${points[1].y}`;
-  }
-  let d = `M ${points[0].x} ${points[0].y}`;
-  for (let i = 0; i < points.length - 1; i++) {
-    const p0 = points[Math.max(0, i - 1)];
-    const p1 = points[i];
-    const p2 = points[i + 1];
-    const p3 = points[Math.min(points.length - 1, i + 2)];
-    d += ` C ${p1.x + (p2.x - p0.x) / 6} ${p1.y + (p2.y - p0.y) / 6}, ${p2.x - (p3.x - p1.x) / 6} ${p2.y - (p3.y - p1.y) / 6}, ${p2.x} ${p2.y}`;
-  }
-  return d;
-}
+// ─── The Flow — Perlin noise particle flow field (Fry/Reas/Abloh synthesis) ───
+// Particles born at center, flowing outward through noise field.
+// Each particle IS a moment of practice. Your time becomes visible as flowing light.
+function FlowCanvas({ elapsed, timerState, prefersReduced, countdownTarget, isDark }) {
+  const canvasRef = useRef(null);
+  const particlesRef = useRef([]);
+  const frameRef = useRef(null);
+  const timeRef = useRef(0);
+  const lastSpawnRef = useRef(0);
 
-// The Bloom — concentric rings emanating from luminous core (Fry/Reas synthesis)
-function BloomSVG({ elapsed, timerState, prefersReduced, countdownTarget }) {
-  const isPaused = timerState === 'paused';
-  const isStopped = timerState === 'stopped';
+  // Resolve CSS colors for canvas (can't use var() in canvas)
+  const colors = useMemo(() => {
+    if (isDark) {
+      return {
+        water1: 'rgba(30, 58, 95, 0.9)',
+        water2: 'rgba(50, 90, 210, 0.9)',    // brighter blue
+        water3: 'rgba(60, 120, 250, 0.85)',
+        water4: 'rgba(80, 150, 255, 0.8)',
+        water5: 'rgba(120, 180, 255, 0.75)',
+        lavender: 'rgba(200, 185, 255, 0.7)',
+        glow: 'rgba(59, 130, 246, 0.25)',
+      };
+    }
+    return {
+      water1: 'rgba(150, 200, 254, 0.9)',
+      water2: 'rgba(80, 150, 250, 0.85)',
+      water3: 'rgba(50, 120, 246, 0.8)',
+      water4: 'rgba(37, 99, 235, 0.75)',
+      water5: 'rgba(30, 64, 175, 0.7)',
+      lavender: 'rgba(167, 139, 250, 0.65)',
+      glow: 'rgba(59, 130, 246, 0.15)',
+    };
+  }, [isDark]);
 
-  // Generate rings — one every 12 seconds, expanding outward from center
-  const ringInterval = 12000;
-  const totalPossible = Math.floor(elapsed / ringInterval) + 1;
+  // Color based on particle age and elapsed time
+  const getParticleColor = useCallback((age, minutes) => {
+    // Every 7th particle gets lavender accent
+    if (age > 0.5 && Math.random() < 0.003) return colors.lavender;
+    if (minutes >= 30) return colors.water5;
+    if (minutes >= 15) return colors.water4;
+    if (minutes >= 5) return colors.water3;
+    return colors.water2;
+  }, [colors]);
 
-  const rings = [];
-  for (let i = 0; i < totalPossible; i++) {
-    const birthTime = i * ringInterval;
-    const age = (elapsed - birthTime) / 1000;
-    if (age < 0) continue;
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
 
-    const maxAge = 420; // 7 min to reach max radius
-    const ageT = Math.min(1, age / maxAge);
+    // Size canvas to container
+    const resize = () => {
+      const rect = canvas.parentElement.getBoundingClientRect();
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      canvas.style.width = `${rect.width}px`;
+      canvas.style.height = `${rect.height}px`;
+      ctx.scale(dpr, dpr);
+    };
+    resize();
 
-    // Radius: 3 at birth → 45 at max age
-    const baseR = 3 + ageT * 42;
-    // Organic wobble — each ring has unique personality (Reas: "systems and emergence")
-    const wobble = Math.sin(i * 2.7 + 0.5) * 1.2 + Math.cos(i * 1.3) * 0.6;
-    const r = baseR + wobble;
+    const isPaused = timerState === 'paused';
+    const isRunning = timerState === 'running';
+    const minutes = elapsed / 60000;
 
-    // Opacity: bright when young (0.6), fades outward (0.05)
-    const opacity = Math.max(0.05, 0.6 - ageT * 0.55);
-    if (opacity <= 0.05) continue;
+    // Spawn rate increases with time (more particles = richer flow)
+    const spawnRate = Math.min(8, 1 + minutes * 0.3); // 1/frame → 8/frame over 23min
+    const maxParticles = prefersReduced ? 40 : Math.min(300, 60 + minutes * 8);
+    const noiseScale = 0.008; // How zoomed-in the flow field is
+    const noiseZ = elapsed * 0.00003; // Slowly evolving field (Reas: emergence over time)
 
-    // Stroke width: thick young → thin old
-    const strokeWidth = Math.max(0.3, 1.8 - ageT * 1.5);
+    const w = canvas.width / dpr;
+    const h = canvas.height / dpr;
+    const cx = w / 2;
+    const cy = h / 2;
 
-    // Color: inner water-2, outer water-4, every 4th ring = lavender (Jen: "chromatic bloom")
-    let color;
-    if (i % 4 === 0 && i > 0) {
-      color = 'var(--color-lavender)';
-    } else if (ageT < 0.3) {
-      color = 'var(--color-water-2)';
-    } else if (ageT < 0.6) {
-      color = 'var(--color-water-3)';
-    } else {
-      color = 'var(--color-water-4)';
+    function spawnParticle() {
+      // Born near center with slight randomness
+      const angle = Math.random() * Math.PI * 2;
+      const dist = 4 + Math.random() * 12;
+      return {
+        x: cx + Math.cos(angle) * dist,
+        y: cy + Math.sin(angle) * dist,
+        vx: 0,
+        vy: 0,
+        life: 0,
+        maxLife: 180 + Math.random() * 220, // ~3-7 seconds at 60fps
+        size: 1.8 + Math.random() * 2.5,
+        hueShift: Math.random(), // for color variety
+      };
     }
 
-    rings.push({ r, strokeWidth, opacity, color, key: i });
-  }
+    function animate() {
+      const particles = particlesRef.current;
 
-  // Performance cap: 40 most visible rings
-  const visibleRings = rings.slice(-40);
+      // Semi-transparent clear for trail effect (Hodgin: luminous trails)
+      // Lower alpha = longer trails. 0.03 gives beautiful ghostly persistence.
+      ctx.fillStyle = isDark ? 'rgba(12, 10, 9, 0.035)' : 'rgba(237, 234, 228, 0.04)';
+      ctx.fillRect(0, 0, w, h);
 
-  // Core color deepens with time
-  const minutes = elapsed / 60000;
-  const coreColor = minutes >= 30 ? 'var(--color-water-5)'
-    : minutes >= 15 ? 'var(--color-water-4)'
-    : minutes >= 5 ? 'var(--color-water-3)'
-    : 'var(--color-water-2)';
+      // Spawn new particles (only when running)
+      if (isRunning && !prefersReduced) {
+        const now = performance.now();
+        if (now - lastSpawnRef.current > 50) { // ~20 spawns/sec max
+          const count = Math.ceil(spawnRate);
+          for (let i = 0; i < count && particles.length < maxParticles; i++) {
+            particles.push(spawnParticle());
+          }
+          lastSpawnRef.current = now;
+        }
+      }
 
-  // Mini clock: show remaining (countdown) or elapsed (count-up)
+      // Update and draw particles
+      timeRef.current += 0.01;
+
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.life++;
+
+        // Remove dead particles
+        if (p.life > p.maxLife || p.x < -10 || p.x > w + 10 || p.y < -10 || p.y > h + 10) {
+          particles.splice(i, 1);
+          continue;
+        }
+
+        // Flow field force from Perlin noise
+        const noiseVal = noise2D(p.x * noiseScale + noiseZ, p.y * noiseScale + noiseZ);
+        const angle = noiseVal * Math.PI * 4; // Full rotation range
+
+        // Outward drift from center (gentle, not explosive)
+        const dx = p.x - cx, dy = p.y - cy;
+        const distFromCenter = Math.sqrt(dx * dx + dy * dy);
+        const outwardForce = 0.02 + distFromCenter * 0.0001;
+        const outAngle = Math.atan2(dy, dx);
+
+        // Combine flow field + outward drift
+        const speed = isPaused ? 0.2 : 0.8 + minutes * 0.015;
+        p.vx += (Math.cos(angle) * 0.5 + Math.cos(outAngle) * outwardForce) * speed;
+        p.vy += (Math.sin(angle) * 0.5 + Math.sin(outAngle) * outwardForce) * speed;
+
+        // Damping (prevents runaway velocity)
+        p.vx *= 0.96;
+        p.vy *= 0.96;
+
+        p.x += p.vx;
+        p.y += p.vy;
+
+        // Opacity: fade in, sustain, fade out
+        const lifeT = p.life / p.maxLife;
+        let opacity;
+        if (lifeT < 0.1) opacity = lifeT / 0.1; // Fade in
+        else if (lifeT > 0.7) opacity = (1 - lifeT) / 0.3; // Fade out
+        else opacity = 1;
+        opacity *= isPaused ? 0.25 : 0.85;
+
+        // Color deepens with practice time
+        const color = getParticleColor(lifeT, minutes);
+
+        // Draw particle
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size * (isPaused ? 0.6 : 1), 0, Math.PI * 2);
+        ctx.fillStyle = color.replace(/[\d.]+\)$/, `${opacity})`);
+        ctx.fill();
+      }
+
+      // Center glow — soft ambient light (not a staring eye — spread wide, no hard edge)
+      if (!prefersReduced) {
+        const glowSize = 60 + Math.sin(timeRef.current * 0.3) * 10;
+        const gradient = ctx.createRadialGradient(cx, cy, 0, cx, cy, glowSize);
+        gradient.addColorStop(0, colors.glow.replace(/[\d.]+\)$/, `${isPaused ? 0.05 : 0.15})`));
+        gradient.addColorStop(0.4, colors.glow.replace(/[\d.]+\)$/, `${isPaused ? 0.02 : 0.06})`));
+        gradient.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx.fillStyle = gradient;
+        ctx.fillRect(cx - glowSize, cy - glowSize, glowSize * 2, glowSize * 2);
+      }
+
+      frameRef.current = requestAnimationFrame(animate);
+    }
+
+    // Start animation
+    frameRef.current = requestAnimationFrame(animate);
+
+    return () => {
+      if (frameRef.current) cancelAnimationFrame(frameRef.current);
+    };
+  }, [elapsed, timerState, prefersReduced, isDark, colors, getParticleColor]);
+
   const displayMs = countdownTarget ? Math.max(0, countdownTarget * 60000 - elapsed) : elapsed;
 
   return (
-    <svg
-      viewBox="0 0 100 100"
-      className="w-full"
-      style={{ maxWidth: '360px', height: '55vh', maxHeight: '440px' }}
-      preserveAspectRatio="xMidYMid meet"
-      aria-hidden="true"
-    >
-      <defs>
-        <filter id="bloom-halo">
-          <feGaussianBlur stdDeviation="5" />
-        </filter>
-        <filter id="bloom-glow">
-          <feGaussianBlur stdDeviation="2" result="blur" />
-          <feMerge>
-            <feMergeNode in="blur" />
-            <feMergeNode in="SourceGraphic" />
-          </feMerge>
-        </filter>
-      </defs>
-
-      {/* Breathing wrapper — all elements breathe together (Fry: 6s cycle, calming) */}
-      <g className={!isPaused && !prefersReduced ? 'animate-bloom-breathe' : ''}>
-
-        {/* Rings — expanding outward from center */}
-        {visibleRings.map((ring) => (
-          <circle
-            key={ring.key}
-            cx="50" cy="50"
-            r={ring.r}
-            fill="none"
-            stroke={ring.color}
-            strokeWidth={ring.strokeWidth}
-            opacity={isPaused ? ring.opacity * 0.3 : isStopped ? Math.min(1, ring.opacity * 1.4) : ring.opacity}
-            style={{ transition: 'opacity 0.5s ease' }}
-          />
-        ))}
-
-        {/* Core — 3 layers: halo, aura, white center (Ive: "glow like a star") */}
-        <circle cx="50" cy="50" r="8" fill={coreColor} opacity={isPaused ? 0.04 : 0.12} filter="url(#bloom-halo)" />
-        <circle cx="50" cy="50" r="4" fill={coreColor} opacity={isPaused ? 0.15 : 0.5} filter="url(#bloom-glow)" />
-        <circle cx="50" cy="50" r="2" fill="white" opacity={isPaused ? 0.25 : 0.85} />
-
-        {/* Ripples from core — only when running (Reas: "emergence") */}
-        {!isPaused && !isStopped && !prefersReduced && (
-          <>
-            <circle cx="50" cy="50" r="2" fill="none" stroke={coreColor} strokeWidth="0.4">
-              <animate attributeName="r" from="2" to="14" dur="3s" repeatCount="indefinite" />
-              <animate attributeName="opacity" from="0.45" to="0" dur="3s" repeatCount="indefinite" />
-            </circle>
-            <circle cx="50" cy="50" r="2" fill="none" stroke={coreColor} strokeWidth="0.4">
-              <animate attributeName="r" from="2" to="14" dur="3s" begin="1.5s" repeatCount="indefinite" />
-              <animate attributeName="opacity" from="0.45" to="0" dur="3s" begin="1.5s" repeatCount="indefinite" />
-            </circle>
-          </>
-        )}
-      </g>
-
-      {/* Mini clock — always visible (Wroblewski: "don't make the user guess") */}
-      <text
-        x="50" y="95"
-        textAnchor="middle"
-        style={{
-          fontSize: '3.8px',
-          fontFamily: 'var(--font-sans)',
-          fontVariantNumeric: 'tabular-nums',
-          fill: 'var(--color-text-3)',
-          opacity: 0.4,
-        }}
-      >
-        {formatTimer(displayMs)}
-      </text>
-      {elapsed < 8000 && (
-        <text
-          x="50" y="98.5"
-          textAnchor="middle"
+    <div className="relative w-full" style={{ maxWidth: '360px', height: '55vh', maxHeight: '440px' }}>
+      <canvas
+        ref={canvasRef}
+        className="absolute inset-0 w-full h-full rounded-2xl"
+        aria-hidden="true"
+      />
+      {/* Time display — integrated into the flow, not layered awkwardly */}
+      <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+        <span
+          className="leading-none"
           style={{
-            fontSize: '2.2px',
-            fontFamily: 'var(--font-sans)',
-            fill: 'var(--color-text-3)',
-            opacity: 0.25,
+            fontSize: '64px',
+            fontFamily: 'var(--font-serif)',
+            fontWeight: 400,
+            fontVariantNumeric: 'tabular-nums',
+            letterSpacing: '-0.02em',
+            color: 'var(--color-text)',
+            opacity: timerState === 'paused' ? 0.25 : 0.7,
+            transition: 'opacity 0.5s ease',
+            textShadow: isDark ? '0 0 40px rgba(59,130,246,0.2)' : '0 0 30px rgba(191,219,254,0.3)',
           }}
         >
-          tap for fullscreen time
-        </text>
-      )}
-    </svg>
+          {formatTimer(displayMs)}
+        </span>
+        {timerState === 'paused' && (
+          <p className="text-text-3 text-xs font-medium uppercase tracking-widest mt-3 animate-fade-in" style={{ opacity: 0.5 }}>
+            Paused
+          </p>
+        )}
+      </div>
+    </div>
   );
 }
 
@@ -594,39 +681,21 @@ export default function TimerFAB({ onSaveSession, onQuickLog, showTabBar = true 
           {timerState === 'stopped' && 'Session complete'}
         </div>
 
-        {/* Timer display — Symbolic river or Classic clock */}
+        {/* Timer display — The Flow (particle field) or Classic clock */}
         {timerState !== 'stopped' && timerDisplayMode === 'symbolic' ? (
-          /* The Bloom — concentric rings from luminous core (Fry/Reas synthesis) */
+          /* The Flow — particles flowing through Perlin noise (Fry/Reas/Abloh synthesis) */
           <div
             className="flex flex-col items-center justify-center mb-4 relative"
-            onClick={handleClockPeek}
             role="timer"
             aria-label={`Practice time: ${formatTimer(elapsed)}`}
           >
-            <BloomSVG elapsed={elapsed} timerState={timerState} prefersReduced={prefersReduced} countdownTarget={countdownTarget} />
-            {/* Clock peek overlay — tap to reveal for 3s */}
-            {showClockPeek && (
-              <div className="absolute inset-0 flex items-center justify-center animate-fade-in">
-                <span
-                  className="leading-none"
-                  style={{
-                    fontSize: '72px',
-                    fontFamily: 'var(--font-serif)',
-                    fontWeight: 400,
-                    fontVariantNumeric: 'tabular-nums',
-                    color: timerDepthColor,
-                    textShadow: '0 0 40px rgba(59,130,246,0.3)',
-                  }}
-                >
-                  {formatTimer(countdownTarget ? Math.max(0, countdownTarget * 60000 - elapsed) : elapsed)}
-                </span>
-              </div>
-            )}
-            {timerState === 'paused' && (
-              <p className="text-text-3 text-xs font-medium uppercase tracking-widest mt-2 animate-fade-in">
-                Paused
-              </p>
-            )}
+            <FlowCanvas
+              elapsed={elapsed}
+              timerState={timerState}
+              prefersReduced={prefersReduced}
+              countdownTarget={countdownTarget}
+              isDark={isDark}
+            />
           </div>
         ) : (
           /* Classic clock — Lora running, DM Serif stopped (Ive/Jen synthesis) */
