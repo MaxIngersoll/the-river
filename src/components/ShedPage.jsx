@@ -578,6 +578,43 @@ function getIntervalColor(noteIdx, rootIdx, quality) {
   return INTERVAL_COLORS.other;
 }
 
+// Living Chord Diagrams: emotional color temperature based on musical character
+// Subtle tints that help the eye learn what the ear already knows
+function getChordColor(chordName) {
+  if (!chordName) return 'transparent';
+
+  const nameLower = chordName.toLowerCase();
+
+  // Diminished: muted/grey — tension and unease
+  if (nameLower.includes('dim') || nameLower.includes('°')) {
+    return { border: 'rgba(120, 113, 108, 0.15)', bg: 'rgba(120, 113, 108, 0.03)' };
+  }
+
+  // Major 7th: luminous (soft white glow) — open, floating, peaceful
+  if (nameLower.includes('maj7')) {
+    return { border: 'rgba(240, 240, 240, 0.2)', bg: 'rgba(240, 240, 240, 0.04)' };
+  }
+
+  // Dominant 7th: warm with tension (amber with hint of red) — blues swagger
+  if (nameLower.includes('7') && !nameLower.includes('9') && !nameLower.includes('11') && !nameLower.includes('13')) {
+    return { border: 'rgba(249, 115, 22, 0.18)', bg: 'rgba(249, 115, 22, 0.03)' };
+  }
+
+  // Suspended: neutral/open (subtle green) — questioning, unresolved
+  if (nameLower.includes('sus')) {
+    return { border: 'rgba(34, 197, 94, 0.12)', bg: 'rgba(34, 197, 94, 0.02)' };
+  }
+
+  // Minor chords: cool tint (subtle blue/indigo) — introspective, dark
+  if (nameLower.includes('m') && !nameLower.includes('maj')) {
+    return { border: 'rgba(99, 102, 241, 0.12)', bg: 'rgba(99, 102, 241, 0.03)' };
+  }
+
+  // Major chords: warm tint (subtle amber/gold) — bright, open, resolved
+  // This is the default for anything else that doesn't match above
+  return { border: 'rgba(217, 119, 6, 0.12)', bg: 'rgba(217, 119, 6, 0.03)' };
+}
+
 // Common chord shapes for quick ref (kept for backward compat)
 const COMMON_SHAPES = [
   { name: 'E Major', frets: [0, 2, 2, 1, 0, 0] },
@@ -599,11 +636,12 @@ function ChordDiagram({ name, frets, rootIdx, barre, showIntervals = false }) {
   const playedFrets = frets.filter(f => f > 0);
   const minFret = playedFrets.length > 0 ? Math.min(...playedFrets) : 0;
   const offset = minFret > 2 ? minFret - 1 : 0;
+  const chordColor = getChordColor(name);
 
   return (
-    <div className="text-center">
+    <div className="text-center" style={{ borderRadius: '0.375rem', padding: '0.375rem', backgroundColor: chordColor.bg, transition: 'all 0.2s ease' }}>
       <p className="text-[10px] font-bold text-text-2 mb-1">{name}</p>
-      <svg viewBox="0 0 50 60" className="w-14 mx-auto">
+      <svg viewBox="0 0 50 60" className="w-14 mx-auto" style={{ borderRadius: '0.25rem', border: `1.5px solid ${chordColor.border}` }}>
         {/* Nut or position indicator */}
         {offset === 0 ? (
           <rect x="8" y="8" width="34" height="2.5" rx="0.5" fill="currentColor" className="text-text-2" />
@@ -772,12 +810,15 @@ function parseSessionContext(session) {
 
 // Analyze which keys/scales have been practiced recently
 function analyzePracticeHistory(sessions) {
-  if (!sessions?.length) return { recentKeys: {}, recentTags: {}, avgMinutes: 15, lastSession: null };
+  if (!sessions?.length) return { recentKeys: {}, recentTags: {}, avgMinutes: 15, lastSession: null, sevenDaysKeys: {} };
   const twoWeeksAgo = addDays(today(), -14);
+  const sevenDaysAgo = addDays(today(), -7);
   const recent = sessions.filter(s => s.date >= twoWeeksAgo && !s.fog);
+  const recentSeven = sessions.filter(s => s.date >= sevenDaysAgo && !s.fog);
   const sorted = [...sessions].filter(s => !s.fog).sort((a, b) => (b.created_at || b.date).localeCompare(a.created_at || a.date));
 
   const recentKeys = {};
+  const sevenDaysKeys = {};
   const recentTags = {};
   for (const s of recent) {
     const ctx = parseSessionContext(s);
@@ -786,18 +827,22 @@ function analyzePracticeHistory(sessions) {
       for (const t of s.tags) recentTags[t] = (recentTags[t] || 0) + 1;
     }
   }
+  for (const s of recentSeven) {
+    const ctx = parseSessionContext(s);
+    if (ctx?.root) sevenDaysKeys[ctx.root] = true;
+  }
 
   const totalMins = recent.reduce((sum, s) => sum + s.duration_minutes, 0);
   const avgMinutes = recent.length > 0 ? Math.round(totalMins / recent.length) : 15;
 
-  return { recentKeys, recentTags, avgMinutes, lastSession: sorted[0] || null };
+  return { recentKeys, recentTags, avgMinutes, lastSession: sorted[0] || null, sevenDaysKeys };
 }
 
 // Generate a deterministic "explore" suggestion based on practice gaps
-function getExploreSuggestion(recentKeys) {
+function getExploreSuggestion(sevenDaysKeys) {
   const allKeys = [...NOTES];
-  // Find keys NOT practiced recently
-  const unpracticed = allKeys.filter(k => !recentKeys[k]);
+  // Find keys NOT practiced in the last 7 days (exploring what's fresh)
+  const unpracticed = allKeys.filter(k => !sevenDaysKeys[k]);
   if (unpracticed.length === 0) return { root: 'E', scale: 'dorian' }; // fallback to something interesting
   // Pick based on day-of-year for determinism
   const dayOfYear = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0)) / 86400000);
@@ -830,17 +875,23 @@ function QuickStartCards({ sessions, onSetRoot, onSetScale }) {
 
   if (!sessions?.length) return null;
 
+  // CONTINUE: Try to use last session's parsed context, fall back to last tag or "Start fresh"
   const continueCtx = parseSessionContext(analysis.lastSession);
-  const explore = getExploreSuggestion(analysis.recentKeys);
+  const continueLabel = continueCtx?.root
+    ? `${continueCtx.root} ${continueCtx.scale ? SCALE_NAMES[continueCtx.scale] : 'Major'}`
+    : analysis.lastSession?.tags?.[0] || 'Start fresh';
+
+  // EXPLORE: Find a key not practiced in the last 7 days
+  const explore = getExploreSuggestion(analysis.sevenDaysKeys);
+
+  // CHALLENGE: Deterministic daily challenge
   const challenge = getChallengeSuggestion(analysis.avgMinutes);
 
   const cards = [
     {
       id: 'continue',
       label: 'Continue',
-      sublabel: continueCtx?.root
-        ? `${continueCtx.root} ${continueCtx.scale ? SCALE_NAMES[continueCtx.scale] : 'Major'}`
-        : analysis.lastSession?.tags?.[0] || 'Last session',
+      sublabel: continueLabel,
       icon: '→',
       action: () => {
         if (continueCtx?.root) onSetRoot(continueCtx.root);
@@ -894,8 +945,8 @@ function CurrentCard({ sessions, onSetRoot, onSetScale, onSetIntent }) {
 
   if (!sessions?.length || sessions.length < 3) return null;
 
-  // Determine suggestion based on practice gaps
-  const explore = getExploreSuggestion(analysis.recentKeys);
+  // Determine suggestion based on practice gaps (broader 2-week window for CurrentCard)
+  const explore = getExploreSuggestion(analysis.sevenDaysKeys);
 
   // Find the least-practiced tag
   const tagCounts = analysis.recentTags;
