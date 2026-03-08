@@ -617,6 +617,11 @@ html.dark .glass-input:focus {
   100% { transform: scale(3); opacity: 0; }
 }
 
+@keyframes slide-up {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
 .animate-pulse-glow {
   animation: pulse-glow 2.5s ease-in-out infinite;
 }

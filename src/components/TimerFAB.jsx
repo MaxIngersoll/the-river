@@ -41,7 +41,7 @@ function clearTimerStorage() {
   localStorage.removeItem(TIMER_STORAGE_KEY);
 }
 
-export default function TimerFAB({ onSaveSession, showTabBar = true }) {
+export default function TimerFAB({ onSaveSession, onQuickLog, showTabBar = true }) {
   const { isDark } = useTheme();
 
   // Visual viewport offset for iOS keyboard
@@ -217,6 +217,36 @@ export default function TimerFAB({ onSaveSession, showTabBar = true }) {
   }, []);
 
   const isActive = timerState !== 'idle';
+
+  // Long-press FAB to open Quick Log (only when idle)
+  const longPressRef = useRef(null);
+  const longPressFired = useRef(false);
+  const handleFABPressStart = useCallback((e) => {
+    if (isActive) return;
+    longPressFired.current = false;
+    longPressRef.current = setTimeout(() => {
+      longPressRef.current = null;
+      longPressFired.current = true;
+      onQuickLog?.();
+    }, 500);
+  }, [isActive, onQuickLog]);
+  const handleFABPressEnd = useCallback(() => {
+    if (longPressRef.current) {
+      clearTimeout(longPressRef.current);
+      longPressRef.current = null;
+    }
+  }, []);
+  const handleFABClick = useCallback(() => {
+    if (longPressFired.current) {
+      longPressFired.current = false;
+      return; // Swallow click after long-press
+    }
+    if (isActive) {
+      setExpanded(true);
+    } else {
+      handleStart();
+    }
+  }, [isActive, handleStart]);
 
   // Persist note/tags while in stopped state
   useEffect(() => {
@@ -413,7 +443,13 @@ export default function TimerFAB({ onSaveSession, showTabBar = true }) {
   // ─── FAB (floating action button) ───
   return (
     <button
-      onClick={isActive ? () => setExpanded(true) : handleStart}
+      onClick={handleFABClick}
+      onTouchStart={handleFABPressStart}
+      onTouchEnd={handleFABPressEnd}
+      onMouseDown={handleFABPressStart}
+      onMouseUp={handleFABPressEnd}
+      onMouseLeave={handleFABPressEnd}
+      onContextMenu={(e) => { if (!isActive) e.preventDefault(); }}
       className={`fixed z-40 flex items-center justify-center active:scale-[0.90] transition-all ${!isActive ? 'animate-pulse-glow' : ''}`}
       style={{
         bottom: showTabBar ? 'calc(88px + env(safe-area-inset-bottom, 0px))' : 'calc(24px + env(safe-area-inset-bottom, 0px))',
@@ -427,7 +463,7 @@ export default function TimerFAB({ onSaveSession, showTabBar = true }) {
           ? '0 4px 24px rgba(59,130,246,0.4), 0 0 0 4px rgba(59,130,246,0.12), inset 0 1px 0 rgba(255,255,255,0.2)'
           : '0 4px 20px rgba(59,130,246,0.3), inset 0 1px 0 rgba(255,255,255,0.2)',
       }}
-      aria-label={isActive ? 'Open timer' : 'Start practice timer'}
+      aria-label={isActive ? 'Open timer' : 'Start practice timer. Long-press for Quick Log.'}
     >
       {isActive ? (
         /* Running/paused — show elapsed time */

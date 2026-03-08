@@ -15,6 +15,7 @@ import ShedPage from './components/ShedPage';
 import GuitarTuner from './components/GuitarTuner';
 import TimerFAB from './components/TimerFAB';
 import OnboardingFlow from './components/OnboardingFlow';
+import QuickLog from './components/QuickLog';
 import { SeasonProvider } from './contexts/SeasonContext';
 import { haptics } from './utils/haptics';
 
@@ -33,6 +34,7 @@ export default function App() {
   const [showOnboarding, setShowOnboarding] = useState(() =>
     sessions.length === 0 && !localStorage.getItem('river-onboarding-complete')
   );
+  const [showQuickLog, setShowQuickLog] = useState(false);
 
   // Page transition state
   const [displayedTab, setDisplayedTab] = useState(() => {
@@ -156,6 +158,17 @@ export default function App() {
     if (reading.should) setPendingReading(reading);
     handleTabChange('home');
   }, [handleTabChange]);
+
+  const handleQuickLog = useCallback((session) => {
+    const updated = getSessions();
+    setSessions(updated);
+    const newMilestones = checkNewMilestones(updated);
+    if (newMilestones.length > 0) setCelebrations(newMilestones);
+    const totalHours = getTotalHours(updated);
+    checkAndWriteMarginNotes(totalHours);
+    const reading = shouldTriggerReading(updated);
+    if (reading.should) setPendingReading(reading);
+  }, []);
 
   const handleSessionUpdate = useCallback((id, updates) => {
     updateSession(id, updates);
@@ -332,7 +345,13 @@ export default function App() {
 
         {showTabBar && <TabBar active={activeTab} onChange={handleTabChange} />}
 
-        <TimerFAB onSaveSession={handleTimerSave} showTabBar={showTabBar} />
+        <TimerFAB onSaveSession={handleTimerSave} onQuickLog={() => setShowQuickLog(true)} showTabBar={showTabBar} />
+
+        <QuickLog
+          open={showQuickLog}
+          onClose={() => setShowQuickLog(false)}
+          onLog={handleQuickLog}
+        />
 
         {/* Undo delete toast */}
         {pendingDelete && (
