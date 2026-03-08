@@ -40,6 +40,15 @@ export default function SettingsPage({ sessions, onBack, onDataCleared }) {
   const [saved, setSaved] = useState(false);
   const { theme, setTheme } = useTheme();
 
+  // Timer display mode (symbolic river drop vs classic clock)
+  const [timerMode, setTimerModeState] = useState(() => {
+    try { return localStorage.getItem('river-timer-display-mode') || 'symbolic'; } catch { return 'symbolic'; }
+  });
+  const setTimerMode = (mode) => {
+    setTimerModeState(mode);
+    try { localStorage.setItem('river-timer-display-mode', mode); } catch {}
+  };
+
   const [importStatus, setImportStatus] = useState(null); // null | 'success' | 'error' | 'preview'
   const [importPreview, setImportPreview] = useState(null);
   const totalMinutes = getTotalMinutes(sessions);
@@ -175,6 +184,32 @@ export default function SettingsPage({ sessions, onBack, onDataCleared }) {
               {opt.label}
             </button>
           ))}
+        </div>
+      </div>
+
+      {/* Timer Display Mode */}
+      <div className="card p-5 mb-4">
+        <h3 className="text-text-2 text-xs font-medium uppercase tracking-wider mb-1">
+          Timer Display
+        </h3>
+        <p className="text-text-3 text-xs mb-4">
+          How the timer looks during practice
+        </p>
+        <div className="theme-toggle w-full">
+          <button
+            onClick={() => { setTimerMode('symbolic'); flashSaved(); }}
+            className={`theme-toggle-option flex-1 ${timerMode === 'symbolic' ? 'active' : ''}`}
+          >
+            <span className="mr-1.5">💧</span>
+            River
+          </button>
+          <button
+            onClick={() => { setTimerMode('clock'); flashSaved(); }}
+            className={`theme-toggle-option flex-1 ${timerMode === 'clock' ? 'active' : ''}`}
+          >
+            <span className="mr-1.5">⌚</span>
+            Clock
+          </button>
         </div>
       </div>
 

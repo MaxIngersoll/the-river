@@ -67,6 +67,121 @@ function clearTimerStorage() {
   localStorage.removeItem(TIMER_STORAGE_KEY);
 }
 
+// Timer display mode — symbolic river drop vs classic clock
+const TIMER_DISPLAY_KEY = 'river-timer-display-mode';
+function getTimerDisplayMode() {
+  try { return localStorage.getItem(TIMER_DISPLAY_KEY) || 'symbolic'; } catch { return 'symbolic'; }
+}
+function setTimerDisplayModeStorage(mode) {
+  try { localStorage.setItem(TIMER_DISPLAY_KEY, mode); } catch {}
+}
+
+// Smooth organic jitter for river trail meander
+function getTrailJitter(i) {
+  return Math.sin(i * 0.7) * 0.6 + Math.sin(i * 1.3 + 2.1) * 0.3 + Math.sin(i * 2.7 + 5.3) * 0.1;
+}
+
+// Catmull-Rom spline → SVG cubic bezier path
+function catmullRomPath(points) {
+  if (points.length < 2) return '';
+  if (points.length === 2) {
+    return `M ${points[0].x} ${points[0].y} L ${points[1].x} ${points[1].y}`;
+  }
+  let d = `M ${points[0].x} ${points[0].y}`;
+  for (let i = 0; i < points.length - 1; i++) {
+    const p0 = points[Math.max(0, i - 1)];
+    const p1 = points[i];
+    const p2 = points[i + 1];
+    const p3 = points[Math.min(points.length - 1, i + 2)];
+    d += ` C ${p1.x + (p2.x - p0.x) / 6} ${p1.y + (p2.y - p0.y) / 6}, ${p2.x - (p3.x - p1.x) / 6} ${p2.y - (p3.y - p1.y) / 6}, ${p2.x} ${p2.y}`;
+  }
+  return d;
+}
+
+// The Living River — symbolic timer visualization (Miner/Ive competition synthesis)
+function RiverDropSVG({ elapsed, timerState }) {
+  const maxMs = 60 * 60 * 1000; // 60 min full descent
+  const progress = Math.min(elapsed / maxMs, 0.95);
+
+  // Generate trail points — max 40 for performance
+  const numPoints = Math.max(2, Math.min(40, Math.floor(progress * 42) + 2));
+  const points = [];
+  for (let i = 0; i < numPoints; i++) {
+    const t = i / (numPoints - 1);
+    const y = 5 + t * progress * 90; // Trail extends to drop position
+    const jitter = getTrailJitter(i);
+    const x = 50 + jitter * 15; // Center ±15%
+    points.push({ x, y });
+  }
+
+  const dropPoint = points[points.length - 1];
+  const pathD = catmullRomPath(points);
+
+  // Color deepens with time — water-2→water-5
+  const minutes = elapsed / 60000;
+  const color = minutes >= 30 ? 'var(--color-water-5)'
+    : minutes >= 15 ? 'var(--color-water-4)'
+    : minutes >= 5 ? 'var(--color-water-3)'
+    : 'var(--color-water-2)';
+
+  const isPaused = timerState === 'paused';
+
+  return (
+    <svg
+      viewBox="0 0 100 100"
+      className="w-full"
+      style={{ maxWidth: '280px', height: '50vh', maxHeight: '380px' }}
+      preserveAspectRatio="xMidYMid meet"
+      aria-hidden="true"
+    >
+      <defs>
+        <filter id="river-drop-glow">
+          <feGaussianBlur stdDeviation="1.5" result="blur" />
+          <feMerge>
+            <feMergeNode in="blur" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
+        <linearGradient id="river-trail-grad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor={color} stopOpacity="0.05" />
+          <stop offset="50%" stopColor={color} stopOpacity={isPaused ? 0.12 : 0.35} />
+          <stop offset="100%" stopColor={color} stopOpacity={isPaused ? 0.15 : 0.6} />
+        </linearGradient>
+      </defs>
+
+      {/* Ambient trail glow — wider, softer */}
+      <path
+        d={pathD}
+        fill="none"
+        stroke={color}
+        strokeWidth="6"
+        strokeLinecap="round"
+        opacity={isPaused ? 0.02 : 0.06}
+      />
+
+      {/* Trail — the river being born */}
+      <path
+        d={pathD}
+        fill="none"
+        stroke="url(#river-trail-grad)"
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
+
+      {/* Drop — luminous point descending */}
+      <circle
+        cx={dropPoint.x}
+        cy={dropPoint.y}
+        r={isPaused ? 2 : 2.5}
+        fill={color}
+        filter="url(#river-drop-glow)"
+        opacity={isPaused ? 0.4 : 1}
+        style={{ transition: 'all 0.5s ease' }}
+      />
+    </svg>
+  );
+}
+
 export default function TimerFAB({ onSaveSession, onQuickLog, showTabBar = true }) {
   const { isDark } = useTheme();
   const { riverWeight = 300 } = useSeason();
@@ -100,6 +215,9 @@ export default function TimerFAB({ onSaveSession, onQuickLog, showTabBar = true 
   const [mood, setMood] = useState(null);
   const [curiosity, setCuriosity] = useState('');
   const [showSaveFlow, setShowSaveFlow] = useState(false);
+  const [timerDisplayMode, setTimerDisplayModeState] = useState(getTimerDisplayMode);
+  const [showClockPeek, setShowClockPeek] = useState(false);
+  const clockPeekRef = useRef(null);
   const intervalRef = useRef(null);
 
   // Restore timer from localStorage on mount
@@ -275,6 +393,30 @@ export default function TimerFAB({ onSaveSession, onQuickLog, showTabBar = true 
     clearTimerStorage();
   }, []);
 
+  // Timer display mode toggle
+  const toggleTimerDisplay = useCallback(() => {
+    setTimerDisplayModeState(prev => {
+      const next = prev === 'symbolic' ? 'clock' : 'symbolic';
+      setTimerDisplayModeStorage(next);
+      return next;
+    });
+  }, []);
+
+  // Tap-to-peek: show clock briefly over symbolic view
+  const handleClockPeek = useCallback(() => {
+    if (timerDisplayMode !== 'symbolic' || timerState === 'stopped') return;
+    setShowClockPeek(true);
+    if (clockPeekRef.current) clearTimeout(clockPeekRef.current);
+    clockPeekRef.current = setTimeout(() => setShowClockPeek(false), 3000);
+  }, [timerDisplayMode, timerState]);
+
+  // Cleanup clock peek timeout
+  useEffect(() => {
+    return () => {
+      if (clockPeekRef.current) clearTimeout(clockPeekRef.current);
+    };
+  }, []);
+
   const isActive = timerState !== 'idle';
 
   // Long-press FAB to open Quick Log (only when idle)
@@ -355,6 +497,18 @@ export default function TimerFAB({ onSaveSession, onQuickLog, showTabBar = true 
           </svg>
         </button>
 
+        {/* Timer display mode toggle — only during running/paused */}
+        {timerState !== 'stopped' && timerState !== 'idle' && (
+          <button
+            onClick={toggleTimerDisplay}
+            className="absolute top-12 left-5 w-10 h-10 flex items-center justify-center rounded-full text-text-3 hover:bg-dry/60 transition-colors"
+            style={{ opacity: 0.4 }}
+            aria-label={timerDisplayMode === 'symbolic' ? 'Switch to clock display' : 'Switch to river display'}
+          >
+            <span className="text-base">{timerDisplayMode === 'symbolic' ? '⌚' : '💧'}</span>
+          </button>
+        )}
+
         {/* Screen reader announcements */}
         <div aria-live="polite" className="sr-only">
           {timerState === 'running' && 'Timer running'}
@@ -362,52 +516,87 @@ export default function TimerFAB({ onSaveSession, onQuickLog, showTabBar = true 
           {timerState === 'stopped' && 'Session complete'}
         </div>
 
-        {/* Timer display — Lora running, DM Serif stopped (Ive/Jen synthesis) */}
-        <div className="text-center mb-12">
-          <div className="hero-glow">
-            <h1
-              className={`leading-none tracking-tight ${
-                timerState === 'stopped' ? 'ceremony-text animate-timer-settle' : ''
-              }`}
-              style={{
-                fontSize: '80px',
-                fontFamily: timerState === 'stopped' ? undefined : 'var(--font-serif)',
-                fontWeight: 400,
-                fontVariantNumeric: 'tabular-nums',
-                letterSpacing: '-0.02em',
-                color: timerDepthColor,
-                transition: 'color 2s ease',
-              }}
-            >
-              {formatTimerParts(elapsed).map((part, i) =>
-                part.type === 'colon' ? (
-                  <span
-                    key={i}
-                    className={colonPulsing ? 'animate-colon-pulse' : ''}
-                    style={colonPulsing ? {
-                      animationDuration: `${colonPulseDuration}s`,
-                      display: 'inline-block',
-                    } : {
-                      opacity: timerState === 'paused' ? 0 : 1,
-                      transition: 'opacity 0.3s ease',
-                      display: 'inline-block',
-                    }}
-                  >
-                    {part.value}
-                  </span>
-                ) : (
-                  <span key={i}>{part.value}</span>
-                )
-              )}
-            </h1>
+        {/* Timer display — Symbolic river or Classic clock */}
+        {timerState !== 'stopped' && timerDisplayMode === 'symbolic' ? (
+          /* The Living River — symbolic timer (Miner/Ive competition synthesis) */
+          <div
+            className="flex flex-col items-center justify-center mb-6 relative"
+            onClick={handleClockPeek}
+            role="timer"
+            aria-label={`Practice time: ${formatTimer(elapsed)}`}
+          >
+            <RiverDropSVG elapsed={elapsed} timerState={timerState} />
+            {/* Clock peek overlay — tap to reveal for 3s */}
+            {showClockPeek && (
+              <div className="absolute inset-0 flex items-center justify-center animate-fade-in">
+                <span
+                  className="leading-none"
+                  style={{
+                    fontSize: '72px',
+                    fontFamily: 'var(--font-serif)',
+                    fontWeight: 400,
+                    fontVariantNumeric: 'tabular-nums',
+                    color: timerDepthColor,
+                    textShadow: '0 0 40px rgba(59,130,246,0.3)',
+                  }}
+                >
+                  {formatTimer(elapsed)}
+                </span>
+              </div>
+            )}
+            {timerState === 'paused' && (
+              <p className="text-text-3 text-xs font-medium uppercase tracking-widest mt-2 animate-fade-in">
+                Paused
+              </p>
+            )}
           </div>
-          {/* Subtle state indicator — only when paused (Rams: respect their intelligence) */}
-          {timerState === 'paused' && (
-            <p className="text-text-3 text-xs font-medium uppercase tracking-widest mt-4 animate-fade-in">
-              Paused
-            </p>
-          )}
-        </div>
+        ) : (
+          /* Classic clock — Lora running, DM Serif stopped (Ive/Jen synthesis) */
+          <div className="text-center mb-12">
+            <div className="hero-glow">
+              <h1
+                className={`leading-none tracking-tight ${
+                  timerState === 'stopped' ? 'ceremony-text animate-timer-settle' : ''
+                }`}
+                style={{
+                  fontSize: '80px',
+                  fontFamily: timerState === 'stopped' ? undefined : 'var(--font-serif)',
+                  fontWeight: 400,
+                  fontVariantNumeric: 'tabular-nums',
+                  letterSpacing: '-0.02em',
+                  color: timerDepthColor,
+                  transition: 'color 2s ease',
+                }}
+              >
+                {formatTimerParts(elapsed).map((part, i) =>
+                  part.type === 'colon' ? (
+                    <span
+                      key={i}
+                      className={colonPulsing ? 'animate-colon-pulse' : ''}
+                      style={colonPulsing ? {
+                        animationDuration: `${colonPulseDuration}s`,
+                        display: 'inline-block',
+                      } : {
+                        opacity: timerState === 'paused' ? 0 : 1,
+                        transition: 'opacity 0.3s ease',
+                        display: 'inline-block',
+                      }}
+                    >
+                      {part.value}
+                    </span>
+                  ) : (
+                    <span key={i}>{part.value}</span>
+                  )
+                )}
+              </h1>
+            </div>
+            {timerState === 'paused' && (
+              <p className="text-text-3 text-xs font-medium uppercase tracking-widest mt-4 animate-fade-in">
+                Paused
+              </p>
+            )}
+          </div>
+        )}
 
         {/* Soundscape controls */}
         {timerState !== 'stopped' && (
