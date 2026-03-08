@@ -134,7 +134,7 @@ function createCurrent(w, h, index) {
   };
 }
 
-function QuietWaterCanvas({ elapsed, timerState, prefersReduced, countdownTarget, isDark }) {
+function QuietWaterCanvas({ elapsed, timerState, prefersReduced, countdownTarget, isDark, numbersHidden, onToggleNumbers }) {
   const canvasRef = useRef(null);
   const stateRef = useRef({ currents: [], frame: null, time: 0 });
   const propsRef = useRef({ elapsed: 0, timerState: 'running', prefersReduced: false, isDark: true });
@@ -272,15 +272,26 @@ function QuietWaterCanvas({ elapsed, timerState, prefersReduced, countdownTarget
 
   const displayMs = countdownTarget ? Math.max(0, countdownTarget * 60000 - elapsed) : elapsed;
 
+  // Compute timer opacity: hidden (tap-to-hide) → 0, paused → 0.15, normal → 0.7
+  const timerOpacity = numbersHidden ? 0 : (timerState === 'paused' ? 0.15 : 0.7);
+
   return (
-    <div className="relative" style={{ width: 'min(calc(100vw - 48px), 380px)', height: '55vh', maxHeight: '460px' }}>
+    <div
+      className="relative cursor-pointer"
+      style={{ width: 'min(calc(100vw - 48px), 380px)', height: '55vh', maxHeight: '460px' }}
+      onClick={onToggleNumbers}
+      role="button"
+      aria-label={numbersHidden ? 'Show timer' : 'Hide timer'}
+      tabIndex={0}
+      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onToggleNumbers(); } }}
+    >
       <canvas
         ref={canvasRef}
         className="absolute inset-0 w-full h-full"
         style={{ borderRadius: '20px' }}
         aria-hidden="true"
       />
-      {/* Timer — THE focal point (Rams: the number IS the design) */}
+      {/* Timer — tap anywhere to fade in/out (Insight Timer style) */}
       <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
         <span
           className="leading-none"
@@ -291,8 +302,8 @@ function QuietWaterCanvas({ elapsed, timerState, prefersReduced, countdownTarget
             fontVariantNumeric: 'tabular-nums',
             letterSpacing: '-0.02em',
             color: 'var(--color-text)',
-            opacity: timerState === 'paused' ? 0.15 : 0.7,
-            transition: 'opacity 0.8s ease',
+            opacity: timerOpacity,
+            transition: 'opacity 1.2s ease', // slow, breath-like fade
             textShadow: isDark
               ? '0 0 80px rgba(35,75,170,0.2), 0 0 160px rgba(35,75,170,0.08)'
               : '0 0 60px rgba(70,140,230,0.15)',
@@ -300,7 +311,7 @@ function QuietWaterCanvas({ elapsed, timerState, prefersReduced, countdownTarget
         >
           {formatTimer(displayMs)}
         </span>
-        {timerState === 'paused' && (
+        {timerState === 'paused' && !numbersHidden && (
           <p className="text-text-3 text-xs font-medium uppercase tracking-widest mt-3 animate-fade-in" style={{ opacity: 0.4 }}>
             Paused
           </p>
@@ -346,6 +357,7 @@ export default function TimerFAB({ onSaveSession, onQuickLog, showTabBar = true 
   const [timerDisplayMode, setTimerDisplayModeState] = useState(getTimerDisplayMode);
   const [showClockPeek, setShowClockPeek] = useState(false);
   const [countdownTarget, setCountdownTarget] = useState(null); // null = count-up, number = minutes
+  const [timerNumbersHidden, setTimerNumbersHidden] = useState(false); // Insight Timer: tap to hide numbers
   const clockPeekRef = useRef(null);
   const intervalRef = useRef(null);
 
@@ -504,6 +516,7 @@ export default function TimerFAB({ onSaveSession, onQuickLog, showTabBar = true 
       setMood(null);
       setCuriosity('');
       setShowSaveFlow(false);
+      setTimerNumbersHidden(false);
       clearTimerStorage();
     }, 350);
   }, [elapsed, note, tags, curiosity, onSaveSession]);
@@ -515,6 +528,7 @@ export default function TimerFAB({ onSaveSession, onQuickLog, showTabBar = true 
     setElapsed(0);
     setExpanded(false);
     setNote('');
+    setTimerNumbersHidden(false);
     setTags([]);
     setMood(null);
     setCuriosity('');
@@ -671,6 +685,8 @@ export default function TimerFAB({ onSaveSession, onQuickLog, showTabBar = true 
               prefersReduced={prefersReduced}
               countdownTarget={countdownTarget}
               isDark={isDark}
+              numbersHidden={timerNumbersHidden}
+              onToggleNumbers={() => setTimerNumbersHidden(h => !h)}
             />
           </div>
         ) : (
