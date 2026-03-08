@@ -1,5 +1,5 @@
 /* eslint-disable react-refresh/only-export-components */
-import { createContext, useContext, useMemo, useEffect } from 'react';
+import { createContext, useContext, useMemo, useEffect, useState, useCallback } from 'react';
 import { getTotalHours } from '../utils/storage';
 
 const SeasonContext = createContext({
@@ -79,6 +79,34 @@ export function SeasonProvider({ children, sessions }) {
   const totalHours = useMemo(() => getTotalHours(sessions), [sessions]);
   const riverWeight = useMemo(() => Math.min(300 + Math.floor(totalHours / 5) * 10, 600), [totalHours]);
   const cardRadius = useMemo(() => 8 + Math.min(totalHours, 200) / 200 * 16, [totalHours]);
+  // Ink saturation — UI chrome text deepens with practice hours (Ive)
+  // Progress: 0 at 0h → 1 at 500h. CSS applies per-theme opacity ranges.
+  const inkProgress = useMemo(() => Math.min(totalHours / 500, 1), [totalHours]);
+
+  // Circadian Glass — subtle warm/cool tint from time of day
+  // Sine curve: warm at dawn/dusk, cool at midnight, neutral at noon
+  // ±2.5% hue shift (Rubin: if you notice it, halve it)
+  const computeCircadian = useCallback(() => {
+    const now = new Date();
+    const hours = now.getHours() + now.getMinutes() / 60;
+    // Sine curve: peak warm at 7am and 7pm, peak cool at 1am and 1pm
+    // Using sin with period of 12 hours, offset so 7am = peak
+    const radians = ((hours - 7) / 12) * Math.PI * 2;
+    const shift = Math.sin(radians) * 2.5; // ±2.5 degree hue shift
+    const warmth = (Math.sin(radians) + 1) / 2; // 0-1 warmth factor
+    return { hueShift: shift, warmth };
+  }, []);
+
+  const [circadian, setCircadian] = useState(computeCircadian);
+
+  useEffect(() => {
+    // Update on visibilitychange (user returns to tab)
+    const handleVisibility = () => {
+      if (!document.hidden) setCircadian(computeCircadian());
+    };
+    document.addEventListener('visibilitychange', handleVisibility);
+    return () => document.removeEventListener('visibilitychange', handleVisibility);
+  }, [computeCircadian]);
 
   // Apply CSS custom properties to <html>
   useEffect(() => {
@@ -91,6 +119,9 @@ export function SeasonProvider({ children, sessions }) {
     root.style.setProperty('--season-drift-speed', `${config.driftSpeed}s`);
     root.style.setProperty('--river-weight', riverWeight);
     root.style.setProperty('--card-radius', `${cardRadius}px`);
+    root.style.setProperty('--circadian-hue-shift', circadian.hueShift.toFixed(1));
+    root.style.setProperty('--circadian-warmth', circadian.warmth.toFixed(3));
+    root.style.setProperty('--ink-progress', inkProgress.toFixed(3));
 
     return () => {
       root.removeAttribute('data-season');
@@ -101,11 +132,21 @@ export function SeasonProvider({ children, sessions }) {
       root.style.removeProperty('--season-drift-speed');
       root.style.removeProperty('--river-weight');
       root.style.removeProperty('--card-radius');
+      root.style.removeProperty('--circadian-hue-shift');
+      root.style.removeProperty('--circadian-warmth');
+      root.style.removeProperty('--ink-progress');
     };
-  }, [season, config, riverWeight, cardRadius]);
+  }, [season, config, riverWeight, cardRadius, circadian, inkProgress]);
+
+  const value = useMemo(() => ({
+    ...config,
+    riverWeight,
+    cardRadius,
+    totalHours,
+  }), [config, riverWeight, cardRadius, totalHours]);
 
   return (
-    <SeasonContext.Provider value={config}>
+    <SeasonContext.Provider value={value}>
       {children}
     </SeasonContext.Provider>
   );

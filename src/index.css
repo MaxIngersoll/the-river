@@ -129,7 +129,8 @@ html, body, #root {
   height: 100%;
   margin: 0;
   padding: 0;
-  overscroll-behavior: none;
+  overscroll-behavior-x: none;  /* block horizontal bounce */
+  overscroll-behavior-y: auto;  /* enable iOS elastic bounce */
 }
 
 body {
@@ -265,6 +266,11 @@ html[data-season="spring"] .hero-glow::before { background: radial-gradient(elli
 html[data-season="autumn"] .hero-glow::before { background: radial-gradient(ellipse 80% 60% at 50% 40%, rgba(251, 191, 36, 0.06) 0%, transparent 70%) !important; }
 html[data-season="winter"] .hero-glow::before { background: radial-gradient(ellipse 80% 60% at 50% 40%, rgba(148, 163, 184, 0.06) 0%, transparent 70%) !important; }
 
+/* Circadian glass tint on ambient backgrounds — barely perceptible hue rotation */
+#root::before {
+  filter: hue-rotate(calc(var(--circadian-hue-shift, 0) * 1deg));
+}
+
 /* Atmosphere breathing — Thermal Drift from Competition F */
 @keyframes atmosphere-drift {
   0%, 100% { transform: translate(0, 0) scale(1); }
@@ -314,6 +320,22 @@ html[data-season] .card::after {
     0 0 0 0.5px rgba(0, 0, 0, 0.05),
     inset 0 1px 0 var(--color-card-highlight),
     inset 0 0 0 0.5px rgba(255, 255, 255, 0.35);
+}
+
+/* Circadian Glass — subtle warm/cool tint from time of day (Rubin: invisible = success) */
+:root {
+  --circadian-hue-shift: 0;
+  --circadian-warmth: 0.5;
+  --ink-progress: 0;
+}
+
+/* Ink Saturation — UI chrome text deepens with practice hours (Ive)
+   Dark: 0.75 → 1.0, Light: 0.88 → 1.0. User content unaffected. WCAG AA floor. */
+:root {
+  --ink-depth: calc(0.88 + var(--ink-progress) * 0.12);
+}
+html.dark, html.warm {
+  --ink-depth: calc(0.75 + var(--ink-progress) * 0.25);
 }
 
 /* Cooling Glass transition — warm back as you arrive */
@@ -823,6 +845,14 @@ html.warm .hero-glow::before {
     filter: none;
     transform: none;
   }
+}
+
+/* Ink depth on UI chrome — deepens with practice (user content stays full opacity) */
+[role="tab"] span,
+.flow-pill,
+.flow-pill-dry,
+nav p {
+  opacity: var(--ink-depth, 1);
 }
 
 /* Prevent text selection on interactive elements */

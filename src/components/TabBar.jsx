@@ -103,12 +103,12 @@ export default memo(function TabBar({ active, onChange }) {
               }`}
               aria-label={tab.label}
             >
-              {/* Active tab background glow */}
+              {/* Active tab background glow — season-colored */}
               {isActive && (
                 <div
                   className="absolute inset-x-2 inset-y-1 rounded-2xl"
                   style={{
-                    background: 'radial-gradient(ellipse at center, rgba(59,130,246,0.10) 0%, transparent 70%)',
+                    background: `radial-gradient(ellipse at center, hsla(var(--season-hue, 210), var(--season-saturation, 40%), 55%, 0.12) 0%, transparent 70%)`,
                   }}
                 />
               )}

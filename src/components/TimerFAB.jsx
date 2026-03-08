@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useTheme } from '../contexts/ThemeContext';
+import { useSeason } from '../contexts/SeasonContext';
 import { PRACTICE_TAGS } from '../utils/storage';
 import { haptics } from '../utils/haptics';
 import MoodPicker from './MoodPicker';
@@ -44,6 +45,7 @@ function clearTimerStorage() {
 
 export default function TimerFAB({ onSaveSession, onQuickLog, showTabBar = true }) {
   const { isDark } = useTheme();
+  const { riverWeight = 300 } = useSeason();
 
   // Visual viewport offset for iOS keyboard
   const [viewportOffset, setViewportOffset] = useState(0);
@@ -477,8 +479,8 @@ export default function TimerFAB({ onSaveSession, onQuickLog, showTabBar = true 
       {isActive ? (
         /* Running/paused — show elapsed time */
         <span
-          className="text-white font-bold text-sm"
-          style={{ fontVariantNumeric: 'tabular-nums' }}
+          className="text-white text-sm"
+          style={{ fontVariantNumeric: 'tabular-nums', fontWeight: riverWeight }}
         >
           {timerState === 'paused' && (
             <span className="opacity-60 mr-1">⏸</span>
