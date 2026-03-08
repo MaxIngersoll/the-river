@@ -1,33 +1,43 @@
 {
-  "version": 5,
-  "last_updated": "2026-03-08T09:50:00Z",
+  "version": 6,
+  "last_updated": "2026-03-08T10:10:00Z",
   "paused": false,
+  "dry_run": false,
+  "locked_by": null,
+  "lock_timeout_minutes": 45,
 
   "status": "clean",
   "working_branch": "claude/musing-nightingale",
   "worktree_path": ".claude/worktrees/musing-nightingale",
-  "last_commit": "8756099",
+  "last_commit": "7215963",
 
-  "human_summary": "Wave 1 + Wave 2 done (12 features shipped). MoodPicker, Bottom Sheet, Quick Log, haptics, save ripple, Space shortcut all live. AUTOPILOT system designed with 9-person team review. App: 384KB JS, 114KB gzip, zero errors.",
+  "human_summary": "Wave 1 + Wave 2 done (13 features shipped). AUTOPILOT v6 battle-tested by 15 experts across 3 rounds. App: 384KB JS, 114KB gzip, zero errors. Night shift starts tonight at midnight.",
 
   "uncommitted_files": null,
-
   "current_task": null,
 
   "next_tasks": [
-    "wave1-fab-weight: FAB font weight changes with practice hours (20min)",
-    "wave3-visual-grammar: Document how data maps to visual properties (45min)",
-    "wave3-temporal-resonance: Data model for mood, energy, schedule fields (60min)",
-    "wave4-circadian-glass: Warm/cool tint based on time of day (30min)",
-    "wave4-ink-saturation: Text darkness increases with practice depth (30min)"
+    {"id": "wave1-fab-weight", "description": "FAB font weight changes with practice hours", "estimated_min": 20, "wave": 1, "files_likely": ["src/components/TimerFAB.jsx", "src/contexts/SeasonContext.jsx"]},
+    {"id": "wave3-visual-grammar", "description": "Document how data maps to visual properties", "estimated_min": 45, "wave": 3, "files_likely": ["docs/visual-grammar.md"]},
+    {"id": "wave3-temporal-resonance", "description": "Data model for mood, energy, schedule fields", "estimated_min": 60, "wave": 3, "files_likely": ["src/utils/storage.js", "docs/data-schema.md"]},
+    {"id": "wave4-circadian-glass", "description": "Warm/cool tint based on time of day", "estimated_min": 30, "wave": 4, "files_likely": ["src/contexts/SeasonContext.jsx", "src/index.css"]},
+    {"id": "wave4-ink-saturation", "description": "Text darkness increases with practice depth", "estimated_min": 30, "wave": 4, "files_likely": ["src/contexts/SeasonContext.jsx", "src/index.css"]}
   ],
 
   "completed": [
-    "wave0-haptics", "wave0-reduced-motion",
-    "wave1-save-ripple", "wave1-space-shortcut", "wave1-animation-constants",
-    "wave1-empty-state", "wave1-warm-typography", "wave1-earned-border-radius",
-    "wave2-bottom-sheet", "wave2-quick-log", "wave2-mood-picker",
-    "consequential-river-level-rise", "consequential-cooling-glass"
+    {"id": "wave0-haptics", "shipped": "2026-03-08T04:15Z"},
+    {"id": "wave0-reduced-motion", "shipped": "prior"},
+    {"id": "wave1-save-ripple", "shipped": "2026-03-08T04:30Z"},
+    {"id": "wave1-space-shortcut", "shipped": "2026-03-08T04:30Z"},
+    {"id": "wave1-animation-constants", "shipped": "2026-03-08T04:30Z"},
+    {"id": "wave1-empty-state", "shipped": "prior"},
+    {"id": "wave1-warm-typography", "shipped": "2026-03-08T04:15Z"},
+    {"id": "wave1-earned-border-radius", "shipped": "2026-03-08T04:15Z"},
+    {"id": "wave2-bottom-sheet", "shipped": "2026-03-08T04:45Z"},
+    {"id": "wave2-quick-log", "shipped": "2026-03-08T04:45Z"},
+    {"id": "wave2-mood-picker", "shipped": "2026-03-08T09:50Z"},
+    {"id": "consequential-river-level-rise", "shipped": "2026-03-08T04:00Z"},
+    {"id": "consequential-cooling-glass", "shipped": "2026-03-08T04:00Z"}
   ],
 
   "session_log_max": 20,
@@ -36,17 +46,18 @@
     {"time": "2026-03-08T04:15Z", "tasks": ["warm-typography", "earned-border-radius", "haptics"], "commits": 2},
     {"time": "2026-03-08T04:30Z", "tasks": ["save-ripple", "space-shortcut", "dao-de-jing-fix"], "commits": 1},
     {"time": "2026-03-08T04:45Z", "tasks": ["bottom-sheet", "quick-log"], "commits": 1},
-    {"time": "2026-03-08T09:50Z", "tasks": ["mood-picker", "autopilot-system"], "commits": 2}
+    {"time": "2026-03-08T09:50Z", "tasks": ["mood-picker", "autopilot-v5"], "commits": 2},
+    {"time": "2026-03-08T10:10Z", "tasks": ["autopilot-v6", "consultant-frequency"], "commits": 2}
   ],
 
   "build_gate": {
     "required_before_commit": true,
     "steps": [
-      "npm run build must pass",
-      "Verify key elements exist: hero stat text, tab bar with 4 tabs, FAB visible",
-      "No React errors in console (Vite websocket errors are OK)"
+      "npm run build (exit code 0 = pass)",
+      "Verify key elements: hero stat, tab bar (4 tabs), FAB visible",
+      "No React errors in console (Vite websocket errors OK)"
     ],
-    "on_failure": "git stash (save hash in stash_archive), log failure, move to next_task"
+    "on_failure": "git stash, save hash to stash_archive, log failure, move to next_task"
   },
 
   "bundle_budget": {
@@ -54,28 +65,30 @@
     "js_gzip_max_kb": 125,
     "current_js_raw_kb": 384,
     "current_js_gzip_kb": 114,
-    "on_exceeded": "Code-split the new feature or reject it. Log in session_log."
+    "on_exceeded": "Code-split or reject. Log in session_log."
   },
 
   "stash_archive": [],
 
   "panic_recovery": {
-    "json_parse_fails": "Run git log -1 --format=%H, set status to clean, start fresh",
-    "build_fails": "git stash, save stash ref to stash_archive, move to next_task",
+    "json_parse_fails": "git log -1 --format=%H, set status to clean, start fresh",
+    "build_fails": "git stash, save ref to stash_archive, move to next_task",
     "worktree_missing": "git worktree add .claude/worktrees/musing-nightingale claude/musing-nightingale",
-    "merge_conflicts": "git checkout --theirs, rebuild, note in session_log",
+    "merge_conflicts": "git pull --rebase. If rebase fails: git rebase --abort, git stash, reset to origin, start fresh",
+    "push_rejected": "git pull --rebase origin <branch>, retry push. Never force-push.",
     "dirty_state_unclear": "git stash, save ref to stash_archive, set status to clean"
   },
 
   "overnight_config": {
     "one_branch_per_night": true,
     "branch_pattern": "autopilot/YYYY-MM-DD",
-    "first_session_creates_branch": true,
-    "subsequent_sessions_push_to_existing": true,
+    "branch_commands": "git fetch origin; if git show-ref --verify refs/remotes/origin/autopilot/$(date +%Y-%m-%d) 2>/dev/null; then git checkout autopilot/$(date +%Y-%m-%d) && git pull; else git checkout -b autopilot/$(date +%Y-%m-%d) main; fi",
     "overnight_log_file": "docs/overnight-log.md",
+    "overnight_log_format": "Reverse chronological. TLDR at top: what shipped, what broke, what's next. Link commits. Details below.",
     "use_vite_preview_not_dev": true,
+    "kill_server_after_screenshot": true,
     "no_consultants_in_autonomous_mode": true,
     "progressive_context": true,
-    "context_load_order": ["AUTOPILOT.json", "CLAUDE.md", "HANDOFF.md only if needed"]
+    "context_load_order": ["AUTOPILOT.json", "CLAUDE.md", "files_likely from current task", "HANDOFF.md only if needed"]
   }
 }
