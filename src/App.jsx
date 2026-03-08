@@ -19,7 +19,7 @@ import { SeasonProvider } from './contexts/SeasonContext';
 
 export default function App() {
   const [sessions, setSessions] = useState(() => getSessions());
-  // Smart routing: practiced today → Home (reflect), not yet → Dock (act)
+  // Smart routing: practiced today → Home (reflect), not yet → Ready (act)
   const [activeTab, setActiveTab] = useState(() => {
     const initialSessions = getSessions();
     const todayStr = today();
@@ -237,6 +237,13 @@ export default function App() {
 
   const showTabBar = displayedTab !== 'settings';
 
+  // Ando's Breath — opening pause
+  const [arrived, setArrived] = useState(false);
+  useEffect(() => {
+    const t = setTimeout(() => setArrived(true), 100);
+    return () => clearTimeout(t);
+  }, []);
+
   const handleOnboardingComplete = useCallback(() => {
     localStorage.setItem('river-onboarding-complete', 'true');
     localStorage.setItem('river-onboarding-date', new Date().toISOString());
@@ -247,7 +254,7 @@ export default function App() {
   return (
     <SeasonProvider sessions={sessions}>
       {showOnboarding && <OnboardingFlow onComplete={handleOnboardingComplete} />}
-      <div className="min-h-screen bg-bg pb-16">
+      <div className={`min-h-screen bg-bg pb-16 app-breath ${arrived ? 'arrived' : ''}`}>
         <div className={`page-wrapper ${pageClass}`}>
         {displayedTab === 'home' && (
           <div role="tabpanel" id="tabpanel-home" aria-labelledby="tab-home">

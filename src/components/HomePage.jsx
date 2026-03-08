@@ -15,6 +15,14 @@ import { todayIsFogDay } from '../utils/fogHorn';
 import QuoteCard from './QuoteCard';
 import InsightCard from './InsightCard';
 import SignalFireCard from './SignalFireCard';
+import { useSeason } from '../contexts/SeasonContext';
+
+const SEASON_LINES = {
+  spring: 'New strings, old songs',
+  summer: 'The current runs deep',
+  autumn: 'The river remembers',
+  winter: 'The strings remember even when you forget',
+};
 
 
 function getGreeting() {
@@ -63,6 +71,9 @@ export default function HomePage({ sessions, onNavigate, onSessionUpdate, onSess
     const wp = settings.weekly_goal_minutes > 0 ? Math.min(week.totalMinutes / settings.weekly_goal_minutes, 1) : 0;
     return { totalMinutes: total, streak: s, todaySessions: todays, todayMinutes: todayMins, weekStats: week, weekProgress: wp };
   }, [sessions, todayStr, settings.weekly_goal_minutes]);
+
+  const { season } = useSeason();
+  const seasonLine = SEASON_LINES[season];
 
   const todayIsFog = useMemo(() => todayIsFogDay(sessions), [sessions]);
 
@@ -180,6 +191,13 @@ export default function HomePage({ sessions, onNavigate, onSessionUpdate, onSess
           ) : null;
         })()}
       </div>
+
+      {/* Cohen's seasonal language */}
+      {seasonLine && (
+        <p className="text-center font-serif italic text-text-3 text-xs opacity-50 mb-4">
+          {seasonLine}
+        </p>
+      )}
 
       {/* Flow status pill — glassy, long-press for fog horn */}
       <div className="flex justify-center mb-8">

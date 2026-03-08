@@ -45,6 +45,31 @@ const CHORD_FORMULAS = {
   aug: [0, 4, 8],
 };
 
+// ─── Oblique Strategy Cards ───
+
+const OBLIQUE_CARDS = [
+  { type: 'chord', text: 'Try an Fsus2 today — it sounds like a question' },
+  { type: 'prompt', text: 'Play the last thing you learned, but slower' },
+  { type: 'chord', text: 'Cmaj7 — the chord that sounds like Sunday morning' },
+  { type: 'prompt', text: 'What does this song sound like in a minor key?' },
+  { type: 'chord', text: 'Dsus4 — resolve it, or don\'t. Both are beautiful.' },
+  { type: 'prompt', text: 'Play something you haven\'t touched in a month' },
+  { type: 'chord', text: 'Am7 — jazz starts here' },
+  { type: 'prompt', text: 'Close your eyes for the first minute' },
+  { type: 'chord', text: 'G/B — one note changes everything' },
+  { type: 'prompt', text: 'What would this sound like if you were happy?' },
+  { type: 'chord', text: 'Bm — the loneliest chord. Give it company.' },
+  { type: 'prompt', text: 'Hum before you play' },
+  { type: 'chord', text: 'Cadd9 — Wonderwall\'s secret ingredient' },
+  { type: 'prompt', text: 'Play something you\'re afraid of' },
+  { type: 'chord', text: 'E7#9 — the Hendrix chord. You know you want to.' },
+  { type: 'prompt', text: 'What does the river sound like today?' },
+  { type: 'prompt', text: 'Learn one new chord. Just one.' },
+  { type: 'prompt', text: 'Play the same thing three times. Notice what changes.' },
+  { type: 'chord', text: 'Dm — every sad song begins here (or should)' },
+  { type: 'prompt', text: 'What would Brian Eno do?' },
+];
+
 // Diatonic chords for major/minor keys
 function getDiatonicChords(root, scale) {
   const rootIdx = NOTES.indexOf(root);
@@ -901,6 +926,11 @@ export default function ShedPage({ sessions = [], onNavigate }) {
   const [activePosition, setActivePosition] = useState(null);
   const [showBarre, setShowBarre] = useState(false);
   const [showIntervals, setShowIntervals] = useState(true);
+  const [obliqueDismissed, setObliqueDismissed] = useState(false);
+
+  // Pick today's oblique card (changes daily, consistent within a day)
+  const dayOfYear = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0)) / 86400000);
+  const obliqueCard = OBLIQUE_CARDS[dayOfYear % OBLIQUE_CARDS.length];
 
   const rootIdx = NOTES.indexOf(rootNote);
   const scaleNoteIndexes = useMemo(() => getScaleNotes(rootNote, scale), [rootNote, scale]);
@@ -915,9 +945,37 @@ export default function ShedPage({ sessions = [], onNavigate }) {
 
   return (
     <div className="px-4 pt-14 pb-24">
+      {/* Oblique Strategy Card */}
+      {!obliqueDismissed && (
+        <div
+          className="relative mb-4 px-4 py-3.5 rounded-xl border border-water-3/15"
+          style={{
+            transform: 'rotate(-0.5deg)',
+            background: 'linear-gradient(135deg, rgba(59,130,246,0.04), rgba(147,130,220,0.06))',
+          }}
+        >
+          <button
+            onClick={() => setObliqueDismissed(true)}
+            className="absolute top-2 right-2.5 w-6 h-6 flex items-center justify-center rounded-full text-text-3/50 hover:text-text-3 transition-colors"
+            aria-label="Dismiss card"
+          >
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
+          <p className="text-[9px] uppercase tracking-widest text-text-3/60 font-semibold mb-1.5">
+            {obliqueCard.type === 'chord' ? 'Today\u2019s Chord' : 'Today\u2019s Prompt'}
+          </p>
+          <p className="font-serif italic text-text text-sm leading-relaxed pr-6">
+            {obliqueCard.text}
+          </p>
+        </div>
+      )}
+
       {/* Header */}
       <div className="mb-4">
-        <h1 className="text-xl font-bold text-text">The Dock</h1>
+        <h1 className="text-xl font-bold text-text">Ready</h1>
         <p className="text-xs text-text-3 mt-0.5">Your launchpad — reference and play</p>
       </div>
 

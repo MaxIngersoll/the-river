@@ -68,6 +68,7 @@ export default function TimerFAB({ onSaveSession, showTabBar = true }) {
   const [expanded, setExpanded] = useState(false);
   const [note, setNote] = useState('');
   const [tags, setTags] = useState([]);
+  const [curiosity, setCuriosity] = useState('');
   const intervalRef = useRef(null);
 
   // Restore timer from localStorage on mount
@@ -122,7 +123,7 @@ export default function TimerFAB({ onSaveSession, showTabBar = true }) {
     persistTimer({ timerState: 'running', startedAt: now, pausedElapsed: 0 });
   }, [timerState]);
 
-  // Listen for external timer-start events (from The Dock, etc.)
+  // Listen for external timer-start events (from Ready, etc.)
   useEffect(() => {
     const handler = (e) => {
       if (timerState === 'idle') {
@@ -163,6 +164,10 @@ export default function TimerFAB({ onSaveSession, showTabBar = true }) {
   const handleSave = useCallback(() => {
     const minutes = Math.max(1, Math.round(elapsed / 60000));
     onSaveSession({ duration_minutes: minutes, note: note.trim(), tags });
+    // Store curiosity prompt for next session
+    if (curiosity.trim()) {
+      localStorage.setItem('river-curiosity', curiosity.trim());
+    }
     // Reset everything
     setTimerState('idle');
     setStartedAt(null);
@@ -171,8 +176,9 @@ export default function TimerFAB({ onSaveSession, showTabBar = true }) {
     setExpanded(false);
     setNote('');
     setTags([]);
+    setCuriosity('');
     clearTimerStorage();
-  }, [elapsed, note, tags, onSaveSession]);
+  }, [elapsed, note, tags, curiosity, onSaveSession]);
 
   const handleNevermind = useCallback(() => {
     setTimerState('idle');
@@ -182,6 +188,7 @@ export default function TimerFAB({ onSaveSession, showTabBar = true }) {
     setExpanded(false);
     setNote('');
     setTags([]);
+    setCuriosity('');
     clearTimerStorage();
   }, []);
 
@@ -335,6 +342,15 @@ export default function TimerFAB({ onSaveSession, showTabBar = true }) {
                 );
               })}
             </div>
+
+            <input
+              type="text"
+              value={curiosity}
+              onChange={(e) => setCuriosity(e.target.value)}
+              placeholder="What are you curious about next?"
+              aria-label="Curiosity for next session"
+              className="glass-input w-full px-4 py-3.5 text-sm text-text placeholder-text-3/50 italic mb-4"
+            />
 
             <button
               onClick={handleSave}

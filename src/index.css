@@ -759,6 +759,18 @@ html.warm .hero-glow::before {
 }
 
 /* ========================================
+   Ando's Breath — opening pause
+   The app takes a breath before becoming interactive.
+   ======================================== */
+.app-breath {
+  opacity: 0;
+  transition: opacity 0.8s ease-in;
+}
+.app-breath.arrived {
+  opacity: 1;
+}
+
+/* ========================================
    Disable sticky hover on touch devices
    ======================================== */
 @media (hover: none) {
