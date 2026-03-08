@@ -65,7 +65,7 @@ bash "$SCRIPTS" unlock
 - **ONE task per invocation.** After completing or failing one task, STOP. Do not pick another.
 - **Do NOT modify AUTOPILOT.json directly.** Use the script commands (complete_task, record_failure, etc.)
 - **Do NOT run raw git commands.** Use `bash "$SCRIPTS" commit_push` and `bash "$SCRIPTS" stash_and_log`.
-- **Do NOT modify TimerFAB.jsx, QuickLog.jsx, or storage.js** — these have uncommitted work in progress.
+- **Do NOT modify RiverSVG.jsx** — this may have active design work in progress. TimerFAB.jsx, QuickLog.jsx, and storage.js are now safe to modify if the task requires it.
 - **Do NOT spend time reading CLAUDE.md, VISION.md, or HANDOFF.md.** You have everything you need in the task description.
 - **Do NOT plan, analyze, or deliberate.** Read files, write code, build, commit. That is it.
 - **If confused about anything, make the simplest choice and move on.**

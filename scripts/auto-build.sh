@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# auto-build.sh v2.1 — Infrastructure for The River's autonomous builder
+# auto-build.sh v2.2 — Infrastructure for The River's autonomous builder
+# v2.2 fixes: sync_state command, auto-sync after build, stale state prevention
 # v2.1 fixes: shell injection, cleanup trap scoping, bundle parse warning, task ID validation
 #
 # DESIGN PRINCIPLES (from 5-expert reliability review):
@@ -440,6 +441,9 @@ cmd_build_gate() {
     echo "GZIP_SIZE_UNKNOWN: could not parse gzip size from build output"
   fi
 
+  # Sync state with actual build output
+  cmd_sync_state 2>/dev/null
+
   cmd_heartbeat "build_gate: passed"
   echo "BUILD_PASSED"
   return 0
@@ -593,6 +597,39 @@ cmd_heartbeat() {
   echo "{\"time\":\"$ts\",\"status\":\"running\",\"context\":\"$context\"}" > "$HEARTBEAT_FILE"
 }
 
+cmd_sync_state() {
+  # Sync AUTOPILOT.json with reality: HEAD commit hash + latest bundle size
+  _ensure_worktree
+  _ensure_python
+  _ensure_node
+
+  local HEAD_HASH
+  HEAD_HASH=$(git log -1 --format=%h 2>/dev/null || echo "unknown")
+
+  # Get bundle size from dist/ if it exists
+  local JS_RAW=0
+  local JS_GZIP=0
+  if [ -d "$WORKTREE/dist/assets" ]; then
+    JS_RAW=$(find "$WORKTREE/dist/assets" -name '*.js' -not -name '*.js.map' -exec wc -c {} + 2>/dev/null | tail -1 | awk '{print int($1/1024)}')
+    JS_GZIP=$(find "$WORKTREE/dist/assets" -name '*.js' -not -name '*.js.map' -exec gzip -c {} + 2>/dev/null | wc -c | awk '{print int($1/1024)}')
+  fi
+  [ -z "$JS_RAW" ] && JS_RAW=0
+  [ -z "$JS_GZIP" ] && JS_GZIP=0
+
+  python3 -c "
+import json
+with open('$AUTOPILOT', 'r') as f:
+    data = json.load(f)
+data['last_commit'] = '$HEAD_HASH'
+if $JS_RAW > 0:
+    data.setdefault('build_gate', {})['current_bundle'] = {'js_raw_kb': $JS_RAW, 'js_gzip_kb': $JS_GZIP}
+with open('$AUTOPILOT', 'w') as f:
+    json.dump(data, f, indent=2)
+    f.write('\n')
+print('STATE_SYNCED: commit=$HEAD_HASH bundle=${JS_RAW}kB/${JS_GZIP}kB gzip')
+"
+}
+
 cmd_status() {
   # Print current builder status — useful for monitoring
   echo "=== Auto-Builder Status ==="
@@ -649,9 +686,10 @@ case "${1:-help}" in
   stash_and_log)  cmd_stash_and_log ;;
   log_session)    shift; cmd_log_session "$@" ;;
   heartbeat)      shift; cmd_heartbeat "$@" ;;
+  sync_state)     cmd_sync_state ;;
   status)         cmd_status ;;
   help)
-    echo "auto-build.sh v2.1 — The River's autonomous builder infrastructure"
+    echo "auto-build.sh v2.2 — The River's autonomous builder infrastructure"
     echo ""
     echo "Commands:"
     echo "  preflight              Validate worktree, node, npm, git, JSON"
@@ -667,6 +705,7 @@ case "${1:-help}" in
     echo "  stash_and_log          Stash changes + record ref"
     echo "  log_session <o> <t> <m>  Append to sessions.jsonl"
     echo "  heartbeat <context>    Update heartbeat with what we're doing"
+    echo "  sync_state             Sync AUTOPILOT.json with HEAD + bundle size"
     echo "  status                 Print current builder status"
     ;;
   *)

@@ -1,6 +1,6 @@
 {
   "version": 12,
-  "auto_build_version": 2.1,
+  "auto_build_version": 2.2,
   "last_updated": "2026-03-08T20:00:00Z",
   "paused": false,
   "dry_run": false,
@@ -13,16 +13,15 @@
   "status": "clean",
   "working_branch": "claude/musing-nightingale",
   "worktree_path": ".claude/worktrees/musing-nightingale",
-  "last_commit": "fbe32cb",
+  "last_commit": "0fd8570",
 
-  "human_summary": "19 features shipped. Auto-build v2 deployed: one-task-per-invocation, structured JSONL logging, preflight checks, circuit breaker, quick-wins-first task selection, per-task attempt tracking. 8 tasks queued.",
+  "human_summary": "19+ features shipped. Session 13 active: timer visualization redesigned (Bloom → Flow → Aurora → Quiet Water), tap-to-hide numbers, auto-build v2.1 stress-tested. 8 queued tasks. Auto-build v2.1 with 5 postmortem fixes.",
 
   "uncommitted_files": null,
   "current_task": null,
 
   "next_tasks": [
-    {"id": "ceremony-typeface", "description": "Apply DM Serif Display (.ceremony-text class) at threshold moments: ReadingCeremony.jsx headings, CelebrationOverlay.jsx milestone text, OnboardingFlow.jsx titles. The font is already loaded in index.css. Just add className='ceremony-text' to the right elements. Keep it RARE — this font should feel special.", "estimated_min": 15, "files_likely": ["src/components/ReadingCeremony.jsx", "src/components/CelebrationOverlay.jsx", "src/components/OnboardingFlow.jsx"]},
-    {"id": "page-transitions-tune", "description": "Tune page transitions to 200ms crossfade (Q49). Currently 150ms exit + 300ms enter in index.css. Change to: exit 150ms (keep), enter 200ms. Update the page-enter-anim keyframe duration.", "estimated_min": 5, "files_likely": ["src/index.css"]},
+    {"id": "page-transitions-tune", "description": "Tune page enter transition to 200ms (Q49). Currently 300ms in index.css (page-enter-anim 0.3s). Change to 0.2s. The exit is fine.", "estimated_min": 5, "files_likely": ["src/index.css"]},
     {"id": "touch-target-audit", "description": "Audit all interactive elements for 44px minimum touch targets (Q50). Check: TabBar buttons, tag pills in TimerFAB, theme toggle options, mood picker icons, settings buttons. Add min-h-[44px] min-w-[44px] or padding where needed. Do NOT change visual appearance — only increase hit areas.", "estimated_min": 20, "files_likely": ["src/components/TabBar.jsx", "src/components/TimerFAB.jsx", "src/components/MoodPicker.jsx", "src/components/SettingsPage.jsx"]},
     {"id": "total-hours-home", "description": "Show total practice hours on HomePage as a subtle stat below the main hero (Q61). Use useSeason().totalHours. Format as 'Xh total' in text-text-3 text-xs. Position below the river chart, above the session cards. Keep it quiet — informational, not heroic.", "estimated_min": 15, "files_likely": ["src/components/HomePage.jsx"]},
     {"id": "export-json-csv", "description": "Add data export in Settings (Q60). Primary: JSON (full session array from localStorage). Secondary: CSV (date, duration_minutes, tags joined by semicolons, mood, note). Add two buttons to SettingsPage.jsx: 'Export JSON' and 'Export CSV'. Use Blob + URL.createObjectURL + click-to-download pattern. No server needed.", "estimated_min": 20, "files_likely": ["src/components/SettingsPage.jsx", "src/utils/storage.js"]},
@@ -50,7 +49,8 @@
     {"id": "wave1-fab-weight", "shipped": "2026-03-08T14:22Z"},
     {"id": "wave1-season-tab-glow", "shipped": "2026-03-08T14:24Z"},
     {"id": "wave4-circadian-glass", "shipped": "2026-03-08T14:26Z"},
-    {"id": "wave4-ink-saturation", "shipped": "2026-03-08T14:28Z"}
+    {"id": "wave4-ink-saturation", "shipped": "2026-03-08T14:28Z"},
+    {"id": "ceremony-typeface", "shipped": "prior", "note": "Already applied in ReadingCeremony, CelebrationOverlay, OnboardingFlow, TimerFAB"}
   ],
 
   "session_log_max": 20,
@@ -75,7 +75,7 @@
       "Take screenshot, save to docs/overnight-screenshots/ with commit hash (Ive: visual morning review)"
     ],
     "on_failure": "git stash, save hash to stash_archive, log failure, move to next_task",
-    "current_bundle": {"js_raw_kb": 385, "js_gzip_kb": 114}
+    "current_bundle": {"js_raw_kb": 394, "js_gzip_kb": 117}
   },
 
   "stash_archive": [],
