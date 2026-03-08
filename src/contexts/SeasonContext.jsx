@@ -1,5 +1,6 @@
 /* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useMemo, useEffect } from 'react';
+import { getTotalHours } from '../utils/storage';
 
 const SeasonContext = createContext({
   season: 'spring',
@@ -74,6 +75,11 @@ export function SeasonProvider({ children, sessions }) {
     return { season, ...target };
   }, [season]);
 
+  // Consequential UI — derived from practice hours
+  const totalHours = useMemo(() => getTotalHours(sessions), [sessions]);
+  const riverWeight = useMemo(() => Math.min(300 + Math.floor(totalHours / 5) * 10, 600), [totalHours]);
+  const cardRadius = useMemo(() => 8 + Math.min(totalHours, 200) / 200 * 16, [totalHours]);
+
   // Apply CSS custom properties to <html>
   useEffect(() => {
     const root = document.documentElement;
@@ -83,6 +89,8 @@ export function SeasonProvider({ children, sessions }) {
     root.style.setProperty('--season-warmth', config.warmth);
     root.style.setProperty('--season-glow-opacity', config.glowOpacity);
     root.style.setProperty('--season-drift-speed', `${config.driftSpeed}s`);
+    root.style.setProperty('--river-weight', riverWeight);
+    root.style.setProperty('--card-radius', `${cardRadius}px`);
 
     return () => {
       root.removeAttribute('data-season');
@@ -91,8 +99,10 @@ export function SeasonProvider({ children, sessions }) {
       root.style.removeProperty('--season-warmth');
       root.style.removeProperty('--season-glow-opacity');
       root.style.removeProperty('--season-drift-speed');
+      root.style.removeProperty('--river-weight');
+      root.style.removeProperty('--card-radius');
     };
-  }, [season, config]);
+  }, [season, config, riverWeight, cardRadius]);
 
   return (
     <SeasonContext.Provider value={config}>
