@@ -1,6 +1,6 @@
 // Shotwell: "Where's the versioning strategy?"
 // Bump this on every deploy. Old caches auto-purge on activate.
-const SW_VERSION = '3';
+const SW_VERSION = '4';
 const CACHE = `river-v${SW_VERSION}`;
 const OFFLINE_URL = '/offline.html';
 
@@ -11,6 +11,10 @@ const PRECACHE_URLS = [
   '/icon-192.png',
   '/icon-512.png',
   '/manifest.json',
+  '/fonts/dm-sans-400.woff2',
+  '/fonts/dm-serif-display-400.woff2',
+  '/fonts/lora-normal.woff2',
+  '/fonts/lora-italic.woff2',
 ];
 
 self.addEventListener('install', (e) => {
