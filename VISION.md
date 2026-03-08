@@ -23,7 +23,8 @@ It's not a dashboard. It's a *place*. The river metaphor isn't decorative — it
 
 ### Aesthetic Direction
 - **"Liquid Glass"** — Frosted panels, `backdrop-filter: blur(40px) saturate(180%)`, specular highlights, ambient glow
-- **Deep blue/indigo palette** — Inspired by Apple Health's Sleep/Mindfulness. Nocturnal. The quiet hours when musicians actually practice.
+- **NEW COLOR DIRECTION (Session 13)** — Max: "I'm kind of sick of that blue. We need to go into a different direction. That's not our color." Explore warm earth tones, amber/gold, deep greens, or other non-blue palettes for the timer visualization.
+- **Deep blue/indigo palette (LEGACY)** — Original palette, inspired by Apple Health. Still in app UI but Max wants a new direction for the timer/visualization layer.
 - **Apple-quality feel** — Not Apple copycat. But the same level of care. Think: Apple Health, Linear, Notion.
 - **Poetic, not clinical** — Serif fonts for quotes. River metaphors everywhere. "Your river begins with one drop."
 - **The app has weather** — Seasons don't just tint the river; they cascade through the ENTIRE UI. Card backgrounds, text colors, icon tints, ambient sounds all shift with the season engine. The app feels like a living place with weather, not a static tool. (Session 11, Q63 — Max: "I love this idea. Great one, Kanye.")
@@ -183,16 +184,20 @@ See `docs/AGENT-PROTOCOL.md` for the full protocol. Key elements:
 - QuickLog: duration presets + tags + mood + note via BottomSheet (Session 12)
 - MoodPicker: 4 weather icons (sun/cloud/rain/wind), ARIA radiogroup (Session 12)
 - AUTOPILOT v8: overnight autonomous building system, 8 iterations, 15+ expert reviews (Session 12)
+- Timer visualization exploration: Aurora (rejected) → Quiet Water (approved vibe, saved as `quiet-water-v1` tag) (Session 13)
+- Tap-to-hide timer numbers: Insight Timer-style, 1.2s ease fade (Session 13)
+- Auto-build v2.2: 5 postmortem fixes, v2 skills installed, sync_state command (Session 13)
+- 10 Timer Design Commandments established from all discourse (Session 13)
+- 7 inspiration sketches cataloged for next timer design (Session 13)
 
 ### What's Next (Priority Order)
-1. Vercel soft launch — deploy as demo capacity, get it live with a URL
-2. Ceremony typeface — try a single high-contrast serif for threshold moments (Reading, milestones, onboarding)
-3. Refine chord diagrams based on Competition E synthesis ("The Luthier's Current")
-4. Polish: ShedPage.jsx breakup (1,170 lines → sub-components), mobile audit, accessibility
-5. Architecture: begin opening identity beyond guitar — instrument-aware, creative practice broadly
+1. **NEW TIMER VISUALIZATION** — Full Tier 1 competition with 7 new personas. Raven Kwok as inspiration. **NEW COLOR DIRECTION** — Max killed blue ("I'm kind of sick of that blue"). Start from scratch with 10 Commandments.
+2. Vercel soft launch — deploy as demo capacity, get it live with a URL
+3. Automation: 7 queued tasks running via continuer (every 30 min). Page transitions, touch targets, total hours, export, backup health, progressive mood, splash screens.
+4. Merge claude/musing-nightingale → main (20+ commits)
+5. Polish: ShedPage.jsx breakup (1,170 lines → sub-components), mobile audit, accessibility
 6. Competition C implementation: Maya's River pitch deck narrative (designed, not built)
-7. Real device testing: PWA install flow, touch interactions
-8. Max may have new directions — ask before assuming
+7. Max may have new directions — ask before assuming
 
 ### Competition Results
 - **Competition A: The Dock** — WINNER: "The Current" + "The Dock" synthesis. **IMPLEMENTED (Phase 1 + 2).** Renamed Shed→Dock, tuning strip, progressions, proportional frets, CurrentCard, QuickStartCards.
