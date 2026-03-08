@@ -136,7 +136,7 @@ export default function HomePage({ sessions, onNavigate, onSessionUpdate, onSess
           <QuoteCard
             quote={{
               text: "A journey of a thousand miles begins with a single step.",
-              author: "Lao Tzu",
+              author: "Laozi",
               source: "Dao De Jing",
             }}
           />

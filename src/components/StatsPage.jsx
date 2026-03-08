@@ -57,7 +57,7 @@ export default function StatsPage({ sessions, onSessionUpdate, onSessionDelete, 
         <QuoteCard
           quote={{
             text: "Do you have the patience to wait until your mud settles and the water is clear?",
-            author: "Lao Tzu",
+            author: "Laozi",
             source: "Dao De Jing",
           }}
         />
