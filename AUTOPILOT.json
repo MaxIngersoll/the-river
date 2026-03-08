@@ -1,17 +1,21 @@
 {
-  "version": 10,
-  "last_updated": "2026-03-08T15:00:00Z",
+  "version": 12,
+  "auto_build_version": 2,
+  "last_updated": "2026-03-08T20:00:00Z",
   "paused": false,
   "dry_run": false,
   "locked_by": null,
   "lock_timeout_minutes": 45,
+  "consecutive_failures": 0,
+  "circuit_breaker_limit": 3,
+  "max_task_attempts": 2,
 
   "status": "clean",
   "working_branch": "claude/musing-nightingale",
   "worktree_path": ".claude/worktrees/musing-nightingale",
   "last_commit": "fbe32cb",
 
-  "human_summary": "19 features shipped total. Session 13 afternoon: Laozi fix, PWA polish, 5 features. 8 new tasks queued for autonomous run. Continuer fixed and tested (9/9 pass). Bundle: 385KB/114KB gzip.",
+  "human_summary": "19 features shipped. Auto-build v2 deployed: one-task-per-invocation, structured JSONL logging, preflight checks, circuit breaker, quick-wins-first task selection, per-task attempt tracking. 8 tasks queued.",
 
   "uncommitted_files": null,
   "current_task": null,
@@ -85,22 +89,23 @@
     "dirty_state_unclear": "git stash, save ref to stash_archive, set status to clean"
   },
 
+  "auto_build_config": {
+    "_note": "v2: auto-build.sh handles infrastructure. LLM only does creative work.",
+    "script_path": "scripts/auto-build.sh",
+    "session_log_path": "docs/auto-logs/sessions.jsonl",
+    "heartbeat_path": "/Users/Max/Claude/Guitar Tracking App/.claude/auto-heartbeat",
+    "task_selection": "quick_wins_first",
+    "one_task_per_invocation": true,
+    "skill_templates": "scripts/SKILL-continuer.md and scripts/SKILL-dry-run-test.md",
+    "install_skills": "bash scripts/install-skills.sh"
+  },
+
   "overnight_config": {
-    "one_branch_per_night": true,
-    "branch_pattern": "autopilot/YYYY-MM-DD",
-    "branch_commands": "git fetch origin; if git show-ref --verify refs/remotes/origin/autopilot/$(date +%Y-%m-%d) 2>/dev/null; then git checkout autopilot/$(date +%Y-%m-%d) && git pull; else git checkout -b autopilot/$(date +%Y-%m-%d) main; fi",
     "overnight_log_file": "docs/overnight-log.md",
-    "overnight_log_format": "TLDR (3 bullets: shipped/broke/next) + git log --oneline. Screenshots in docs/overnight-screenshots/. Morning TODO: actionable items for next session (Jobs: not prose, TODOs).",
+    "screenshots_dir": "docs/overnight-screenshots/",
     "use_vite_preview_not_dev": true,
     "kill_server_after_screenshot": true,
-    "quality_systems_consolidated": {
-      "_note": "Rams: 4 systems, no more. Culture is in the constraints, not the checking.",
-      "1_build_gate": "Build + bundle + snapshot + screenshot. Catches machine-detectable problems.",
-      "2_margin_notes_live_only": "After each file write (Jobs: work-driven, not clock-driven). Domain label + observation, max 25 words. e.g. '🎨 CSS: animation conflicts with transform on drag'. No persona names (Rams+Miyazaki: honest).",
-      "3_overnight_log": "TLDR + git log + screenshots. Morning TODO with actionable items.",
-      "4_panic_recovery": "See panic_recovery object. Error handling, not quality."
-    },
     "progressive_context": true,
-    "context_load_order": ["AUTOPILOT.json", "CLAUDE.md", "files_likely from current task", "HANDOFF.md only if needed"]
+    "context_load_order": ["AUTOPILOT.json", "files_likely from current task"]
   }
 }
