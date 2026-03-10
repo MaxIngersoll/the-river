@@ -114,42 +114,30 @@ function fbm(x, y) {
   return val;
 }
 
-// ─── The Quiet Water — Turrell/Eno/Rams synthesis ───
-// "Ambient means it can be ignored AND attended to." — Brian Eno
-// "Light so slow you can't tell it's moving." — James Turrell
-// "Less, but better." — Dieter Rams
+// ─── The Spiral Sun — af Klint/Eliasson/Martin/Raven Kwok synthesis ───
+// Competition K winner. 7-artist panel. Blue is dead.
 //
-// 2 slow, soft currents through gentle noise. No particles. No chaos.
-// The timer number IS the design. Everything else is atmosphere.
+// Growing Archimedean spiral (af Klint) on a slowly warming background (Eliasson).
+// Noise displacement on the spiral path (Raven Kwok: organic, not geometric).
+// Hair-thin stroke (Martin: sublime restraint).
+// Rose → Amber → Sage color journey. No blue anywhere.
+// Progressive disclosure: nothing for 30s, spiral begins, complexity earned.
 
-function createCurrent(w, h, index) {
-  return {
-    points: [{ x: w * (0.15 + index * 0.35), y: h * (0.2 + Math.random() * 0.6) }],
-    maxPoints: 160,
-    speed: 0.3 + Math.random() * 0.15, // slow but visible flow
-    noiseOffX: index * 137.3 + Math.random() * 300,
-    noiseOffY: index * 89.7 + Math.random() * 300,
-    colorIndex: index,
-    width: 10 + Math.random() * 10,
-  };
-}
+// Revolution colors: rose → amber → sage (warm palette, no blue)
+const SPIRAL_COLORS = [
+  [139, 34, 82],   // deep rose
+  [160, 80, 50],   // rose-amber transition
+  [184, 134, 11],  // amber
+  [150, 140, 40],  // amber-sage transition
+  [107, 142, 107], // sage green
+  [90, 120, 90],   // sage darker
+];
 
-function QuietWaterCanvas({ elapsed, timerState, prefersReduced, countdownTarget, isDark, numbersHidden, onToggleNumbers }) {
+function SpiralSunCanvas({ elapsed, timerState, prefersReduced, countdownTarget, isDark, numbersHidden, onToggleNumbers }) {
   const canvasRef = useRef(null);
-  const stateRef = useRef({ currents: [], frame: null, time: 0 });
-  const propsRef = useRef({ elapsed: 0, timerState: 'running', prefersReduced: false, isDark: true });
+  const stateRef = useRef({ frame: null, time: 0 });
+  const propsRef = useRef({});
   propsRef.current = { elapsed, timerState, prefersReduced, isDark };
-
-  const palette = useMemo(() => ({
-    bg: isDark ? [13, 12, 11] : [242, 240, 236],
-    // Deep, quiet water colors — only 2-3 hues
-    currents: isDark
-      ? [[30, 70, 160], [45, 95, 200], [25, 55, 130]]
-      : [[70, 140, 230], [50, 110, 200], [90, 155, 240]],
-    glow: isDark ? [35, 80, 180] : [80, 145, 235],
-  }), [isDark]);
-  const paletteRef = useRef(palette);
-  paletteRef.current = palette;
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -166,101 +154,110 @@ function QuietWaterCanvas({ elapsed, timerState, prefersReduced, countdownTarget
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
     const w = rect.width, h = rect.height;
+    const cx = w / 2, cy = h / 2;
+    const maxRadius = Math.min(w, h) * 0.4;
 
-    // Start with 2 currents (Rams: less but better)
-    state.currents = [createCurrent(w, h, 0), createCurrent(w, h, 1)];
+    // Spiral geometry: base radius so it starts visible, wider spacing
+    const BASE_RADIUS = maxRadius * 0.15; // start at 15% of max — visible immediately
+    const spacing = (maxRadius - BASE_RADIUS) / 5; // 5 revolutions fill the space
+
+    // Draw one revolution of the spiral as a single path
+    function drawRevolution(startAngle, endAngle, cr, cg, cb, opacity, glow) {
+      const step = 0.06;
+      const count = Math.ceil((endAngle - startAngle) / step);
+      if (count < 2) return;
+
+      if (glow) {
+        ctx.shadowColor = `rgba(${cr},${cg},${cb},${opacity * 0.6})`;
+        ctx.shadowBlur = 16;
+      }
+
+      ctx.lineWidth = 2;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.strokeStyle = `rgba(${cr},${cg},${cb},${opacity})`;
+      ctx.beginPath();
+
+      const t = state.time;
+      for (let i = 0; i <= count; i++) {
+        const angle = startAngle + (endAngle - startAngle) * (i / count);
+        const r = BASE_RADIUS + (angle / (Math.PI * 2)) * spacing;
+
+        // Noise displacement (Raven Kwok: organic, hand-drawn feel)
+        const nx = fbm(angle * 0.3 + 100, t * 0.2) * 5;
+        const ny = fbm(angle * 0.3 + 200, t * 0.2) * 5;
+
+        const x = cx + Math.cos(angle) * r + nx;
+        const y = cy + Math.sin(angle) * r + ny;
+
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+
+      ctx.stroke();
+      ctx.shadowBlur = 0;
+    }
 
     function animate() {
-      const { elapsed: el, timerState: ts, prefersReduced: pr } = propsRef.current;
-      const pal = paletteRef.current;
+      const { elapsed: el, timerState: ts, prefersReduced: pr, isDark: dark } = propsRef.current;
       const isPaused = ts === 'paused';
       const minutes = el / 60000;
 
-      // Time moves slowly — Turrell: barely perceptible change
-      state.time += isPaused ? 0.001 : 0.004;
-      const t = state.time;
+      state.time += isPaused ? 0.0005 : 0.002;
 
-      // ─── Full clear ───
-      const [br, bg, bb] = pal.bg;
-      ctx.fillStyle = `rgb(${br},${bg},${bb})`;
+      // ─── Eliasson's Slow Sun: background warms imperceptibly over 30 min ───
+      const warmth = Math.min(1, minutes / 30);
+      let bgR, bgG, bgB;
+      if (dark) {
+        bgR = Math.round(10 + warmth * 16);
+        bgG = Math.round(8 + warmth * 10);
+        bgB = Math.round(6 + warmth * 2);
+      } else {
+        bgR = Math.round(242 - warmth * 8);
+        bgG = Math.round(240 - warmth * 6);
+        bgB = Math.round(236 - warmth * 10);
+      }
+      ctx.fillStyle = `rgb(${bgR},${bgG},${bgB})`;
       ctx.fillRect(0, 0, w, h);
 
-      // ─── Single soft ambient glow (barely visible) ───
-      if (!pr) {
-        const gx = w * 0.5 + Math.sin(t * 0.15) * w * 0.15;
-        const gy = h * 0.45 + Math.cos(t * 0.12) * h * 0.1;
-        const gSize = Math.min(w, h) * 0.6;
-        const [gr, gg, gb] = pal.glow;
-        // Glow intensity deepens with practice time (Jen: drama through time)
-        const glowOp = isPaused ? 0.03 : Math.min(0.12, 0.05 + minutes * 0.003);
-        const grad = ctx.createRadialGradient(gx, gy, 0, gx, gy, gSize);
-        grad.addColorStop(0, `rgba(${gr},${gg},${gb},${glowOp})`);
-        grad.addColorStop(0.5, `rgba(${gr},${gg},${gb},${glowOp * 0.4})`);
+      // Warm ambient glow — grows with time (Eliasson: sun rising on your practice)
+      if (!pr && minutes > 2) {
+        const gi = Math.min(0.08, (minutes - 2) * 0.003);
+        const gr = Math.min(w, h) * (0.3 + warmth * 0.3);
+        const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, gr);
+        if (dark) {
+          grad.addColorStop(0, `rgba(180,120,60,${gi})`);
+          grad.addColorStop(0.6, `rgba(140,90,40,${gi * 0.4})`);
+        } else {
+          grad.addColorStop(0, `rgba(200,150,80,${gi * 0.5})`);
+          grad.addColorStop(0.6, `rgba(180,130,60,${gi * 0.2})`);
+        }
         grad.addColorStop(1, 'rgba(0,0,0,0)');
         ctx.fillStyle = grad;
         ctx.fillRect(0, 0, w, h);
       }
 
-      // ─── After 10 min, a third current emerges (reward for staying) ───
-      if (minutes > 10 && state.currents.length < 3) {
-        state.currents.push(createCurrent(w, h, 2));
-      }
+      // ─── af Klint's Spiral: starts at 30s, one revolution per 5 min ───
+      if (minutes > 0.5 && !pr) {
+        const spiralMin = minutes - 0.5;
+        const totalAngle = (spiralMin / 5) * Math.PI * 2;
+        const cappedAngle = Math.min(totalAngle, 5 * Math.PI * 2);
+        const completedRevs = Math.floor(cappedAngle / (Math.PI * 2));
+        const activeEnd = cappedAngle;
 
-      // ─── Update & draw currents — the heart of The Quiet Water ───
-      for (const current of state.currents) {
-        const head = current.points[current.points.length - 1];
-
-        // Use atan2(fbm, fbm) for smooth, sweeping curves — no jitter
-        const nx = fbm(head.x * 0.002 + current.noiseOffX + t * 0.05, head.y * 0.002 + current.noiseOffY);
-        const ny = fbm(head.x * 0.002 + current.noiseOffX, head.y * 0.002 + current.noiseOffY + t * 0.04);
-        const angle = Math.atan2(ny, nx);
-
-        // Breathing: imperceptible oscillation
-        const breathe = 1 + Math.sin(t * 0.4) * 0.05;
-        const speed = (isPaused ? 0.04 : current.speed * breathe);
-
-        current.points.push({
-          x: head.x + Math.cos(angle) * speed,
-          y: head.y + Math.sin(angle) * speed,
-        });
-        if (current.points.length > current.maxPoints) current.points.shift();
-
-        // Gentle edge wrap
-        const last = current.points[current.points.length - 1];
-        if (last.x < -30) last.x = w + 25;
-        if (last.x > w + 30) last.x = -25;
-        if (last.y < -30) last.y = h + 25;
-        if (last.y > h + 30) last.y = -25;
-
-        const pts = current.points;
-        if (pts.length < 4) continue;
-
-        const [cr, cg, cb] = pal.currents[current.colorIndex % pal.currents.length];
-
-        // Glow behind the current (Turrell: light has thingness)
-        ctx.lineCap = 'round';
-        ctx.lineJoin = 'round';
-        ctx.shadowColor = `rgba(${cr},${cg},${cb},${isPaused ? 0.08 : 0.3})`;
-        ctx.shadowBlur = current.width * 4;
-
-        // Draw smooth quadratic curve: tail (barely visible) → head (softly luminous)
-        const baseOp = isPaused ? 0.06 : 0.25;
-        for (let j = 2; j < pts.length; j++) {
-          const segT = j / pts.length;
-          // Quadratic ease-in: gentle gradient, visible enough to see the flow shape
-          const opacity = segT * segT * baseOp;
-          if (opacity < 0.005) continue; // skip nearly invisible segments
-
-          const lw = current.width * (0.25 + segT * 0.75);
-          ctx.lineWidth = lw;
-          ctx.strokeStyle = `rgba(${cr},${cg},${cb},${opacity})`;
-          ctx.beginPath();
-          const p0 = pts[j - 2], p1 = pts[j - 1], p2 = pts[j];
-          ctx.moveTo((p0.x + p1.x) / 2, (p0.y + p1.y) / 2);
-          ctx.quadraticCurveTo(p1.x, p1.y, (p1.x + p2.x) / 2, (p1.y + p2.y) / 2);
-          ctx.stroke();
+        // Ghost revolutions (completed — they stay as faint memory)
+        for (let rev = 0; rev < completedRevs; rev++) {
+          const [cr, cg, cb] = SPIRAL_COLORS[Math.min(rev, SPIRAL_COLORS.length - 1)];
+          drawRevolution(rev * Math.PI * 2, (rev + 1) * Math.PI * 2, cr, cg, cb, dark ? 0.12 : 0.08, false);
         }
-        ctx.shadowBlur = 0;
+
+        // Active revolution (the one currently growing)
+        const activeStart = completedRevs * Math.PI * 2;
+        if (activeEnd - activeStart > 0.05) {
+          const [cr, cg, cb] = SPIRAL_COLORS[Math.min(completedRevs, SPIRAL_COLORS.length - 1)];
+          const activeOp = isPaused ? 0.2 : (dark ? 0.6 : 0.45);
+          drawRevolution(activeStart, activeEnd, cr, cg, cb, activeOp, !isPaused);
+        }
       }
 
       state.frame = requestAnimationFrame(animate);
@@ -271,8 +268,6 @@ function QuietWaterCanvas({ elapsed, timerState, prefersReduced, countdownTarget
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const displayMs = countdownTarget ? Math.max(0, countdownTarget * 60000 - elapsed) : elapsed;
-
-  // Compute timer opacity: hidden (tap-to-hide) → 0, paused → 0.15, normal → 0.7
   const timerOpacity = numbersHidden ? 0 : (timerState === 'paused' ? 0.15 : 0.7);
 
   return (
@@ -303,10 +298,10 @@ function QuietWaterCanvas({ elapsed, timerState, prefersReduced, countdownTarget
             letterSpacing: '-0.02em',
             color: 'var(--color-text)',
             opacity: timerOpacity,
-            transition: 'opacity 1.2s ease', // slow, breath-like fade
+            transition: 'opacity 1.2s ease',
             textShadow: isDark
-              ? '0 0 80px rgba(35,75,170,0.2), 0 0 160px rgba(35,75,170,0.08)'
-              : '0 0 60px rgba(70,140,230,0.15)',
+              ? '0 0 80px rgba(180,120,60,0.2), 0 0 160px rgba(140,90,40,0.08)'
+              : '0 0 60px rgba(180,130,70,0.15)',
           }}
         >
           {formatTimer(displayMs)}
@@ -631,8 +626,8 @@ export default function TimerFAB({ onSaveSession, onQuickLog, showTabBar = true 
         className="fixed inset-0 z-50 flex flex-col items-center justify-center p-6"
         style={{
           background: isDark
-            ? 'radial-gradient(ellipse at center, rgba(59,130,246,0.08) 0%, rgba(12,10,9,0.98) 70%)'
-            : 'radial-gradient(ellipse at center, rgba(191,219,254,0.10) 0%, rgba(242,241,237,0.98) 70%)',
+            ? 'radial-gradient(ellipse at center, rgba(180,120,60,0.06) 0%, rgba(12,10,9,0.98) 70%)'
+            : 'radial-gradient(ellipse at center, rgba(200,160,100,0.08) 0%, rgba(242,241,237,0.98) 70%)',
           backdropFilter: 'blur(24px)',
           WebkitBackdropFilter: 'blur(24px)',
           paddingBottom: viewportOffset > 0 ? `${viewportOffset}px` : undefined,
@@ -673,13 +668,13 @@ export default function TimerFAB({ onSaveSession, onQuickLog, showTabBar = true 
 
         {/* Timer display — The Quiet Water or Classic clock */}
         {timerState !== 'stopped' && timerDisplayMode === 'symbolic' ? (
-          /* The Quiet Water — gentle currents through noise field (Turrell/Eno/Rams synthesis) */
+          /* The Spiral Sun — growing spiral on warming field (af Klint/Eliasson/Raven Kwok synthesis) */
           <div
             className="flex flex-col items-stretch justify-center mb-4 relative"
             role="timer"
             aria-label={`Practice time: ${formatTimer(elapsed)}`}
           >
-            <QuietWaterCanvas
+            <SpiralSunCanvas
               elapsed={elapsed}
               timerState={timerState}
               prefersReduced={prefersReduced}
