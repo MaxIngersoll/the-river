@@ -44,7 +44,7 @@ export function applyTheme(effectiveTheme) {
   if (effectiveTheme === 'dark') {
     root.classList.add('dark');
     const meta = document.querySelector('meta[name="theme-color"]');
-    if (meta) meta.setAttribute('content', '#0C0A09');
+    if (meta) meta.setAttribute('content', '#1A1614');
   } else if (effectiveTheme === 'warm') {
     root.classList.add('warm');
     const meta = document.querySelector('meta[name="theme-color"]');

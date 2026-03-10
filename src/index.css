@@ -43,17 +43,19 @@
   --color-card-border: rgba(0, 0, 0, 0.06);
   --color-card-highlight: rgba(255, 255, 255, 0.90);
 
-  --color-water-1: #BFDBFE;
-  --color-water-2: #60A5FA;
-  --color-water-3: #3B82F6;
-  --color-water-4: #2563EB;
-  --color-water-5: #1E40AF;
+  --color-water-1: #CCF8F9;
+  --color-water-2: #8DB585;
+  --color-water-3: #6E9B64;
+  --color-water-4: #507841;
+  --color-water-5: #405930;
 
-  /* Accent — Warm Amber (centralized, Session 13) */
-  --accent-rgb: 190, 130, 50;
-  --accent-deep-rgb: 150, 95, 30;
-  --accent: #BE8232;
-  --accent-deep: #965F1E;
+  /* Accent — Forest palette (Session 13: Olivine + Hunter Green) */
+  --accent-rgb: 110, 155, 100;
+  --accent-deep-rgb: 64, 89, 48;
+  --accent: #6E9B64;
+  --accent-deep: #405930;
+  --accent-secondary-rgb: 76, 174, 174;
+  --accent-secondary: #4CAEAE;
 
   --color-dry: #E2DDD5;
   --color-dry-bank: #C8BBAC;
@@ -74,22 +76,24 @@
 
 /* ===== Dark mode overrides ===== */
 html.dark {
-  --color-bg: #0C0A09;
-  --color-card: rgba(255, 255, 255, 0.08);
-  --color-card-border: rgba(255, 255, 255, 0.14);
+  --color-bg: #1A1614;
+  --color-card: rgba(141, 181, 133, 0.05);
+  --color-card-border: rgba(141, 181, 133, 0.10);
   --color-card-highlight: rgba(255, 255, 255, 0.18);
 
-  --color-water-1: #1E3A5F;
-  --color-water-2: #1E40AF;
-  --color-water-3: #2563EB;
-  --color-water-4: #3B82F6;
-  --color-water-5: #60A5FA;
+  --color-water-1: #2A3525;
+  --color-water-2: #405930;
+  --color-water-3: #507841;
+  --color-water-4: #8DB585;
+  --color-water-5: #A8D4A0;
 
-  /* Accent — Warm Amber (brighter for dark mode) */
-  --accent-rgb: 215, 160, 65;
-  --accent-deep-rgb: 175, 120, 40;
-  --accent: #D7A041;
-  --accent-deep: #AF7828;
+  /* Accent — Forest palette (brighter olivine for dark mode) */
+  --accent-rgb: 141, 181, 133;
+  --accent-deep-rgb: 80, 120, 65;
+  --accent: #8DB585;
+  --accent-deep: #507841;
+  --accent-secondary-rgb: 76, 174, 174;
+  --accent-secondary: #4CAEAE;
 
   --color-dry: rgba(255, 255, 255, 0.06);
   --color-dry-bank: #57534E;
@@ -111,17 +115,19 @@ html.warm {
   --color-card-border: rgba(224, 197, 143, 0.12);
   --color-card-highlight: rgba(245, 240, 233, 0.15);
 
-  --color-water-1: #1a3068;
-  --color-water-2: #2a4d88;
-  --color-water-3: #3c507d;
-  --color-water-4: #7c94b8;
-  --color-water-5: #94acd0;
+  --color-water-1: #2A3525;
+  --color-water-2: #405930;
+  --color-water-3: #5A824B;
+  --color-water-4: #A0C89B;
+  --color-water-5: #C0E8BB;
 
-  /* Accent — Warm Amber (warm theme) */
-  --accent-rgb: 224, 197, 143;
-  --accent-deep-rgb: 180, 150, 90;
-  --accent: #E0C58F;
-  --accent-deep: #B4965A;
+  /* Accent — Forest palette (warm theme) */
+  --accent-rgb: 160, 200, 155;
+  --accent-deep-rgb: 90, 130, 75;
+  --accent: #A0C89B;
+  --accent-secondary-rgb: 100, 190, 190;
+  --accent-secondary: #64BEBE;
+  --accent-deep: #5A824B;
 
   --color-dry: rgba(217, 203, 194, 0.08);
   --color-dry-bank: #7c6f64;

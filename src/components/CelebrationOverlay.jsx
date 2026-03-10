@@ -45,10 +45,10 @@ export default function CelebrationOverlay({ milestone, onDismiss, queuePosition
 
   const overlayBg = isFogType
     ? (isDark
-      ? 'radial-gradient(ellipse at center, rgba(120,113,108,0.08) 0%, rgba(12,10,9,0.97) 70%)'
+      ? 'radial-gradient(ellipse at center, rgba(120,113,108,0.08) 0%, rgba(26,22,20,0.97) 70%)'
       : 'radial-gradient(ellipse at center, rgba(168,162,158,0.10) 0%, rgba(250,247,242,0.97) 70%)')
     : (isDark
-      ? 'radial-gradient(ellipse at center, rgba(var(--accent-rgb),0.10) 0%, rgba(12,10,9,0.97) 70%)'
+      ? 'radial-gradient(ellipse at center, rgba(var(--accent-rgb),0.10) 0%, rgba(26,22,20,0.97) 70%)'
       : 'radial-gradient(ellipse at center, rgba(191,219,254,0.12) 0%, rgba(250,247,242,0.97) 70%)');
 
   return (

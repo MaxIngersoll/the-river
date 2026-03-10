@@ -12,7 +12,7 @@ export default function ReadingCeremony({ reading, answer, onComplete }) {
   const isClosing = phase === totalPhases - 1;
 
   const overlayBg = isDark
-    ? 'radial-gradient(ellipse at center, rgba(var(--accent-rgb),0.08) 0%, rgba(12,10,9,0.98) 70%)'
+    ? 'radial-gradient(ellipse at center, rgba(var(--accent-rgb),0.08) 0%, rgba(26,22,20,0.98) 70%)'
     : 'radial-gradient(ellipse at center, rgba(191,219,254,0.10) 0%, rgba(250,247,242,0.98) 70%)';
 
   const advance = () => {

@@ -16,17 +16,17 @@ import {
 
 // ─── Color palette ───
 const COLORS = {
-  bg: '#0C0A09',       // deep dark
-  bgGrad: '#0F172A',   // dark navy tint
+  bg: '#1A1614',       // deep dark
+  bgGrad: '#1E1A16',   // warm dark gradient
   water: [
-    '#1E3A5F', '#AF7828', '#D7A041', '#D7A041',
-    '#D7A041', '#D7A041', '#F5E6C8',
+    '#1A1614', '#405930', '#507841', '#6E9B64',
+    '#8DB585', '#8DB585', '#CCF8F9',
   ],
   textPrimary: '#F2F1ED',
   textSecondary: 'rgba(242,241,237,0.55)',
   textMuted: 'rgba(242,241,237,0.35)',
-  accent: '#D7A041',
-  accentGlow: 'rgba(215,160,65,0.25)',
+  accent: '#8DB585',
+  accentGlow: 'rgba(141,181,133,0.25)',
   divider: 'rgba(255,255,255,0.06)',
 };
 

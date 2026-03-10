@@ -120,17 +120,17 @@ function fbm(x, y) {
 // Growing Archimedean spiral (af Klint) on a slowly warming background (Eliasson).
 // Noise displacement on the spiral path (Raven Kwok: organic, not geometric).
 // Hair-thin stroke (Martin: sublime restraint).
-// Rose → Amber → Sage color journey. No blue anywhere.
+// Forest color journey: hunter green → olivine → verdigris → mint.
 // Progressive disclosure: nothing for 30s, spiral begins, complexity earned.
 
-// Revolution colors: rose → amber → sage (warm palette, no blue)
+// Revolution colors: forest palette (hunter green → olivine → verdigris)
 const SPIRAL_COLORS = [
-  [139, 34, 82],   // deep rose
-  [160, 80, 50],   // rose-amber transition
-  [184, 134, 11],  // amber
-  [150, 140, 40],  // amber-sage transition
-  [107, 142, 107], // sage green
-  [90, 120, 90],   // sage darker
+  [41, 30, 32],    // raisin black (darkest)
+  [64, 89, 48],    // hunter green
+  [110, 155, 100], // olivine mid
+  [141, 181, 133], // olivine bright
+  [76, 174, 174],  // verdigris
+  [204, 248, 249], // mint green (lightest)
 ];
 
 function SpiralSunCanvas({ elapsed, timerState, prefersReduced, countdownTarget, isDark, numbersHidden, onToggleNumbers, colonPulsing, colonPulseDuration, timerDepthColor }) {
@@ -226,11 +226,11 @@ function SpiralSunCanvas({ elapsed, timerState, prefersReduced, countdownTarget,
         const gr = Math.min(w, h) * (0.3 + warmth * 0.3);
         const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, gr);
         if (dark) {
-          grad.addColorStop(0, `rgba(180,120,60,${gi})`);
-          grad.addColorStop(0.6, `rgba(140,90,40,${gi * 0.4})`);
+          grad.addColorStop(0, `rgba(100,160,100,${gi})`);
+          grad.addColorStop(0.6, `rgba(64,89,48,${gi * 0.4})`);
         } else {
-          grad.addColorStop(0, `rgba(200,150,80,${gi * 0.5})`);
-          grad.addColorStop(0.6, `rgba(180,130,60,${gi * 0.2})`);
+          grad.addColorStop(0, `rgba(141,181,133,${gi * 0.5})`);
+          grad.addColorStop(0.6, `rgba(100,140,90,${gi * 0.2})`);
         }
         grad.addColorStop(1, 'rgba(0,0,0,0)');
         ctx.fillStyle = grad;
@@ -302,8 +302,8 @@ function SpiralSunCanvas({ elapsed, timerState, prefersReduced, countdownTarget,
             opacity: timerOpacity,
             transition: 'opacity 1.2s ease, color 2s ease, font-size 0.6s ease',
             textShadow: isDark
-              ? '0 0 80px rgba(180,120,60,0.2), 0 0 160px rgba(140,90,40,0.08)'
-              : '0 0 60px rgba(180,130,70,0.15)',
+              ? '0 0 80px rgba(100,160,100,0.2), 0 0 160px rgba(64,89,48,0.08)'
+              : '0 0 60px rgba(100,145,90,0.15)',
           }}
         >
           {formatTimerParts(displayMs).map((part, i) =>
@@ -405,23 +405,23 @@ export default function TimerFAB({ onSaveSession, onQuickLog, showTabBar = true 
     }
   }, []);
 
-  // Progressive color deepening — warm palette (blue is dead, Session 13)
-  // Rose → amber → sage journey matches the Spiral Sun canvas
+  // Progressive color deepening — forest palette (Session 13)
+  // Mint → olivine → verdigris journey
   const timerDepthColor = useMemo(() => {
     if (timerState === 'idle') return 'var(--color-text)';
     if (timerState === 'stopped' && showSaveFlow) return 'var(--color-text)';
     const minutes = elapsed / 60000;
     if (isDark) {
-      if (minutes >= 30) return 'rgb(184,154,61)';   // warm gold
-      if (minutes >= 15) return 'rgb(200,150,80)';   // amber
-      if (minutes >= 5) return 'rgb(180,110,70)';    // rose-amber
-      return 'rgb(170,80,80)';                        // deep rose
+      if (minutes >= 30) return 'rgb(76,174,174)';    // verdigris
+      if (minutes >= 15) return 'rgb(141,181,133)';   // olivine
+      if (minutes >= 5) return 'rgb(120,165,115)';    // mid-green
+      return 'rgb(160,200,160)';                       // light sage
     }
-    // Light mode: subtler warm tones
-    if (minutes >= 30) return 'rgb(140,120,40)';
-    if (minutes >= 15) return 'rgb(160,110,50)';
-    if (minutes >= 5) return 'rgb(150,80,60)';
-    return 'rgb(140,60,60)';
+    // Light mode: deeper forest tones
+    if (minutes >= 30) return 'rgb(64,89,48)';
+    if (minutes >= 15) return 'rgb(90,120,70)';
+    if (minutes >= 5) return 'rgb(110,145,95)';
+    return 'rgb(130,160,120)';
   }, [elapsed, timerState, showSaveFlow, isDark]);
 
   // Pulsing colon — heartbeat that calms over time (Wroblewski: 1Hz→0.5Hz)
@@ -655,8 +655,8 @@ export default function TimerFAB({ onSaveSession, onQuickLog, showTabBar = true 
         className="fixed inset-0 z-50 flex flex-col items-center justify-center p-6"
         style={{
           background: isDark
-            ? 'radial-gradient(ellipse at center, rgba(180,120,60,0.06) 0%, rgba(12,10,9,0.98) 70%)'
-            : 'radial-gradient(ellipse at center, rgba(200,160,100,0.08) 0%, rgba(242,241,237,0.98) 70%)',
+            ? 'radial-gradient(ellipse at center, rgba(100,160,100,0.06) 0%, rgba(26,22,20,0.98) 70%)'
+            : 'radial-gradient(ellipse at center, rgba(141,181,133,0.08) 0%, rgba(242,241,237,0.98) 70%)',
           backdropFilter: 'blur(24px)',
           WebkitBackdropFilter: 'blur(24px)',
           paddingBottom: viewportOffset > 0 ? `${viewportOffset}px` : undefined,
