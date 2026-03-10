@@ -6,6 +6,7 @@ import { PRACTICE_TAGS } from '../utils/storage';
 import { haptics } from '../utils/haptics';
 import MoodPicker from './MoodPicker';
 import SoundscapePanel from './SoundscapePanel';
+import VenationCanvas from './VenationCanvas';
 
 function formatTimer(ms) {
   const totalSec = Math.floor(ms / 1000);
@@ -697,7 +698,7 @@ export default function TimerFAB({ onSaveSession, onQuickLog, showTabBar = true 
 
         {/* Timer display — The Quiet Water or Classic clock */}
         {(timerState !== 'stopped' || (timerState === 'stopped' && !showSaveFlow)) && timerDisplayMode === 'symbolic' ? (
-          /* The Spiral Sun — growing spiral on warming field (af Klint/Eliasson/Raven Kwok synthesis) */
+          /* The Living Vein — venation growth on warming field (Nervous System/Lieberman/Kurokawa synthesis) */
           <div
             className={`flex flex-col items-stretch justify-center mb-4 relative ${
               timerState === 'stopped' && !showSaveFlow ? 'animate-timer-settle' : ''
@@ -705,7 +706,7 @@ export default function TimerFAB({ onSaveSession, onQuickLog, showTabBar = true 
             role="timer"
             aria-label={`Practice time: ${formatTimer(elapsed)}`}
           >
-            <SpiralSunCanvas
+            <VenationCanvas
               elapsed={elapsed}
               timerState={timerState}
               prefersReduced={prefersReduced}
@@ -716,6 +717,8 @@ export default function TimerFAB({ onSaveSession, onQuickLog, showTabBar = true 
               colonPulsing={colonPulsing}
               colonPulseDuration={colonPulseDuration}
               timerDepthColor={timerDepthColor}
+              formatTimerParts={formatTimerParts}
+              formatTimer={formatTimer}
             />
           </div>
         ) : (
