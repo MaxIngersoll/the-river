@@ -132,11 +132,11 @@ export const INTENTS = [
 
 // Interval color system: root=blue, 3rd=warm, 5th=neutral, 7th=purple
 export const INTERVAL_COLORS = {
-  root: '#2563EB',   // vivid blue
+  root: 'var(--accent)',   // vivid blue
   third: '#F59E0B',  // warm amber
   fifth: '#64748B',  // neutral slate
   seventh: '#A78BFA', // purple
-  other: '#3B82F6',  // default blue
+  other: 'var(--accent)',  // default blue
 };
 
 // Common chord shapes for quick ref

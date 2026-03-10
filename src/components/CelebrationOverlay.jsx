@@ -48,7 +48,7 @@ export default function CelebrationOverlay({ milestone, onDismiss, queuePosition
       ? 'radial-gradient(ellipse at center, rgba(120,113,108,0.08) 0%, rgba(12,10,9,0.97) 70%)'
       : 'radial-gradient(ellipse at center, rgba(168,162,158,0.10) 0%, rgba(250,247,242,0.97) 70%)')
     : (isDark
-      ? 'radial-gradient(ellipse at center, rgba(59,130,246,0.10) 0%, rgba(12,10,9,0.97) 70%)'
+      ? 'radial-gradient(ellipse at center, rgba(var(--accent-rgb),0.10) 0%, rgba(12,10,9,0.97) 70%)'
       : 'radial-gradient(ellipse at center, rgba(191,219,254,0.12) 0%, rgba(250,247,242,0.97) 70%)');
 
   return (
@@ -146,8 +146,8 @@ export default function CelebrationOverlay({ milestone, onDismiss, queuePosition
           onClick={onDismiss}
           className="text-white font-semibold px-10 py-3.5 rounded-full text-sm active:scale-[0.97] transition-transform"
           style={{
-            background: 'linear-gradient(135deg, rgba(59,130,246,0.9), rgba(30,64,175,0.95))',
-            boxShadow: '0 4px 20px rgba(59,130,246,0.3), inset 0 1px 0 rgba(255,255,255,0.2)',
+            background: 'linear-gradient(135deg, rgba(var(--accent-rgb),0.9), rgba(var(--accent-deep-rgb),0.95))',
+            boxShadow: '0 4px 20px rgba(var(--accent-rgb),0.3), inset 0 1px 0 rgba(255,255,255,0.2)',
           }}
         >
           {queueTotal > 1 ? `Continue (${queuePosition} of ${queueTotal})` : 'Continue'}

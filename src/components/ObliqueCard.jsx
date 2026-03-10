@@ -12,7 +12,7 @@ export default function ObliqueCard({ dismissed, onDismiss }) {
       className="relative mb-4 px-4 py-3.5 rounded-xl border border-water-3/15"
       style={{
         transform: 'rotate(-0.5deg)',
-        background: 'linear-gradient(135deg, rgba(59,130,246,0.04), rgba(147,130,220,0.06))',
+        background: 'linear-gradient(135deg, rgba(var(--accent-rgb),0.04), rgba(147,130,220,0.06))',
       }}
     >
       <button

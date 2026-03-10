@@ -50,12 +50,12 @@ function curveThrough(points, tension = 5) {
 const WATER_COLORS_LIGHT = [
   { hours: 0,    color: '#DBEAFE' },
   { hours: 0.5,  color: '#BFDBFE' },
-  { hours: 2,    color: '#93C5FD' },
-  { hours: 5,    color: '#60A5FA' },
-  { hours: 10,   color: '#3B82F6' },
-  { hours: 25,   color: '#2563EB' },
+  { hours: 2,    color: 'var(--accent)' },
+  { hours: 5,    color: 'var(--accent)' },
+  { hours: 10,   color: 'var(--accent)' },
+  { hours: 25,   color: 'var(--accent)' },
   { hours: 50,   color: '#1D4ED8' },
-  { hours: 100,  color: '#1E40AF' },
+  { hours: 100,  color: 'var(--accent-deep)' },
   { hours: 250,  color: '#1E3A8A' },
   { hours: 500,  color: '#172554' },
   { hours: 1000, color: '#0F172A' },
@@ -66,11 +66,11 @@ const WATER_COLORS_DARK = [
   { hours: 0,    color: '#0F172A' },   // deep navy (barely visible start)
   { hours: 0.5,  color: '#172554' },   // midnight
   { hours: 2,    color: '#1E3A8A' },   // dark indigo
-  { hours: 5,    color: '#1E40AF' },   // indigo
-  { hours: 10,   color: '#2563EB' },   // vivid blue
-  { hours: 25,   color: '#3B82F6' },   // blue
-  { hours: 50,   color: '#60A5FA' },   // bright blue
-  { hours: 100,  color: '#93C5FD' },   // luminous sky
+  { hours: 5,    color: 'var(--accent-deep)' },   // indigo
+  { hours: 10,   color: 'var(--accent)' },   // vivid blue
+  { hours: 25,   color: 'var(--accent)' },   // blue
+  { hours: 50,   color: 'var(--accent)' },   // bright blue
+  { hours: 100,  color: 'var(--accent)' },   // luminous sky
   { hours: 250,  color: '#BFDBFE' },   // glowing sky
   { hours: 500,  color: '#DBEAFE' },   // soft glow
   { hours: 1000, color: '#EFF6FF' },   // white-blue radiance

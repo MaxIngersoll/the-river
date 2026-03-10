@@ -133,7 +133,7 @@ const SPIRAL_COLORS = [
   [90, 120, 90],   // sage darker
 ];
 
-function SpiralSunCanvas({ elapsed, timerState, prefersReduced, countdownTarget, isDark, numbersHidden, onToggleNumbers }) {
+function SpiralSunCanvas({ elapsed, timerState, prefersReduced, countdownTarget, isDark, numbersHidden, onToggleNumbers, colonPulsing, colonPulseDuration, timerDepthColor }) {
   const canvasRef = useRef(null);
   const stateRef = useRef({ frame: null, time: 0 });
   const propsRef = useRef({});
@@ -268,17 +268,19 @@ function SpiralSunCanvas({ elapsed, timerState, prefersReduced, countdownTarget,
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const displayMs = countdownTarget ? Math.max(0, countdownTarget * 60000 - elapsed) : elapsed;
-  const timerOpacity = numbersHidden ? 0 : (timerState === 'paused' ? 0.15 : 0.7);
+  const isStopped = timerState === 'stopped';
+  // Force numbers visible during pride phase (stopped state)
+  const timerOpacity = isStopped ? 0.9 : (numbersHidden ? 0 : (timerState === 'paused' ? 0.15 : 0.7));
 
   return (
     <div
       className="relative cursor-pointer"
       style={{ width: 'min(calc(100vw - 48px), 380px)', height: '55vh', maxHeight: '460px' }}
-      onClick={onToggleNumbers}
+      onClick={isStopped ? undefined : onToggleNumbers}
       role="button"
       aria-label={numbersHidden ? 'Show timer' : 'Hide timer'}
       tabIndex={0}
-      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onToggleNumbers(); } }}
+      onKeyDown={(e) => { if (!isStopped && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); onToggleNumbers(); } }}
     >
       <canvas
         ref={canvasRef}
@@ -291,20 +293,39 @@ function SpiralSunCanvas({ elapsed, timerState, prefersReduced, countdownTarget,
         <span
           className="leading-none"
           style={{
-            fontSize: '68px',
-            fontFamily: 'var(--font-serif)',
+            fontSize: isStopped ? '80px' : '68px',
+            fontFamily: isStopped ? 'var(--font-ceremony)' : 'var(--font-serif)',
             fontWeight: 400,
             fontVariantNumeric: 'tabular-nums',
             letterSpacing: '-0.02em',
-            color: 'var(--color-text)',
+            color: isStopped ? 'var(--color-text)' : timerDepthColor,
             opacity: timerOpacity,
-            transition: 'opacity 1.2s ease',
+            transition: 'opacity 1.2s ease, color 2s ease, font-size 0.6s ease',
             textShadow: isDark
               ? '0 0 80px rgba(180,120,60,0.2), 0 0 160px rgba(140,90,40,0.08)'
               : '0 0 60px rgba(180,130,70,0.15)',
           }}
         >
-          {formatTimer(displayMs)}
+          {formatTimerParts(displayMs).map((part, i) =>
+            part.type === 'colon' ? (
+              <span
+                key={i}
+                className={colonPulsing ? 'animate-colon-pulse' : ''}
+                style={colonPulsing ? {
+                  animationDuration: `${colonPulseDuration}s`,
+                  display: 'inline-block',
+                } : {
+                  opacity: timerState === 'paused' ? 0 : 1,
+                  transition: 'opacity 0.3s ease',
+                  display: 'inline-block',
+                }}
+              >
+                {part.value}
+              </span>
+            ) : (
+              <span key={i}>{part.value}</span>
+            )
+          )}
         </span>
         {timerState === 'paused' && !numbersHidden && (
           <p className="text-text-3 text-xs font-medium uppercase tracking-widest mt-3 animate-fade-in" style={{ opacity: 0.4 }}>
@@ -384,16 +405,24 @@ export default function TimerFAB({ onSaveSession, onQuickLog, showTabBar = true 
     }
   }, []);
 
-  // Progressive color deepening — river deepens as you practice (Jen: drama through time)
+  // Progressive color deepening — warm palette (blue is dead, Session 13)
+  // Rose → amber → sage journey matches the Spiral Sun canvas
   const timerDepthColor = useMemo(() => {
     if (timerState === 'idle') return 'var(--color-text)';
     if (timerState === 'stopped' && showSaveFlow) return 'var(--color-text)';
     const minutes = elapsed / 60000;
-    if (minutes >= 30) return 'var(--color-water-5)';
-    if (minutes >= 15) return 'var(--color-water-4)';
-    if (minutes >= 5) return 'var(--color-water-3)';
-    return 'var(--color-water-2)';
-  }, [elapsed, timerState, showSaveFlow]);
+    if (isDark) {
+      if (minutes >= 30) return 'rgb(184,154,61)';   // warm gold
+      if (minutes >= 15) return 'rgb(200,150,80)';   // amber
+      if (minutes >= 5) return 'rgb(180,110,70)';    // rose-amber
+      return 'rgb(170,80,80)';                        // deep rose
+    }
+    // Light mode: subtler warm tones
+    if (minutes >= 30) return 'rgb(140,120,40)';
+    if (minutes >= 15) return 'rgb(160,110,50)';
+    if (minutes >= 5) return 'rgb(150,80,60)';
+    return 'rgb(140,60,60)';
+  }, [elapsed, timerState, showSaveFlow, isDark]);
 
   // Pulsing colon — heartbeat that calms over time (Wroblewski: 1Hz→0.5Hz)
   const colonPulsing = timerState === 'running' && elapsed >= 5 * 60 * 1000;
@@ -667,10 +696,12 @@ export default function TimerFAB({ onSaveSession, onQuickLog, showTabBar = true 
         </div>
 
         {/* Timer display — The Quiet Water or Classic clock */}
-        {timerState !== 'stopped' && timerDisplayMode === 'symbolic' ? (
+        {(timerState !== 'stopped' || (timerState === 'stopped' && !showSaveFlow)) && timerDisplayMode === 'symbolic' ? (
           /* The Spiral Sun — growing spiral on warming field (af Klint/Eliasson/Raven Kwok synthesis) */
           <div
-            className="flex flex-col items-stretch justify-center mb-4 relative"
+            className={`flex flex-col items-stretch justify-center mb-4 relative ${
+              timerState === 'stopped' && !showSaveFlow ? 'animate-timer-settle' : ''
+            }`}
             role="timer"
             aria-label={`Practice time: ${formatTimer(elapsed)}`}
           >
@@ -682,6 +713,9 @@ export default function TimerFAB({ onSaveSession, onQuickLog, showTabBar = true 
               isDark={isDark}
               numbersHidden={timerNumbersHidden}
               onToggleNumbers={() => setTimerNumbersHidden(h => !h)}
+              colonPulsing={colonPulsing}
+              colonPulseDuration={colonPulseDuration}
+              timerDepthColor={timerDepthColor}
             />
           </div>
         ) : (
@@ -745,7 +779,7 @@ export default function TimerFAB({ onSaveSession, onQuickLog, showTabBar = true 
                     : 'text-text-3/40'
                 }`}
                 style={countdownTarget === mins ? {
-                  background: 'linear-gradient(135deg, rgba(59,130,246,0.6), rgba(30,64,175,0.7))',
+                  background: 'linear-gradient(135deg, rgba(var(--accent-rgb),0.6), rgba(var(--accent-deep-rgb),0.7))',
                 } : undefined}
               >
                 {mins ? `${mins}m` : '\u221E'}
@@ -769,8 +803,8 @@ export default function TimerFAB({ onSaveSession, onQuickLog, showTabBar = true 
               onClick={timerState === 'running' ? handlePause : handleResume}
               className="w-16 h-16 rounded-full flex items-center justify-center text-white active:scale-[0.93] transition-transform"
               style={{
-                background: 'linear-gradient(135deg, rgba(59,130,246,0.9), rgba(30,64,175,0.95))',
-                boxShadow: '0 4px 24px rgba(59,130,246,0.35), inset 0 1px 0 rgba(255,255,255,0.2)',
+                background: 'linear-gradient(135deg, rgba(var(--accent-rgb),0.9), rgba(var(--accent-deep-rgb),0.95))',
+                boxShadow: '0 4px 24px rgba(var(--accent-rgb),0.35), inset 0 1px 0 rgba(255,255,255,0.2)',
               }}
             >
               {timerState === 'running' ? (
@@ -827,8 +861,8 @@ export default function TimerFAB({ onSaveSession, onQuickLog, showTabBar = true 
                       active ? 'text-white' : 'card text-text-2 active:scale-[0.95]'
                     }`}
                     style={active ? {
-                      background: 'linear-gradient(135deg, rgba(59,130,246,0.9), rgba(30,64,175,0.95))',
-                      boxShadow: '0 2px 8px rgba(59,130,246,0.3)',
+                      background: 'linear-gradient(135deg, rgba(var(--accent-rgb),0.9), rgba(var(--accent-deep-rgb),0.95))',
+                      boxShadow: '0 2px 8px rgba(var(--accent-rgb),0.3)',
                     } : undefined}
                   >
                     {tag}
@@ -862,8 +896,8 @@ export default function TimerFAB({ onSaveSession, onQuickLog, showTabBar = true 
                 opacity: 0,
                 animationDelay: '320ms',
                 animationFillMode: 'forwards',
-                background: 'linear-gradient(135deg, rgba(59,130,246,0.9), rgba(30,64,175,0.95))',
-                boxShadow: '0 4px 20px rgba(59,130,246,0.3), inset 0 1px 0 rgba(255,255,255,0.2)',
+                background: 'linear-gradient(135deg, rgba(var(--accent-rgb),0.9), rgba(var(--accent-deep-rgb),0.95))',
+                boxShadow: '0 4px 20px rgba(var(--accent-rgb),0.3), inset 0 1px 0 rgba(255,255,255,0.2)',
               }}
             >
               {showRipple && (
@@ -911,10 +945,10 @@ export default function TimerFAB({ onSaveSession, onQuickLog, showTabBar = true 
         height: '56px',
         borderRadius: '28px',
         padding: isActive ? '0 16px' : '0',
-        background: 'linear-gradient(135deg, rgba(59,130,246,0.9), rgba(30,64,175,0.95))',
+        background: 'linear-gradient(135deg, rgba(var(--accent-rgb),0.9), rgba(var(--accent-deep-rgb),0.95))',
         boxShadow: isActive
-          ? '0 4px 24px rgba(59,130,246,0.4), 0 0 0 4px rgba(59,130,246,0.12), inset 0 1px 0 rgba(255,255,255,0.2)'
-          : '0 4px 20px rgba(59,130,246,0.3), inset 0 1px 0 rgba(255,255,255,0.2)',
+          ? '0 4px 24px rgba(var(--accent-rgb),0.4), 0 0 0 4px rgba(var(--accent-rgb),0.12), inset 0 1px 0 rgba(255,255,255,0.2)'
+          : '0 4px 20px rgba(var(--accent-rgb),0.3), inset 0 1px 0 rgba(255,255,255,0.2)',
       }}
       aria-label={isActive ? 'Open timer' : 'Start practice timer. Long-press for Quick Log.'}
     >

@@ -384,7 +384,7 @@ function SessionHistory({ sessions, onUpdate, onDelete }) {
                           onClick={saveEdit}
                           className="px-3 py-1.5 rounded-full text-[11px] font-semibold text-white active:scale-[0.95] transition-all"
                           style={{
-                            background: 'linear-gradient(135deg, rgba(59,130,246,0.9), rgba(30,64,175,0.95))',
+                            background: 'linear-gradient(135deg, rgba(var(--accent-rgb),0.9), rgba(var(--accent-deep-rgb),0.95))',
                           }}
                         >
                           Save

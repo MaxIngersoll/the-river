@@ -109,8 +109,8 @@ export default function ShareCard({ sessions, onClose }) {
           disabled={status === 'sharing'}
           className="flex-1 flex items-center justify-center gap-2 text-white font-semibold py-3.5 rounded-full text-sm active:scale-[0.97] transition-all"
           style={{
-            background: 'linear-gradient(135deg, rgba(59,130,246,0.9), rgba(30,64,175,0.95))',
-            boxShadow: '0 4px 20px rgba(59,130,246,0.3), inset 0 1px 0 rgba(255,255,255,0.2)',
+            background: 'linear-gradient(135deg, rgba(var(--accent-rgb),0.9), rgba(var(--accent-deep-rgb),0.95))',
+            boxShadow: '0 4px 20px rgba(var(--accent-rgb),0.3), inset 0 1px 0 rgba(255,255,255,0.2)',
           }}
         >
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

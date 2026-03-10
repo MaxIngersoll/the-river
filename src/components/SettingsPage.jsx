@@ -233,8 +233,8 @@ export default function SettingsPage({ sessions, onBack, onDataCleared }) {
                   : 'card text-text-2 active:scale-[0.97]'
               }`}
               style={settings.weekly_goal_minutes === mins ? {
-                background: 'linear-gradient(135deg, rgba(59,130,246,0.9), rgba(30,64,175,0.95))',
-                boxShadow: '0 4px 16px rgba(59,130,246,0.3), inset 0 1px 0 rgba(255,255,255,0.2)',
+                background: 'linear-gradient(135deg, rgba(var(--accent-rgb),0.9), rgba(var(--accent-deep-rgb),0.95))',
+                boxShadow: '0 4px 16px rgba(var(--accent-rgb),0.3), inset 0 1px 0 rgba(255,255,255,0.2)',
               } : undefined}
             >
               {formatDuration(mins)}
@@ -258,7 +258,7 @@ export default function SettingsPage({ sessions, onBack, onDataCleared }) {
             disabled={!customGoal || parseInt(customGoal, 10) <= 0}
             className="px-5 py-3 rounded-2xl text-sm font-semibold text-white disabled:opacity-30 disabled:cursor-not-allowed active:scale-[0.97] transition-all"
             style={{
-              background: 'linear-gradient(135deg, rgba(59,130,246,0.9), rgba(30,64,175,0.95))',
+              background: 'linear-gradient(135deg, rgba(var(--accent-rgb),0.9), rgba(var(--accent-deep-rgb),0.95))',
               boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.2)',
             }}
           >
@@ -371,7 +371,7 @@ export default function SettingsPage({ sessions, onBack, onDataCleared }) {
                 disabled={importPreview.newSessions.length === 0}
                 className="flex-1 py-2.5 rounded-xl text-sm font-semibold text-white active:scale-[0.97] transition-all disabled:opacity-40"
                 style={{
-                  background: 'linear-gradient(135deg, rgba(59,130,246,0.9), rgba(30,64,175,0.95))',
+                  background: 'linear-gradient(135deg, rgba(var(--accent-rgb),0.9), rgba(var(--accent-deep-rgb),0.95))',
                   boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.2)',
                 }}
               >

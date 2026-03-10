@@ -13,8 +13,8 @@ function CircleOfFifths({ selectedRoot, onSelect }) {
         const isSelected = note === selectedRoot;
         return (
           <g key={note} onClick={() => onSelect(note)} className="cursor-pointer">
-            <circle cx={x} cy={y} r={isSelected ? 16 : 13} fill={isSelected ? 'rgba(59,130,246,0.3)' : 'rgba(255,255,255,0.05)'} stroke={isSelected ? 'rgba(59,130,246,0.6)' : 'rgba(255,255,255,0.1)'} strokeWidth="1" />
-            <text x={x} y={y} textAnchor="middle" dominantBaseline="central" fill={isSelected ? '#60A5FA' : '#A8A29E'} fontSize="10" fontWeight={isSelected ? '700' : '500'}>
+            <circle cx={x} cy={y} r={isSelected ? 16 : 13} fill={isSelected ? 'rgba(var(--accent-rgb),0.3)' : 'rgba(255,255,255,0.05)'} stroke={isSelected ? 'rgba(var(--accent-rgb),0.6)' : 'rgba(255,255,255,0.1)'} strokeWidth="1" />
+            <text x={x} y={y} textAnchor="middle" dominantBaseline="central" fill={isSelected ? 'var(--accent)' : '#A8A29E'} fontSize="10" fontWeight={isSelected ? '700' : '500'}>
               {note}
             </text>
           </g>

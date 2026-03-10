@@ -21,7 +21,7 @@ function ChordDiagram({ name, frets, rootIdx, barre, showIntervals = false }) {
           <rect
             x="7" y={10 + (barre - offset - 0.5) * 10 - 2.5}
             width="36" height="5" rx="2.5"
-            fill="rgba(59,130,246,0.2)" stroke="rgba(59,130,246,0.3)" strokeWidth="0.5"
+            fill="rgba(var(--accent-rgb),0.2)" stroke="rgba(var(--accent-rgb),0.3)" strokeWidth="0.5"
           />
         )}
         {/* Fret lines */}
@@ -43,7 +43,7 @@ function ChordDiagram({ name, frets, rootIdx, barre, showIntervals = false }) {
           const noteIdx = (OPEN_STRINGS[i] + f) % 12;
           const color = showIntervals && rootIdx != null
             ? getIntervalColor(noteIdx, rootIdx, 'major')
-            : '#3B82F6';
+            : 'var(--accent)';
           const isRoot = rootIdx != null && noteIdx === rootIdx;
           return (
             <g key={i}>

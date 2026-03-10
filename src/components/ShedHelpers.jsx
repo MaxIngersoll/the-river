@@ -150,7 +150,7 @@ export function CurrentCard({ sessions, onSetRoot, onSetScale, onSetIntent }) {
   return (
     <div
       className="w-full card p-4 mb-5 text-left active:scale-[0.98] transition-all group"
-      style={{ borderLeft: '3px solid rgba(59,130,246,0.4)' }}
+      style={{ borderLeft: '3px solid rgba(var(--accent-rgb),0.4)' }}
     >
       <div className="flex items-center justify-between mb-1">
         <span className="text-[10px] font-semibold text-water-4 uppercase tracking-widest">The Current</span>
@@ -163,7 +163,7 @@ export function CurrentCard({ sessions, onSetRoot, onSetScale, onSetIntent }) {
         <button
           onClick={handleStartTimer}
           className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-semibold text-white active:scale-95 transition-all"
-          style={{ background: 'linear-gradient(135deg, rgba(59,130,246,0.9), rgba(30,64,175,0.95))' }}
+          style={{ background: 'linear-gradient(135deg, rgba(var(--accent-rgb),0.9), rgba(var(--accent-deep-rgb),0.95))' }}
         >
           <svg width="8" height="8" viewBox="0 0 24 24" fill="white"><polygon points="5,3 19,12 5,21" /></svg>
           Flow

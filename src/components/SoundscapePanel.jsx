@@ -175,7 +175,7 @@ export default function SoundscapePanel({ timerState }) {
         className="flex items-center gap-2 px-4 py-1.5 rounded-full transition-colors"
         style={{
           background: expanded
-            ? 'linear-gradient(135deg, rgba(59,130,246,0.15), rgba(30,64,175,0.1))'
+            ? 'linear-gradient(135deg, rgba(var(--accent-rgb),0.15), rgba(var(--accent-deep-rgb),0.1))'
             : 'rgba(128,128,128,0.08)',
         }}
       >
@@ -229,9 +229,9 @@ export default function SoundscapePanel({ timerState }) {
                 style={
                   prefs.metronomeEnabled
                     ? {
-                        background: 'linear-gradient(135deg, rgba(59,130,246,0.9), rgba(30,64,175,0.95))',
+                        background: 'linear-gradient(135deg, rgba(var(--accent-rgb),0.9), rgba(var(--accent-deep-rgb),0.95))',
                         color: 'white',
-                        boxShadow: '0 2px 8px rgba(59,130,246,0.3)',
+                        boxShadow: '0 2px 8px rgba(var(--accent-rgb),0.3)',
                       }
                     : {
                         background: 'rgba(128,128,128,0.1)',
@@ -307,9 +307,9 @@ export default function SoundscapePanel({ timerState }) {
               style={
                 prefs.rainEnabled
                   ? {
-                      background: 'linear-gradient(135deg, rgba(59,130,246,0.9), rgba(30,64,175,0.95))',
+                      background: 'linear-gradient(135deg, rgba(var(--accent-rgb),0.9), rgba(var(--accent-deep-rgb),0.95))',
                       color: 'white',
-                      boxShadow: '0 2px 8px rgba(59,130,246,0.3)',
+                      boxShadow: '0 2px 8px rgba(var(--accent-rgb),0.3)',
                     }
                   : {
                       background: 'rgba(128,128,128,0.1)',
@@ -329,7 +329,7 @@ export default function SoundscapePanel({ timerState }) {
               onChange={handleRainVolume}
               className="glass-input w-28 h-1 appearance-none rounded-full cursor-pointer"
               style={{
-                background: `linear-gradient(to right, rgba(59,130,246,0.6) ${prefs.rainVolume * 100}%, rgba(128,128,128,0.15) ${prefs.rainVolume * 100}%)`,
+                background: `linear-gradient(to right, rgba(var(--accent-rgb),0.6) ${prefs.rainVolume * 100}%, rgba(128,128,128,0.15) ${prefs.rainVolume * 100}%)`,
               }}
               aria-label="Rain volume"
             />
@@ -363,7 +363,7 @@ export default function SoundscapePanel({ timerState }) {
               onChange={handleMasterVolume}
               className="glass-input flex-1 h-1 appearance-none rounded-full cursor-pointer"
               style={{
-                background: `linear-gradient(to right, rgba(59,130,246,0.6) ${prefs.masterVolume * 100}%, rgba(128,128,128,0.15) ${prefs.masterVolume * 100}%)`,
+                background: `linear-gradient(to right, rgba(var(--accent-rgb),0.6) ${prefs.masterVolume * 100}%, rgba(128,128,128,0.15) ${prefs.masterVolume * 100}%)`,
               }}
               aria-label="Master volume"
             />

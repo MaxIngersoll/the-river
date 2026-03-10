@@ -54,7 +54,7 @@ function RiverBirth({ visible }) {
               <animate attributeName="offset" values="0.4;0.1;0.4" dur="3s" repeatCount="indefinite" />
             </stop>
             <stop offset="100%" stopColor="rgba(59, 130, 246, 0.8)">
-              <animate attributeName="stopColor" values="rgba(59,130,246,0.4);rgba(59,130,246,0.8);rgba(59,130,246,0.4)" dur="4s" repeatCount="indefinite" />
+              <animate attributeName="stopColor" values="rgba(var(--accent-rgb),0.4);rgba(var(--accent-rgb),0.8);rgba(var(--accent-rgb),0.4)" dur="4s" repeatCount="indefinite" />
             </stop>
           </linearGradient>
         </defs>
@@ -170,8 +170,8 @@ export default function OnboardingFlow({ onComplete }) {
         style={
           isLast
             ? {
-                background: 'linear-gradient(135deg, rgba(59,130,246,0.9), rgba(30,64,175,0.95))',
-                boxShadow: '0 4px 24px rgba(59,130,246,0.3), inset 0 1px 0 rgba(255,255,255,0.15)',
+                background: 'linear-gradient(135deg, rgba(var(--accent-rgb),0.9), rgba(var(--accent-deep-rgb),0.95))',
+                boxShadow: '0 4px 24px rgba(var(--accent-rgb),0.3), inset 0 1px 0 rgba(255,255,255,0.15)',
               }
             : {
                 background: 'rgba(148, 163, 184, 0.08)',

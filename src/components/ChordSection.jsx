@@ -27,7 +27,7 @@ function ChordDiagram({ name, frets, rootIdx, barre, showIntervals = false }) {
           <rect
             x="7" y={10 + (barre - offset - 0.5) * 10 - 2.5}
             width="36" height="5" rx="2.5"
-            fill="rgba(59,130,246,0.2)" stroke="rgba(59,130,246,0.3)" strokeWidth="0.5"
+            fill="rgba(var(--accent-rgb),0.2)" stroke="rgba(var(--accent-rgb),0.3)" strokeWidth="0.5"
           />
         )}
         {/* Fret lines */}
@@ -49,7 +49,7 @@ function ChordDiagram({ name, frets, rootIdx, barre, showIntervals = false }) {
           const noteIdx = (OPEN_STRINGS[i] + f) % 12;
           const color = showIntervals && rootIdx != null
             ? getIntervalColor(noteIdx, rootIdx, 'major')
-            : '#3B82F6';
+            : 'var(--accent)';
           const isRoot = rootIdx != null && noteIdx === rootIdx;
           return (
             <g key={i}>
@@ -125,8 +125,8 @@ function ProgressionStrips({ rootNote, scale, diatonicChords }) {
               activeProg === prog.name ? 'ring-2 ring-water-4' : ''
             }`}
             style={{ background: activeProg === prog.name
-              ? 'linear-gradient(135deg, rgba(59,130,246,0.9), rgba(30,64,175,1))'
-              : 'linear-gradient(135deg, rgba(59,130,246,0.4), rgba(30,64,175,0.5))'
+              ? 'linear-gradient(135deg, rgba(var(--accent-rgb),0.9), rgba(var(--accent-deep-rgb),1))'
+              : 'linear-gradient(135deg, rgba(var(--accent-rgb),0.4), rgba(var(--accent-deep-rgb),0.5))'
             }}
             aria-label={`Highlight ${prog.name} progression`}
           >

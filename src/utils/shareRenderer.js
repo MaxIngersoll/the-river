@@ -19,14 +19,14 @@ const COLORS = {
   bg: '#0C0A09',       // deep dark
   bgGrad: '#0F172A',   // dark navy tint
   water: [
-    '#1E3A5F', '#1E40AF', '#2563EB', '#3B82F6',
-    '#60A5FA', '#93C5FD', '#BFDBFE',
+    '#1E3A5F', '#AF7828', '#D7A041', '#D7A041',
+    '#D7A041', '#D7A041', '#F5E6C8',
   ],
   textPrimary: '#F2F1ED',
   textSecondary: 'rgba(242,241,237,0.55)',
   textMuted: 'rgba(242,241,237,0.35)',
-  accent: '#3B82F6',
-  accentGlow: 'rgba(59,130,246,0.25)',
+  accent: '#D7A041',
+  accentGlow: 'rgba(215,160,65,0.25)',
   divider: 'rgba(255,255,255,0.06)',
 };
 

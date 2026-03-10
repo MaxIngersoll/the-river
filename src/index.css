@@ -49,6 +49,12 @@
   --color-water-4: #2563EB;
   --color-water-5: #1E40AF;
 
+  /* Accent — Warm Amber (centralized, Session 13) */
+  --accent-rgb: 190, 130, 50;
+  --accent-deep-rgb: 150, 95, 30;
+  --accent: #BE8232;
+  --accent-deep: #965F1E;
+
   --color-dry: #E2DDD5;
   --color-dry-bank: #C8BBAC;
 
@@ -79,6 +85,12 @@ html.dark {
   --color-water-4: #3B82F6;
   --color-water-5: #60A5FA;
 
+  /* Accent — Warm Amber (brighter for dark mode) */
+  --accent-rgb: 215, 160, 65;
+  --accent-deep-rgb: 175, 120, 40;
+  --accent: #D7A041;
+  --accent-deep: #AF7828;
+
   --color-dry: rgba(255, 255, 255, 0.06);
   --color-dry-bank: #57534E;
 
@@ -104,6 +116,12 @@ html.warm {
   --color-water-3: #3c507d;
   --color-water-4: #7c94b8;
   --color-water-5: #94acd0;
+
+  /* Accent — Warm Amber (warm theme) */
+  --accent-rgb: 224, 197, 143;
+  --accent-deep-rgb: 180, 150, 90;
+  --accent: #E0C58F;
+  --accent-deep: #B4965A;
 
   --color-dry: rgba(217, 203, 194, 0.08);
   --color-dry-bank: #7c6f64;

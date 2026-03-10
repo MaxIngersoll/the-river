@@ -147,9 +147,9 @@ export default function HomePage({ sessions, onNavigate, onSessionUpdate, onSess
           onClick={() => onNavigate('log')}
           className="w-full font-medium py-4 rounded-full text-base active:scale-[0.97] transition-all"
           style={{
-            background: 'linear-gradient(135deg, rgba(59,130,246,0.9), rgba(30,64,175,0.95))',
+            background: 'linear-gradient(135deg, rgba(var(--accent-rgb),0.9), rgba(var(--accent-deep-rgb),0.95))',
             color: 'white',
-            boxShadow: '0 4px 20px rgba(59,130,246,0.3), inset 0 1px 0 rgba(255,255,255,0.2)',
+            boxShadow: '0 4px 20px rgba(var(--accent-rgb),0.3), inset 0 1px 0 rgba(255,255,255,0.2)',
           }}
         >
           Log Your First Session
@@ -412,7 +412,7 @@ function TodaySessions({ sessions, onUpdate, onDelete }) {
                     onClick={saveEdit}
                     className="px-3 py-1.5 rounded-full text-[11px] font-semibold text-white active:scale-[0.95] transition-all"
                     style={{
-                      background: 'linear-gradient(135deg, rgba(59,130,246,0.9), rgba(30,64,175,0.95))',
+                      background: 'linear-gradient(135deg, rgba(var(--accent-rgb),0.9), rgba(var(--accent-deep-rgb),0.95))',
                     }}
                   >
                     Save

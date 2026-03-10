@@ -21,8 +21,8 @@ export default memo(function ProgressRing({ progress, size = 72, strokeWidth = 7
     >
       <defs>
         <linearGradient id={gradId} x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor={isDark ? '#60A5FA' : '#3B82F6'} />
-          <stop offset="100%" stopColor={isDark ? '#93C5FD' : '#1E40AF'} />
+          <stop offset="0%" stopColor={isDark ? 'var(--accent)' : 'var(--accent)'} />
+          <stop offset="100%" stopColor={isDark ? 'var(--accent)' : 'var(--accent-deep)'} />
         </linearGradient>
       </defs>
       {/* Background track */}

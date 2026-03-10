@@ -79,8 +79,8 @@ export default function ShedPage({ sessions = [], onNavigate }) {
                   : 'card text-text-2'
               }`}
               style={note === rootNote ? {
-                background: 'linear-gradient(135deg, rgba(59,130,246,0.9), rgba(30,64,175,0.95))',
-                boxShadow: '0 2px 10px rgba(59,130,246,0.3)',
+                background: 'linear-gradient(135deg, rgba(var(--accent-rgb),0.9), rgba(var(--accent-deep-rgb),0.95))',
+                boxShadow: '0 2px 10px rgba(var(--accent-rgb),0.3)',
               } : undefined}
             >
               {NOTE_DISPLAY[note] ? note.replace('#', '#') : note}

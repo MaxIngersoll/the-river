@@ -82,8 +82,8 @@ function FretboardDiagram({ scaleNoteIndexes, rootIdx, showDegrees, highlightRan
             width={fretLineX(highlightRange.start - 1 + highlightRange.span) - fretLineX(highlightRange.start - 1) - 2}
             height={(STRINGS - 1) * STRING_GAP + 12}
             rx="3"
-            fill="rgba(59,130,246,0.06)"
-            stroke="rgba(59,130,246,0.15)"
+            fill="rgba(var(--accent-rgb),0.06)"
+            stroke="rgba(var(--accent-rgb),0.15)"
             strokeWidth="1"
           />
         )}
@@ -123,7 +123,7 @@ function FretboardDiagram({ scaleNoteIndexes, rootIdx, showDegrees, highlightRan
           return (
             <text key={`open-${s}`} x={LEFT + NUT_W / 2} y={stringY(s) - 16}
               textAnchor="middle" fontSize="9" fontWeight="600"
-              fill={isInScale ? '#3B82F6' : '#A8A29E'}>
+              fill={isInScale ? 'var(--accent)' : '#A8A29E'}>
               {isInScale ? 'O' : 'X'}
             </text>
           );
@@ -157,15 +157,15 @@ function FretboardDiagram({ scaleNoteIndexes, rootIdx, showDegrees, highlightRan
             return (
               <g key={`${s}-${f}`} opacity={dimmed ? 0.2 : 1}>
                 {isRoot && !dimmed && (
-                  <circle cx={cx} cy={cy} r={DOT_R + 2} fill="rgba(59,130,246,0.15)" />
+                  <circle cx={cx} cy={cy} r={DOT_R + 2} fill="rgba(var(--accent-rgb),0.15)" />
                 )}
                 <circle cx={cx} cy={cy} r={DOT_R}
-                  fill={isRoot ? '#2563EB' : 'rgba(59,130,246,0.15)'}
-                  stroke={isRoot ? 'none' : 'rgba(59,130,246,0.4)'}
+                  fill={isRoot ? 'var(--accent)' : 'rgba(var(--accent-rgb),0.15)'}
+                  stroke={isRoot ? 'none' : 'rgba(var(--accent-rgb),0.4)'}
                   strokeWidth="1" />
                 <text x={cx} y={cy + 1} textAnchor="middle" dominantBaseline="central"
                   fontSize="9" fontWeight="700"
-                  fill={isRoot ? 'white' : '#3B82F6'}>
+                  fill={isRoot ? 'white' : 'var(--accent)'}>
                   {label}
                 </text>
               </g>
@@ -218,11 +218,11 @@ function PositionDiagram({ scaleNoteIndexes, rootIdx, startFret, name }) {
             return (
               <g key={`${stringIdx}-${f}`}>
                 <circle cx={cx} cy={cy} r={DOT_R}
-                  fill={isRoot ? '#2563EB' : 'rgba(59,130,246,0.35)'}
-                  stroke={isRoot ? 'none' : 'rgba(59,130,246,0.5)'}
+                  fill={isRoot ? 'var(--accent)' : 'rgba(var(--accent-rgb),0.35)'}
+                  stroke={isRoot ? 'none' : 'rgba(var(--accent-rgb),0.5)'}
                   strokeWidth="0.5" />
                 <text x={cx} y={cy + 0.3} textAnchor="middle" dominantBaseline="central"
-                  fontSize="3" fontWeight="700" fill={isRoot ? 'white' : '#1e40af'}>
+                  fontSize="3" fontWeight="700" fill={isRoot ? 'white' : 'var(--accent-deep)'}>
                   {NOTES[noteIdx]}
                 </text>
               </g>

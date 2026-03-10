@@ -113,8 +113,8 @@ export default function LogPage({ sessions, onLog, onCelebrate, onNavigateHome }
         <div
           className="w-20 h-20 mx-auto mb-5 rounded-full flex items-center justify-center animate-bounce-in"
           style={{
-            background: 'linear-gradient(135deg, rgba(59,130,246,0.9), rgba(30,64,175,0.95))',
-            boxShadow: '0 4px 24px rgba(59,130,246,0.35), inset 0 1px 0 rgba(255,255,255,0.2)',
+            background: 'linear-gradient(135deg, rgba(var(--accent-rgb),0.9), rgba(var(--accent-deep-rgb),0.95))',
+            boxShadow: '0 4px 24px rgba(var(--accent-rgb),0.35), inset 0 1px 0 rgba(255,255,255,0.2)',
           }}
         >
           <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -162,7 +162,7 @@ export default function LogPage({ sessions, onLog, onCelebrate, onNavigateHome }
                 disabled={!bottleText.trim()}
                 className="px-4 py-1.5 rounded-full text-[11px] font-semibold text-white disabled:opacity-40 transition-opacity"
                 style={{
-                  background: 'linear-gradient(135deg, rgba(59,130,246,0.9), rgba(30,64,175,0.95))',
+                  background: 'linear-gradient(135deg, rgba(var(--accent-rgb),0.9), rgba(var(--accent-deep-rgb),0.95))',
                 }}
               >
                 Cast it into the river
@@ -201,8 +201,8 @@ export default function LogPage({ sessions, onLog, onCelebrate, onNavigateHome }
             onClick={handleDone}
             className="w-full text-white font-semibold py-3.5 rounded-full text-sm active:scale-[0.97] transition-all"
             style={{
-              background: 'linear-gradient(135deg, rgba(59,130,246,0.9), rgba(30,64,175,0.95))',
-              boxShadow: '0 4px 20px rgba(59,130,246,0.3), inset 0 1px 0 rgba(255,255,255,0.2)',
+              background: 'linear-gradient(135deg, rgba(var(--accent-rgb),0.9), rgba(var(--accent-deep-rgb),0.95))',
+              boxShadow: '0 4px 20px rgba(var(--accent-rgb),0.3), inset 0 1px 0 rgba(255,255,255,0.2)',
             }}
           >
             Done
@@ -240,8 +240,8 @@ export default function LogPage({ sessions, onLog, onCelebrate, onNavigateHome }
                   : 'card text-text-2 active:scale-[0.97]'
               }`}
               style={selectedPreset === mins ? {
-                background: 'linear-gradient(135deg, rgba(59,130,246,0.9), rgba(30,64,175,0.95))',
-                boxShadow: '0 4px 16px rgba(59,130,246,0.3), inset 0 1px 0 rgba(255,255,255,0.2)',
+                background: 'linear-gradient(135deg, rgba(var(--accent-rgb),0.9), rgba(var(--accent-deep-rgb),0.95))',
+                boxShadow: '0 4px 16px rgba(var(--accent-rgb),0.3), inset 0 1px 0 rgba(255,255,255,0.2)',
               } : undefined}
             >
               {mins}m
@@ -314,8 +314,8 @@ export default function LogPage({ sessions, onLog, onCelebrate, onNavigateHome }
                   active ? 'text-white' : 'card text-text-2 active:scale-[0.95]'
                 }`}
                 style={active ? {
-                  background: 'linear-gradient(135deg, rgba(59,130,246,0.9), rgba(30,64,175,0.95))',
-                  boxShadow: '0 2px 8px rgba(59,130,246,0.3)',
+                  background: 'linear-gradient(135deg, rgba(var(--accent-rgb),0.9), rgba(var(--accent-deep-rgb),0.95))',
+                  boxShadow: '0 2px 8px rgba(var(--accent-rgb),0.3)',
                 } : undefined}
               >
                 {tag}
@@ -331,10 +331,10 @@ export default function LogPage({ sessions, onLog, onCelebrate, onNavigateHome }
           className="w-full text-white font-semibold py-4 rounded-full text-base active:scale-[0.97] transition-all disabled:opacity-30 disabled:cursor-not-allowed disabled:active:scale-100"
           style={{
             background: effectiveDuration > 0
-              ? 'linear-gradient(135deg, rgba(59,130,246,0.9), rgba(30,64,175,0.95))'
+              ? 'linear-gradient(135deg, rgba(var(--accent-rgb),0.9), rgba(var(--accent-deep-rgb),0.95))'
               : 'rgba(120,113,108,0.3)',
             boxShadow: effectiveDuration > 0
-              ? '0 4px 20px rgba(59,130,246,0.3), inset 0 1px 0 rgba(255,255,255,0.2)'
+              ? '0 4px 20px rgba(var(--accent-rgb),0.3), inset 0 1px 0 rgba(255,255,255,0.2)'
               : 'none',
           }}
         >
