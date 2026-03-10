@@ -144,10 +144,10 @@ See `docs/AGENT-PROTOCOL.md` for the full protocol. Key elements:
 
 ---
 
-## Current State (as of March 8, 2026)
+## Current State (as of March 10, 2026 — Session 13 continued)
 
 ### What's Built & Working
-- Full Liquid Glass UI (dark + light modes, blue/indigo palette)
+- Full Liquid Glass UI (dark + light modes, forest palette)
 - Timer FAB (start/pause/stop/save with localStorage persistence)
 - Timer integration: external start via CustomEvent bridge (`river-start-timer`)
 - Space key start/pause/resume (Session 12)
@@ -189,15 +189,18 @@ See `docs/AGENT-PROTOCOL.md` for the full protocol. Key elements:
 - Auto-build v2.2: 5 postmortem fixes, v2 skills installed, sync_state command (Session 13)
 - 10 Timer Design Commandments established from all discourse (Session 13)
 - 7 inspiration sketches cataloged for next timer design (Session 13)
+- **Forest palette pivot**: replaced all blue accents → olivine/hunter green/verdigris/mint (Session 13)
+- **The Spiral Sun** (Competition K): growing Archimedean spiral. Tagged as `spiral-sun-v1`. (Session 13)
+- **The Living Vein** (Competition L): venation growth algorithm. Toggle: art vs numbers. Max: "love the concept, don't love the execution — kind of ugly. Also veins don't fit the RIVER metaphor." (Session 13)
+- **Smart Ready page** (Competition M): accordion sections + sticky Root Lock. Progressive disclosure. (Session 13)
+- **Competition N needed**: Timer visualization that fits the RIVER metaphor. One flowing path, not branching. Beautiful and unique per session. (Session 13)
 
 ### What's Next (Priority Order)
-1. **NEW TIMER VISUALIZATION** — Full Tier 1 competition with 7 new personas. Raven Kwok as inspiration. **NEW COLOR DIRECTION** — Max killed blue ("I'm kind of sick of that blue"). Start from scratch with 10 Commandments.
-2. Vercel soft launch — deploy as demo capacity, get it live with a URL
-3. Automation: 7 queued tasks running via continuer (every 30 min). Page transitions, touch targets, total hours, export, backup health, progressive mood, splash screens.
-4. Merge claude/musing-nightingale → main (20+ commits)
-5. Polish: ShedPage.jsx breakup (1,170 lines → sub-components), mobile audit, accessibility
-6. Competition C implementation: Maya's River pitch deck narrative (designed, not built)
-7. Max may have new directions — ask before assuming
+1. **TIMER VIS v3** — Competition N: river-themed visualization. One flowing path. Must be beautiful + conceptually fit "The River." Max: "A vein doesn't make sense for a river... maybe one river flowing."
+2. Polish and deploy to Vercel
+3. Merge claude/musing-nightingale → main
+4. Competition C implementation: Maya's River pitch deck narrative (designed, not built)
+5. Max may have new directions — ask before assuming
 
 ### Competition Results
 - **Competition A: The Dock** — WINNER: "The Current" + "The Dock" synthesis. **IMPLEMENTED (Phase 1 + 2).** Renamed Shed→Dock, tuning strip, progressions, proportional frets, CurrentCard, QuickStartCards.
@@ -210,6 +213,9 @@ See `docs/AGENT-PROTOCOL.md` for the full protocol. Key elements:
 - **Competition H: Internal Audit** — WINNER: Synthesis of 6 improvements + 7-expert panel review. **IMPLEMENTED.** Competition tiers, Bridge Notes, DECISIONS.md, Outtakes Reel, fun protocols, stale doc cleanup.
 - **Competition I: The Sapphire Sessions** — WINNERS: "Earned Sapphire" (colorway), "Quick Chronograph" (tuner), "Tab Bar Whisper" (quote). **IMPLEMENTED.** Sapphire Night theme, guitar tuner, Milne quote.
 - **Competition J: The Big Questions** — Tier 1 philosophical competition. 10 questions on identity and direction. 5 key decisions: audio recording (yes, subtle), ceremony typeface (yes, try it), keep metronome/kill ear training, Vercel demo launch, River > guitar identity. **DECISIONS RECORDED.**
+- **Competition K: The Spiral Sun** — Timer vis v1. 7-artist panel. Winner: af Klint spiral + Eliasson warmth + Kwok noise. Max: "okay but not the best." **TAGGED spiral-sun-v1.**
+- **Competition L: The Living Vein** — Timer vis v2. 7-artist panel. Winner: venation growth (Nervous System). Max: "love the concept, ugly execution, doesn't fit river metaphor." **NEEDS REDESIGN → Competition N.**
+- **Competition M: Smart Ready** — Ready page redesign. Spool + Rams + Wroblewski. Winner: accordion sections + sticky Root Lock. **IMPLEMENTED.**
 
 ---
 
