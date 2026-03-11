@@ -6,7 +6,7 @@ import { PRACTICE_TAGS } from '../utils/storage';
 import { haptics } from '../utils/haptics';
 import MoodPicker from './MoodPicker';
 import SoundscapePanel from './SoundscapePanel';
-import VenationCanvas from './VenationCanvas';
+import WaterHourglassCanvas from './WaterHourglassCanvas';
 
 function formatTimer(ms) {
   const totalSec = Math.floor(ms / 1000);
@@ -698,7 +698,7 @@ export default function TimerFAB({ onSaveSession, onQuickLog, showTabBar = true 
 
         {/* Timer display — The Quiet Water or Classic clock */}
         {(timerState !== 'stopped' || (timerState === 'stopped' && !showSaveFlow)) && timerDisplayMode === 'symbolic' ? (
-          /* The Living Vein — venation growth on warming field (Nervous System/Lieberman/Kurokawa synthesis) */
+          /* The Basin — water hourglass on warming field (Competition N synthesis) */
           <div
             className={`flex flex-col items-stretch justify-center mb-4 relative ${
               timerState === 'stopped' && !showSaveFlow ? 'animate-timer-settle' : ''
@@ -706,7 +706,7 @@ export default function TimerFAB({ onSaveSession, onQuickLog, showTabBar = true 
             role="timer"
             aria-label={`Practice time: ${formatTimer(elapsed)}`}
           >
-            <VenationCanvas
+            <WaterHourglassCanvas
               elapsed={elapsed}
               timerState={timerState}
               prefersReduced={prefersReduced}
