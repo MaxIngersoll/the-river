@@ -156,8 +156,8 @@ export default function ShedPage({ sessions = [], onNavigate }) {
   const [obliqueDismissed, setObliqueDismissed] = useState(false);
   const [rootLockExpanded, setRootLockExpanded] = useState(false);
 
-  // Accordion state — default: chords open (most common use case)
-  const [openSections, setOpenSections] = useState({ chords: true });
+  // Accordion state — default: scale open (Max: scales first)
+  const [openSections, setOpenSections] = useState({ scale: true });
 
   const toggleSection = useCallback((id) => {
     setOpenSections(prev => ({ ...prev, [id]: !prev[id] }));

@@ -124,8 +124,8 @@ export const STRING_FREQS = [
 // ─── Intent Categories ───
 
 export const INTENTS = [
-  { id: 'chords', label: 'Chords', icon: '\u266B', desc: 'What fits this key' },
   { id: 'scale', label: 'Scale', icon: '\uD83C\uDFB8', desc: 'Notes on the neck' },
+  { id: 'chords', label: 'Chords', icon: '\u266B', desc: 'What fits this key' },
   { id: 'circle', label: 'Circle', icon: '\u2299', desc: 'Key relationships' },
   { id: 'ref', label: 'Quick Ref', icon: '\uD83D\uDCD6', desc: 'Common shapes' },
 ];
