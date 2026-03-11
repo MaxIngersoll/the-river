@@ -5,6 +5,30 @@
 import { smoothstep, valueNoise, timerProgress, hourglassPath, hourglassHalfW, hourglassDims } from './hourglassGeometry.js';
 export { smoothstep, valueNoise, timerProgress };
 
+// ─── Shared color system for Competition Q prototypes ───
+export const COLOR_JOURNEY = [
+  { t: 0.00, r: 76,  g: 174, b: 174 },
+  { t: 0.30, r: 96,  g: 178, b: 158 },
+  { t: 0.55, r: 141, g: 181, b: 133 },
+  { t: 0.80, r: 180, g: 175, b: 112 },
+  { t: 1.00, r: 200, g: 170, b: 100 },
+];
+
+export function lerpColor(progress) {
+  const p = Math.max(0, Math.min(1, progress));
+  let i = 0;
+  while (i < COLOR_JOURNEY.length - 2 && COLOR_JOURNEY[i + 1].t < p) i++;
+  const a = COLOR_JOURNEY[i];
+  const b = COLOR_JOURNEY[i + 1];
+  const local = (p - a.t) / (b.t - a.t);
+  const s = local * local * (3 - 2 * local);
+  return [
+    Math.round(a.r + (b.r - a.r) * s),
+    Math.round(a.g + (b.g - a.g) * s),
+    Math.round(a.b + (b.b - a.b) * s),
+  ];
+}
+
 // ═══════════════════════════════════════════════
 // 1. URN 🏺 — Classical amphora
 // ═══════════════════════════════════════════════
