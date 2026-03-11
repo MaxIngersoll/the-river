@@ -7,6 +7,18 @@ import { haptics } from '../utils/haptics';
 import MoodPicker from './MoodPicker';
 import SoundscapePanel from './SoundscapePanel';
 import WaterHourglassCanvas from './WaterHourglassCanvas';
+import HourglassAlpha from './HourglassAlpha';
+import HourglassBeta from './HourglassBeta';
+import HourglassGamma from './HourglassGamma';
+
+// Prototype selector for Competition P — Max picks the winner
+const PROTOTYPES = [
+  { key: 'sand', label: '🏺', Component: WaterHourglassCanvas, name: 'Sand' },
+  { key: 'alpha', label: 'α', Component: HourglassAlpha, name: 'Digital' },
+  { key: 'beta', label: 'β', Component: HourglassBeta, name: 'Classic' },
+  { key: 'gamma', label: 'γ', Component: HourglassGamma, name: 'Light' },
+];
+const PROTO_KEY = 'river-hourglass-proto';
 
 function formatTimer(ms) {
   const totalSec = Math.floor(ms / 1000);
@@ -375,6 +387,9 @@ export default function TimerFAB({ onSaveSession, onQuickLog, showTabBar = true 
   const [showClockPeek, setShowClockPeek] = useState(false);
   const [countdownTarget, setCountdownTarget] = useState(null); // null = count-up, number = minutes
   const [timerNumbersHidden, setTimerNumbersHidden] = useState(false); // Insight Timer: tap to hide numbers
+  const [protoIdx, setProtoIdx] = useState(() => {
+    try { const v = localStorage.getItem(PROTO_KEY); return v ? parseInt(v, 10) : 0; } catch { return 0; }
+  });
   const clockPeekRef = useRef(null);
   const intervalRef = useRef(null);
 
@@ -407,20 +422,20 @@ export default function TimerFAB({ onSaveSession, onQuickLog, showTabBar = true 
   }, []);
 
   // Progressive color deepening — forest palette (Session 13)
-  // Mint → olivine → verdigris journey
+  // Light sage → olivine → deep forest green journey (no blue/teal)
   const timerDepthColor = useMemo(() => {
     if (timerState === 'idle') return 'var(--color-text)';
     if (timerState === 'stopped' && showSaveFlow) return 'var(--color-text)';
     const minutes = elapsed / 60000;
     if (isDark) {
-      if (minutes >= 30) return 'rgb(76,174,174)';    // verdigris
-      if (minutes >= 15) return 'rgb(141,181,133)';   // olivine
-      if (minutes >= 5) return 'rgb(120,165,115)';    // mid-green
-      return 'rgb(160,200,160)';                       // light sage
+      if (minutes >= 30) return 'rgb(141,181,133)';   // olivine (deep)
+      if (minutes >= 15) return 'rgb(155,195,145)';   // bright olivine
+      if (minutes >= 5) return 'rgb(168,212,160)';    // #A8D4A0 — water-5
+      return 'rgb(185,225,175)';                       // light sage
     }
     // Light mode: deeper forest tones
     if (minutes >= 30) return 'rgb(64,89,48)';
-    if (minutes >= 15) return 'rgb(90,120,70)';
+    if (minutes >= 15) return 'rgb(80,120,65)';
     if (minutes >= 5) return 'rgb(110,145,95)';
     return 'rgb(130,160,120)';
   }, [elapsed, timerState, showSaveFlow, isDark]);
@@ -696,9 +711,9 @@ export default function TimerFAB({ onSaveSession, onQuickLog, showTabBar = true 
           {timerState === 'stopped' && 'Session complete'}
         </div>
 
-        {/* Timer display — The Quiet Water or Classic clock */}
+        {/* Timer display — Hourglass prototype or Classic clock */}
         {(timerState !== 'stopped' || (timerState === 'stopped' && !showSaveFlow)) && timerDisplayMode === 'symbolic' ? (
-          /* The Basin — water hourglass on warming field (Competition N synthesis) */
+          /* Hourglass prototype — Competition P: Max picks the winner */
           <div
             className={`flex flex-col items-stretch justify-center mb-4 relative ${
               timerState === 'stopped' && !showSaveFlow ? 'animate-timer-settle' : ''
@@ -706,20 +721,43 @@ export default function TimerFAB({ onSaveSession, onQuickLog, showTabBar = true 
             role="timer"
             aria-label={`Practice time: ${formatTimer(elapsed)}`}
           >
-            <WaterHourglassCanvas
-              elapsed={elapsed}
-              timerState={timerState}
-              prefersReduced={prefersReduced}
-              countdownTarget={countdownTarget}
-              isDark={isDark}
-              numbersHidden={timerNumbersHidden}
-              onToggleNumbers={() => setTimerNumbersHidden(h => !h)}
-              colonPulsing={colonPulsing}
-              colonPulseDuration={colonPulseDuration}
-              timerDepthColor={timerDepthColor}
-              formatTimerParts={formatTimerParts}
-              formatTimer={formatTimer}
-            />
+            {(() => {
+              const { Component } = PROTOTYPES[protoIdx] || PROTOTYPES[0];
+              return (
+                <Component
+                  elapsed={elapsed}
+                  timerState={timerState}
+                  prefersReduced={prefersReduced}
+                  countdownTarget={countdownTarget}
+                  isDark={isDark}
+                  numbersHidden={timerNumbersHidden}
+                  onToggleNumbers={() => setTimerNumbersHidden(h => !h)}
+                  colonPulsing={colonPulsing}
+                  colonPulseDuration={colonPulseDuration}
+                  timerDepthColor={timerDepthColor}
+                  formatTimerParts={formatTimerParts}
+                  formatTimer={formatTimer}
+                />
+              );
+            })()}
+            {/* Prototype switcher — tap to cycle (Competition P judging) */}
+            <div className="flex items-center justify-center gap-1.5 mt-2">
+              {PROTOTYPES.map((p, i) => (
+                <button
+                  key={p.key}
+                  onClick={(e) => { e.stopPropagation(); setProtoIdx(i); localStorage.setItem(PROTO_KEY, String(i)); }}
+                  className={`w-8 h-8 rounded-full text-xs font-bold transition-all active:scale-90 ${
+                    i === protoIdx ? 'text-white' : 'text-text-3/40'
+                  }`}
+                  style={i === protoIdx ? {
+                    background: 'linear-gradient(135deg, rgba(var(--accent-rgb),0.7), rgba(var(--accent-deep-rgb),0.8))',
+                  } : undefined}
+                  aria-label={`Switch to ${p.name} prototype`}
+                >
+                  {p.label}
+                </button>
+              ))}
+            </div>
           </div>
         ) : (
           /* Classic clock — Lora running, DM Serif stopped (Ive/Jen synthesis) */
