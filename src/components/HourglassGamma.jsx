@@ -1,13 +1,13 @@
 import { useEffect, useRef } from 'react';
-import { hourglassPath, hourglassDims, hourglassHalfW, timerProgress, valueNoise } from './hourglassGeometry.js';
+import { VESSELS, timerProgress, valueNoise } from './vesselGeometry.js';
 
-// ─── Team Gamma — "Nature & Light" ───
+// ─── Lantern Timer — "Nature & Light" ───
 // Turrell + Eliasson + Noguchi synthesis
-// The hourglass fills with warm LIGHT, not matter.
 // A dark vessel slowly becomes a lantern.
 // Color journey: cool teal → verdigris → olivine → warm amber (sunset)
 // Subtle noise texture inside (Noguchi's Akari paper lamps)
 // The light BREATHES.
+// Shape is pluggable via `vessel` prop (urn, orb, lantern).
 
 // ─── Color palette keyframes (teal → verdigris → olivine → amber) ───
 const COLOR_JOURNEY = [
@@ -46,6 +46,7 @@ export default function HourglassGamma({
   timerDepthColor,
   formatTimerParts,
   formatTimer,
+  vessel = 'urn',
 }) {
   const canvasRef = useRef(null);
   const stateRef = useRef({
@@ -54,13 +55,17 @@ export default function HourglassGamma({
     sized: false,
     w: 0,
     h: 0,
-    // Noise texture buffer — generated once, overlaid each frame
     noiseCanvas: null,
     noiseW: 0,
     noiseH: 0,
   });
   const propsRef = useRef({});
   propsRef.current = { elapsed, timerState, prefersReduced, isDark, countdownTarget };
+
+  // Resolve vessel geometry functions
+  const vesselConfig = VESSELS[vessel] || VESSELS.urn;
+  const vesselRef = useRef(vesselConfig);
+  vesselRef.current = vesselConfig;
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -137,8 +142,9 @@ export default function HourglassGamma({
       const breathCycle = Math.sin(t * (Math.PI * 2 / 4)) * 0.5 + 0.5; // 0→1 over 4s
       const breathMultiplier = 0.95 + breathCycle * 0.08; // 0.95 → 1.03
 
-      // ─── Hourglass geometry ───
-      const { cx, cy, glassW, glassH, topY, botY, neckY } = hourglassDims(w, h);
+      // ─── Vessel geometry ───
+      const vc = vesselRef.current;
+      const { cx, cy, glassW, glassH, topY, botY } = vc.dims(w, h);
 
       // ─── Background: near-black canvas ───
       if (dark) {
@@ -163,7 +169,7 @@ export default function HourglassGamma({
       // ─── Hourglass vessel outline ───
       // The outline brightens where light touches it
       const outlineBaseAlpha = 0.08;
-      hourglassPath(ctx, cx, cy, glassW, glassH);
+      vc.path(ctx, cx, cy, glassW, glassH);
       ctx.strokeStyle = `rgba(${Math.round(cr * 0.5 + 60)},${Math.round(cg * 0.5 + 60)},${Math.round(cb * 0.5 + 60)},${outlineBaseAlpha + progress * 0.06})`;
       ctx.lineWidth = 1.5;
       ctx.stroke();
@@ -176,7 +182,7 @@ export default function HourglassGamma({
         ctx.beginPath();
         ctx.rect(0, glowLineY - 30, w, h);
         ctx.clip();
-        hourglassPath(ctx, cx, cy, glassW, glassH);
+        vc.path(ctx, cx, cy, glassW, glassH);
         const wallGlow = 0.12 + progress * 0.18;
         ctx.strokeStyle = `rgba(${cr},${cg},${cb},${wallGlow * breathMultiplier})`;
         ctx.lineWidth = 2;
@@ -186,7 +192,7 @@ export default function HourglassGamma({
 
       // ─── The Light Fill (clipped to hourglass interior) ───
       ctx.save();
-      hourglassPath(ctx, cx, cy, glassW, glassH);
+      vc.path(ctx, cx, cy, glassW, glassH);
       ctx.clip();
 
       if (progress > 0.005) {
@@ -273,7 +279,7 @@ export default function HourglassGamma({
           const scanCount = Math.floor(12 * progress);
           for (let i = 0; i < scanCount; i++) {
             const scanY = botY - (botY - glowTopY) * (i / scanCount);
-            const hw = hourglassHalfW(cy, glassH, glassW, scanY);
+            const hw = vc.halfW(cy, glassH, glassW, scanY);
             const noiseOffset = valueNoise(i * 3.7 + t * 0.15, 42) * 0.3;
             const scanAlpha = (0.015 + noiseOffset * 0.01) * breathMultiplier;
             const scanGrad = ctx.createLinearGradient(cx - hw, scanY, cx + hw, scanY);
@@ -317,7 +323,7 @@ export default function HourglassGamma({
       // ─── Glass reflection (left edge, subtle) ───
       if (!pr) {
         ctx.save();
-        hourglassPath(ctx, cx, cy, glassW, glassH);
+        vc.path(ctx, cx, cy, glassW, glassH);
         ctx.clip();
         const reflGrad = ctx.createLinearGradient(cx - glassW * 0.42, 0, cx - glassW * 0.30, 0);
         reflGrad.addColorStop(0, `rgba(${cr},${cg},${cb},${0.015 + progress * 0.02})`);

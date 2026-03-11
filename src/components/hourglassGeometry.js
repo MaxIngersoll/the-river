@@ -29,13 +29,14 @@ export function valueNoise(x, y) {
 }
 
 // Draw hourglass bezier path onto ctx
+// Competition Q: refined proportions — wider neck, softer curves
 export function hourglassPath(ctx, cx, cy, w, h) {
-  const bulbW = w * 0.42;
-  const neckW = w * 0.06;
-  const topY = cy - h * 0.48;
-  const botY = cy + h * 0.48;
+  const bulbW = w * 0.38;
+  const neckW = w * 0.10;
+  const topY = cy - h * 0.47;
+  const botY = cy + h * 0.47;
   const neckY = cy;
-  const bulge = h * 0.22;
+  const bulge = h * 0.18;
 
   ctx.beginPath();
   ctx.moveTo(cx - bulbW, topY);
@@ -50,10 +51,10 @@ export function hourglassPath(ctx, cx, cy, w, h) {
 
 // Get hourglass half-width at a given Y
 export function hourglassHalfW(cy, glassH, glassW, y) {
-  const bulbW = glassW * 0.42;
-  const neckW = glassW * 0.06;
-  const topY = cy - glassH * 0.48;
-  const botY = cy + glassH * 0.48;
+  const bulbW = glassW * 0.38;
+  const neckW = glassW * 0.10;
+  const topY = cy - glassH * 0.47;
+  const botY = cy + glassH * 0.47;
   const neckY = cy;
 
   if (y <= topY || y >= botY) return bulbW;
@@ -76,8 +77,8 @@ export function hourglassDims(w, h) {
   const cy = h / 2;
   const glassW = w * 0.8;
   const glassH = h * 0.88;
-  const topY = cy - glassH * 0.48;
-  const botY = cy + glassH * 0.48;
+  const topY = cy - glassH * 0.47;
+  const botY = cy + glassH * 0.47;
   const neckY = cy;
   return { cx, cy, glassW, glassH, topY, botY, neckY };
 }

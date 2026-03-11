@@ -7,16 +7,15 @@ import { haptics } from '../utils/haptics';
 import MoodPicker from './MoodPicker';
 import SoundscapePanel from './SoundscapePanel';
 import WaterHourglassCanvas from './WaterHourglassCanvas';
-import HourglassAlpha from './HourglassAlpha';
-import HourglassBeta from './HourglassBeta';
 import HourglassGamma from './HourglassGamma';
 
-// Prototype selector for Competition P — Max picks the winner
+// Vessel shape selector — Gamma lantern light in different containers
+// Max picks the winner. Sand kept as backup option.
 const PROTOTYPES = [
-  { key: 'sand', label: '🏺', Component: WaterHourglassCanvas, name: 'Sand' },
-  { key: 'alpha', label: 'α', Component: HourglassAlpha, name: 'Digital' },
-  { key: 'beta', label: 'β', Component: HourglassBeta, name: 'Classic' },
-  { key: 'gamma', label: 'γ', Component: HourglassGamma, name: 'Light' },
+  { key: 'urn', label: '🏺', Component: HourglassGamma, vessel: 'urn', name: 'Urn' },
+  { key: 'orb', label: '○', Component: HourglassGamma, vessel: 'orb', name: 'Orb' },
+  { key: 'lantern', label: '◻', Component: HourglassGamma, vessel: 'lantern', name: 'Lantern' },
+  { key: 'sand', label: '🏜', Component: WaterHourglassCanvas, name: 'Sand' },
 ];
 const PROTO_KEY = 'river-hourglass-proto';
 
@@ -722,7 +721,8 @@ export default function TimerFAB({ onSaveSession, onQuickLog, showTabBar = true 
             aria-label={`Practice time: ${formatTimer(elapsed)}`}
           >
             {(() => {
-              const { Component } = PROTOTYPES[protoIdx] || PROTOTYPES[0];
+              const proto = PROTOTYPES[protoIdx] || PROTOTYPES[0];
+              const { Component } = proto;
               return (
                 <Component
                   elapsed={elapsed}
@@ -737,6 +737,7 @@ export default function TimerFAB({ onSaveSession, onQuickLog, showTabBar = true 
                   timerDepthColor={timerDepthColor}
                   formatTimerParts={formatTimerParts}
                   formatTimer={formatTimer}
+                  {...(proto.vessel ? { vessel: proto.vessel } : {})}
                 />
               );
             })()}
