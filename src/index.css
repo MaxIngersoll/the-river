@@ -668,10 +668,10 @@ html.dark .glass-input:focus {
   100% { transform: scale(1); }
 }
 
-/* Colon pulse — breathing rhythm during practice (Wroblewski: heartbeat slowing) */
+/* Colon pulse — subtle breathing rhythm (Max: tone it down, more subtle) */
 @keyframes colon-pulse {
   0%, 100% { opacity: 1; }
-  50% { opacity: 0.3; }
+  50% { opacity: 0.55; }
 }
 
 @keyframes slide-up {

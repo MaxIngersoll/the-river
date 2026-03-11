@@ -1,15 +1,14 @@
 import { useEffect, useRef } from 'react';
 
-// ─── The Basin — Water Hourglass Timer Visualization ───
-// Competition N synthesis. Max: "A beautiful hourglass. Drip, drip, drip.
-// The screen fills up like an hourglass with sand, but it's water."
+// ─── The Basin v4 — Sand Hourglass ───
+// Max: "Try making sand in an hourglass, like a very classic rendition.
+// Something rhythmic, pulsing, that shows you it's alive and moving."
 //
-// Water drops fall from top. Each creates a ripple when it hits the surface.
-// Water level rises over your practice session. Gentle waves on the surface.
-// Breathing: the whole system pulses subtly. Unique per session (noise seed).
-// By 30 minutes, the basin is full — you've filled your cup.
+// Classic hourglass: top sand depletes, thin stream flows through neck,
+// bottom mound grows. Tiny grains (1-2px) — barely visible individually,
+// collectively mesmerizing. The stream is the heartbeat.
 
-// ─── Noise (for organic variation) ───
+// ─── Noise for organic variation ───
 const NOISE_T = (() => {
   const t = new Uint8Array(512);
   const p = [];
@@ -37,35 +36,69 @@ function valueNoise(x, y) {
   return a + (b - a) * xf + (c - a) * yf + (a - b - c + d) * xf * yf;
 }
 
-// ─── Drop physics ───
-const DROP_INTERVAL_BASE = 2.5;  // seconds between drops at start
-const DROP_INTERVAL_MIN = 0.8;   // seconds between drops at 30 min
-const DROP_RADIUS_MIN = 3;
-const DROP_RADIUS_MAX = 6;
-const GRAVITY = 0.15;
-const MAX_RIPPLES = 8;
+// ─── Hourglass geometry ───
+function hourglassPath(ctx, cx, cy, w, h) {
+  const bulbW = w * 0.42;
+  const neckW = w * 0.06;
+  const topY = cy - h * 0.48;
+  const botY = cy + h * 0.48;
+  const neckY = cy;
+  const bulge = h * 0.22;
 
-// ─── Color palette ───
-const COLORS = {
+  ctx.beginPath();
+  ctx.moveTo(cx - bulbW, topY);
+  ctx.lineTo(cx + bulbW, topY);
+  ctx.bezierCurveTo(cx + bulbW, topY + bulge, cx + neckW, neckY - bulge, cx + neckW, neckY);
+  ctx.bezierCurveTo(cx + neckW, neckY + bulge, cx + bulbW, botY - bulge, cx + bulbW, botY);
+  ctx.lineTo(cx - bulbW, botY);
+  ctx.bezierCurveTo(cx - bulbW, botY - bulge, cx - neckW, neckY + bulge, cx - neckW, neckY);
+  ctx.bezierCurveTo(cx - neckW, neckY - bulge, cx - bulbW, topY + bulge, cx - bulbW, topY);
+  ctx.closePath();
+}
+
+// Get hourglass half-width at a given Y
+function hourglassHalfW(cy, glassH, glassW, y) {
+  const bulbW = glassW * 0.42;
+  const neckW = glassW * 0.06;
+  const topY = cy - glassH * 0.48;
+  const botY = cy + glassH * 0.48;
+  const neckY = cy;
+
+  if (y <= topY || y >= botY) return bulbW;
+  let t, startW, endW;
+  if (y < neckY) {
+    t = (y - topY) / (neckY - topY);
+    startW = bulbW;
+    endW = neckW;
+  } else {
+    t = (y - neckY) / (botY - neckY);
+    startW = neckW;
+    endW = bulbW;
+  }
+  return startW + (endW - startW) * smoothstep(t);
+}
+
+// ─── Sand colors ───
+const SAND = {
   dark: {
-    dropFill: [76, 174, 174],       // verdigris
-    dropHighlight: [204, 248, 249], // mint
-    waterTop: [76, 174, 174, 0.35], // verdigris translucent
-    waterMid: [64, 89, 48, 0.5],    // hunter green
-    waterBottom: [41, 30, 32, 0.7], // raisin black deep
-    ripple: [141, 181, 133],        // olivine
-    surfaceSheen: [204, 248, 249],  // mint shimmer
+    grain: [185, 175, 150],      // warm sand
+    grainLight: [210, 200, 175], // highlighted grain
+    body: [145, 135, 110],       // sand body fill
+    bodyDeep: [95, 85, 65],      // deep shadow in sand
+    stream: [175, 165, 140],     // falling stream
   },
   light: {
-    dropFill: [60, 140, 130],
-    dropHighlight: [120, 200, 190],
-    waterTop: [60, 140, 130, 0.3],
-    waterMid: [50, 100, 40, 0.4],
-    waterBottom: [30, 60, 25, 0.6],
-    ripple: [80, 140, 70],
-    surfaceSheen: [120, 200, 190],
+    grain: [160, 145, 110],
+    grainLight: [185, 170, 135],
+    body: [175, 160, 125],
+    bodyDeep: [135, 120, 90],
+    stream: [165, 150, 120],
   },
 };
+
+// ─── Max grains on screen ───
+const MAX_GRAINS = 80;
+const GRAIN_GRAVITY = 0.12;
 
 export default function WaterHourglassCanvas({
   elapsed,
@@ -85,10 +118,9 @@ export default function WaterHourglassCanvas({
   const stateRef = useRef({
     frame: null,
     time: 0,
-    drops: [],        // Active falling drops: { x, y, vy, radius, born }
-    ripples: [],       // Active ripples: { x, radius, maxRadius, alpha, born }
-    lastDropTime: 0,
-    sessionSeed: Date.now() % 10000, // Unique per session
+    grains: [],        // Falling sand grains: { x, y, vy, size, shade }
+    lastSpawn: 0,
+    sessionSeed: Date.now() % 10000,
     sized: false,
     w: 0, h: 0,
   });
@@ -118,10 +150,7 @@ export default function WaterHourglassCanvas({
     function animate() {
       if (!state.sized) {
         state.sized = sizeCanvas();
-        if (!state.sized) {
-          state.frame = requestAnimationFrame(animate);
-          return;
-        }
+        if (!state.sized) { state.frame = requestAnimationFrame(animate); return; }
       }
 
       const { elapsed: el, timerState: ts, prefersReduced: pr, isDark: dark } = propsRef.current;
@@ -129,203 +158,263 @@ export default function WaterHourglassCanvas({
       const isStopped = ts === 'stopped';
       const minutes = el / 60000;
       const { w, h } = state;
-      const palette = dark ? COLORS.dark : COLORS.light;
+      const palette = dark ? SAND.dark : SAND.light;
 
-      state.time += isPaused ? 0.003 : 0.016;
+      state.time += isPaused ? 0.002 : 0.016;
       const t = state.time;
 
-      // ─── Water level: 0 (empty) → 0.75 (3/4 full at 30 min) ───
-      const targetLevel = countdownTarget
-        ? Math.min(0.85, el / (countdownTarget * 60000) * 0.85)
-        : Math.min(0.75, minutes / 30 * 0.75);
-      const waterLevel = targetLevel;
+      // ─── Hourglass dimensions ───
+      const cx = w / 2;
+      const cy = h / 2;
+      const glassW = w * 0.8;
+      const glassH = h * 0.88;
+      const topY = cy - glassH * 0.48;
+      const botY = cy + glassH * 0.48;
+      const neckY = cy;
+      const neckHalfW = glassW * 0.06;
 
-      // Water surface Y coordinate (from bottom)
-      const surfaceBaseY = h - waterLevel * h;
+      // ─── Progress: 0 → 1 over session ───
+      const progress = countdownTarget
+        ? Math.min(1, el / (countdownTarget * 60000))
+        : Math.min(1, minutes / 30);
 
-      // ─── Background: warm dark with subtle warmth over time ───
+      // Sand levels (Y coordinates)
+      // Top sand: starts near top, drops as sand depletes
+      const topSandMaxH = (neckY - topY) * 0.85; // max sand height in top bulb
+      const topSandH = topSandMaxH * (1 - progress);
+      const topSandSurfaceY = neckY - topSandH; // where top sand surface is
+      // Bottom sand: starts empty, mound grows
+      const botSandMaxH = (botY - neckY) * 0.85;
+      const botSandH = botSandMaxH * progress;
+      const botSandSurfaceY = botY - botSandH; // where bottom mound top is
+
+      // ─── Background ───
       const warmth = Math.min(1, minutes / 30);
-      let bgR, bgG, bgB;
       if (dark) {
-        bgR = Math.round(10 + warmth * 12);
-        bgG = Math.round(8 + warmth * 6);
-        bgB = Math.round(6 + warmth * 2);
+        ctx.fillStyle = `rgb(${Math.round(10 + warmth * 8)},${Math.round(8 + warmth * 5)},${Math.round(6 + warmth * 2)})`;
       } else {
-        bgR = Math.round(242 - warmth * 6);
-        bgG = Math.round(240 - warmth * 4);
-        bgB = Math.round(236 - warmth * 8);
+        ctx.fillStyle = `rgb(${Math.round(244 - warmth * 4)},${Math.round(242 - warmth * 3)},${Math.round(238 - warmth * 6)})`;
       }
-      ctx.fillStyle = `rgb(${bgR},${bgG},${bgB})`;
       ctx.fillRect(0, 0, w, h);
 
-      // ─── Spawn drops ───
-      if (!isPaused && !isStopped && minutes > 0) {
-        const interval = DROP_INTERVAL_BASE - (minutes / 30) * (DROP_INTERVAL_BASE - DROP_INTERVAL_MIN);
-        if (t - state.lastDropTime > interval) {
-          // Drop spawns at a noise-varied X position near center
-          const noiseX = valueNoise(t * 0.5 + state.sessionSeed, 0) - 0.5;
-          const dropX = w * 0.5 + noiseX * w * 0.3;
-          const radiusNoise = valueNoise(t * 0.3 + 100, state.sessionSeed);
-          const dropRadius = DROP_RADIUS_MIN + radiusNoise * (DROP_RADIUS_MAX - DROP_RADIUS_MIN);
+      // ─── Hourglass outline ───
+      hourglassPath(ctx, cx, cy, glassW, glassH);
+      if (dark) {
+        ctx.strokeStyle = `rgba(160,155,130,${0.10 + warmth * 0.04})`;
+      } else {
+        ctx.strokeStyle = `rgba(120,110,80,${0.12 + warmth * 0.04})`;
+      }
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
 
-          state.drops.push({
-            x: dropX,
-            y: -dropRadius * 2,
-            vy: 0,
-            radius: dropRadius,
-            born: t,
-          });
-          state.lastDropTime = t;
+      // ─── Glass highlight (left edge reflection) ───
+      if (!pr) {
+        ctx.save();
+        hourglassPath(ctx, cx, cy, glassW, glassH);
+        ctx.clip();
+        const reflGrad = ctx.createLinearGradient(cx - glassW * 0.42, 0, cx - glassW * 0.28, 0);
+        reflGrad.addColorStop(0, dark ? 'rgba(200,195,170,0.03)' : 'rgba(255,255,255,0.06)');
+        reflGrad.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx.fillStyle = reflGrad;
+        ctx.fillRect(cx - glassW * 0.45, topY, glassW * 0.2, glassH);
+        ctx.restore();
+      }
+
+      // ─── Draw sand (clipped to hourglass) ───
+      ctx.save();
+      hourglassPath(ctx, cx, cy, glassW, glassH);
+      ctx.clip();
+
+      // === TOP SAND (depleting) ===
+      if (topSandH > 0.5) {
+        const [br, bg, bb] = palette.body;
+        const [dr, dg, db] = palette.bodyDeep;
+
+        // Sand body — gradient from surface (light) to bottom (dark)
+        const topGrad = ctx.createLinearGradient(0, topSandSurfaceY, 0, neckY);
+        topGrad.addColorStop(0, `rgba(${br},${bg},${bb},0.7)`);
+        topGrad.addColorStop(0.7, `rgba(${br},${bg},${bb},0.8)`);
+        topGrad.addColorStop(1, `rgba(${dr},${dg},${db},0.85)`);
+
+        // Draw top sand with funnel dip toward center
+        ctx.beginPath();
+        // Surface: slightly dipped toward center (funnel effect)
+        const funnelDepth = Math.min(8, topSandH * 0.15);
+        for (let x = 0; x <= w; x += 2) {
+          const hw = hourglassHalfW(cy, glassH, glassW, topSandSurfaceY);
+          const distFromCenter = Math.abs(x - cx) / hw;
+          const funnel = (1 - distFromCenter * distFromCenter) * funnelDepth;
+          // Small noise for texture
+          const noise = pr ? 0 : (valueNoise(x * 0.05 + t * 0.02, state.sessionSeed * 0.1) - 0.5) * 0.5;
+          const sy = topSandSurfaceY + funnel + noise;
+          if (x === 0) ctx.moveTo(x, sy);
+          else ctx.lineTo(x, sy);
+        }
+        // Close around the bottom of top bulb / neck area
+        ctx.lineTo(w, neckY);
+        ctx.lineTo(0, neckY);
+        ctx.closePath();
+        ctx.fillStyle = topGrad;
+        ctx.fill();
+
+        // Subtle surface texture — tiny grain dots on surface
+        if (!pr) {
+          const [gr, gg, gb] = palette.grainLight;
+          const hw = hourglassHalfW(cy, glassH, glassW, topSandSurfaceY);
+          for (let i = 0; i < 15; i++) {
+            const gx = cx + (valueNoise(i * 7.1 + t * 0.01, state.sessionSeed) - 0.5) * hw * 1.6;
+            const distC = Math.abs(gx - cx) / hw;
+            const funnel = (1 - distC * distC) * funnelDepth;
+            const gy = topSandSurfaceY + funnel + (valueNoise(i * 3.7, t * 0.005) - 0.5) * 1;
+            ctx.beginPath();
+            ctx.arc(gx, gy, 0.5 + valueNoise(i * 2, 0) * 0.5, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(${gr},${gg},${gb},${0.2 + valueNoise(i * 5, t * 0.1) * 0.15})`;
+            ctx.fill();
+          }
         }
       }
 
-      // ─── Update drops ───
-      for (let i = state.drops.length - 1; i >= 0; i--) {
-        const drop = state.drops[i];
-        drop.vy += GRAVITY;
-        drop.y += drop.vy;
+      // === BOTTOM SAND (accumulating mound) ===
+      if (botSandH > 0.5) {
+        const [br, bg, bb] = palette.body;
+        const [dr, dg, db] = palette.bodyDeep;
 
-        // Hit water surface?
-        if (drop.y + drop.radius >= surfaceBaseY) {
-          // Create ripple
-          if (state.ripples.length < MAX_RIPPLES) {
-            state.ripples.push({
-              x: drop.x,
-              radius: 0,
-              maxRadius: drop.radius * 8 + 10,
-              alpha: 0.7,
-              born: t,
+        // Bottom gradient: surface light, bottom dark
+        const botGrad = ctx.createLinearGradient(0, botSandSurfaceY, 0, botY);
+        botGrad.addColorStop(0, `rgba(${br},${bg},${bb},0.7)`);
+        botGrad.addColorStop(0.5, `rgba(${br},${bg},${bb},0.8)`);
+        botGrad.addColorStop(1, `rgba(${dr},${dg},${db},0.85)`);
+
+        // Mound shape: dome higher in center (Miyazaki)
+        ctx.beginPath();
+        const moundPeak = Math.min(12, botSandH * 0.2);
+        for (let x = 0; x <= w; x += 2) {
+          const hw = hourglassHalfW(cy, glassH, glassW, botSandSurfaceY);
+          const distFromCenter = Math.abs(x - cx) / Math.max(hw, 1);
+          // Smooth dome: peak at center, flat at edges
+          const dome = Math.max(0, (1 - distFromCenter * distFromCenter)) * moundPeak;
+          const noise = pr ? 0 : (valueNoise(x * 0.05 + t * 0.01, state.sessionSeed * 0.1 + 50) - 0.5) * 0.5;
+          const sy = botSandSurfaceY - dome + noise;
+          if (x === 0) ctx.moveTo(x, sy);
+          else ctx.lineTo(x, sy);
+        }
+        ctx.lineTo(w, botY + 5);
+        ctx.lineTo(0, botY + 5);
+        ctx.closePath();
+        ctx.fillStyle = botGrad;
+        ctx.fill();
+
+        // Surface texture dots on mound
+        if (!pr) {
+          const [gr, gg, gb] = palette.grainLight;
+          const hw = hourglassHalfW(cy, glassH, glassW, botSandSurfaceY);
+          for (let i = 0; i < 15; i++) {
+            const gx = cx + (valueNoise(i * 7.1 + t * 0.01, state.sessionSeed + 100) - 0.5) * hw * 1.6;
+            const distC = Math.abs(gx - cx) / Math.max(hw, 1);
+            const dome = Math.max(0, (1 - distC * distC)) * moundPeak;
+            const gy = botSandSurfaceY - dome + (valueNoise(i * 3.7 + 50, t * 0.005) - 0.5) * 1;
+            ctx.beginPath();
+            ctx.arc(gx, gy, 0.5 + valueNoise(i * 2 + 50, 0) * 0.5, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(${gr},${gg},${gb},${0.2 + valueNoise(i * 5 + 50, t * 0.1) * 0.15})`;
+            ctx.fill();
+          }
+        }
+      }
+
+      // === FALLING STREAM (the heartbeat) ===
+      if (!isStopped && progress > 0 && progress < 1) {
+        // Spawn grains at neck
+        const spawnRate = isPaused ? 0.15 : 0.04; // seconds between spawns
+        if (t - state.lastSpawn > spawnRate && !isPaused) {
+          // Spawn 1-3 grains per batch for density
+          const batch = 1 + Math.floor(Math.random() * 2);
+          for (let b = 0; b < batch && state.grains.length < MAX_GRAINS; b++) {
+            const nx = (valueNoise(t * 2 + b * 17, state.sessionSeed) - 0.5) * neckHalfW * 1.2;
+            state.grains.push({
+              x: cx + nx,
+              y: neckY + 1 + Math.random() * 2,
+              vy: 0.3 + Math.random() * 0.5,
+              size: 0.8 + Math.random() * 1.0,
+              shade: Math.random(), // 0=dark, 1=light
             });
           }
-          state.drops.splice(i, 1);
+          state.lastSpawn = t;
         }
-      }
 
-      // ─── Update ripples ───
-      for (let i = state.ripples.length - 1; i >= 0; i--) {
-        const ripple = state.ripples[i];
-        const age = t - ripple.born;
-        ripple.radius = ripple.maxRadius * Math.min(1, age * 1.5);
-        ripple.alpha = 0.7 * Math.max(0, 1 - age * 0.8);
-        if (ripple.alpha <= 0.01) {
-          state.ripples.splice(i, 1);
-        }
-      }
+        // Update grains
+        for (let i = state.grains.length - 1; i >= 0; i--) {
+          const grain = state.grains[i];
+          grain.vy += GRAIN_GRAVITY;
+          grain.y += grain.vy;
+          // Slight horizontal drift (organic)
+          grain.x += (valueNoise(grain.y * 0.1 + i, t * 0.5) - 0.5) * 0.3;
 
-      // ─── Draw water body ───
-      if (waterLevel > 0.001) {
-        // Breathing: surface gently rises and falls
-        const breathOffset = pr ? 0 : Math.sin(t * 0.6) * 2;
-
-        // Wave surface path
-        ctx.beginPath();
-        const waveY = surfaceBaseY + breathOffset;
-
-        ctx.moveTo(0, waveY);
-        // Draw wavy surface
-        for (let x = 0; x <= w; x += 2) {
-          const wave1 = Math.sin(x * 0.02 + t * 0.8) * 3;
-          const wave2 = Math.sin(x * 0.035 + t * 0.5 + 1.5) * 1.5;
-          const noiseWave = pr ? 0 : (valueNoise(x * 0.01 + t * 0.2, state.sessionSeed * 0.01) - 0.5) * 2;
-          ctx.lineTo(x, waveY + wave1 + wave2 + noiseWave);
-        }
-        ctx.lineTo(w, h);
-        ctx.lineTo(0, h);
-        ctx.closePath();
-
-        // Water gradient (top=translucent, bottom=deep)
-        const waterGrad = ctx.createLinearGradient(0, waveY, 0, h);
-        const [tr, tg, tb, ta] = palette.waterTop;
-        const [mr, mg, mb, ma] = palette.waterMid;
-        const [br2, bg2, bb2, ba] = palette.waterBottom;
-        waterGrad.addColorStop(0, `rgba(${tr},${tg},${tb},${ta})`);
-        waterGrad.addColorStop(0.4, `rgba(${mr},${mg},${mb},${ma})`);
-        waterGrad.addColorStop(1, `rgba(${br2},${bg2},${bb2},${ba})`);
-        ctx.fillStyle = waterGrad;
-        ctx.fill();
-
-        // Surface sheen / highlight line
-        if (!pr) {
-          const [sr, sg, sb] = palette.surfaceSheen;
-          ctx.beginPath();
-          for (let x = 0; x <= w; x += 2) {
-            const wave1 = Math.sin(x * 0.02 + t * 0.8) * 3;
-            const wave2 = Math.sin(x * 0.035 + t * 0.5 + 1.5) * 1.5;
-            const noiseWave = (valueNoise(x * 0.01 + t * 0.2, state.sessionSeed * 0.01) - 0.5) * 2;
-            const sy = waveY + wave1 + wave2 + noiseWave;
-            if (x === 0) ctx.moveTo(x, sy);
-            else ctx.lineTo(x, sy);
+          // Hit bottom mound?
+          if (grain.y >= botSandSurfaceY - 2) {
+            state.grains.splice(i, 1);
+            continue;
           }
-          ctx.strokeStyle = `rgba(${sr},${sg},${sb},${0.15 + Math.sin(t * 0.4) * 0.05})`;
-          ctx.lineWidth = 1.5;
-          ctx.stroke();
+
+          // Out of hourglass bounds?
+          const hw = hourglassHalfW(cy, glassH, glassW, grain.y);
+          if (Math.abs(grain.x - cx) > hw) {
+            state.grains.splice(i, 1);
+          }
         }
-      }
 
-      // ─── Draw ripples on surface ───
-      for (const ripple of state.ripples) {
-        const [rr, rg, rb] = palette.ripple;
-        const breathOffset = pr ? 0 : Math.sin(t * 0.6) * 2;
-        const ry = surfaceBaseY + breathOffset;
-
-        // Elliptical ripple (perspective: wider than tall)
+        // Draw the continuous stream line (thin column through neck)
+        const [sr, sg, sb] = palette.stream;
+        // Faint stream column
         ctx.beginPath();
-        ctx.ellipse(ripple.x, ry, ripple.radius, ripple.radius * 0.3, 0, 0, Math.PI * 2);
-        ctx.strokeStyle = `rgba(${rr},${rg},${rb},${ripple.alpha * 0.5})`;
-        ctx.lineWidth = 1.2;
-        ctx.stroke();
-
-        // Inner ripple
-        if (ripple.radius > 5) {
-          ctx.beginPath();
-          ctx.ellipse(ripple.x, ry, ripple.radius * 0.5, ripple.radius * 0.15, 0, 0, Math.PI * 2);
-          ctx.strokeStyle = `rgba(${rr},${rg},${rb},${ripple.alpha * 0.3})`;
-          ctx.lineWidth = 0.8;
-          ctx.stroke();
+        const streamW = neckHalfW * 0.6;
+        const streamTop = neckY - 2;
+        const streamBot = Math.min(botSandSurfaceY - 3, botY);
+        ctx.moveTo(cx - streamW, streamTop);
+        for (let y = streamTop; y <= streamBot; y += 2) {
+          const drift = pr ? 0 : Math.sin(y * 0.08 + t * 2) * 0.5;
+          ctx.lineTo(cx - streamW + drift, y);
         }
-      }
-
-      // ─── Draw falling drops ───
-      for (const drop of state.drops) {
-        const [dr, dg, db] = palette.dropFill;
-        const [hr, hg, hb] = palette.dropHighlight;
-
-        // Drop shape: teardrop (circle + pointed top)
-        const { x, y, radius } = drop;
-
-        // Main drop body
-        ctx.beginPath();
-        ctx.arc(x, y, radius, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(${dr},${dg},${db},0.8)`;
+        for (let y = streamBot; y >= streamTop; y -= 2) {
+          const drift = pr ? 0 : Math.sin(y * 0.08 + t * 2) * 0.5;
+          ctx.lineTo(cx + streamW + drift, y);
+        }
+        ctx.closePath();
+        ctx.fillStyle = `rgba(${sr},${sg},${sb},${isPaused ? 0.03 : 0.12})`;
         ctx.fill();
 
-        // Highlight (light reflection on drop)
-        ctx.beginPath();
-        ctx.arc(x - radius * 0.3, y - radius * 0.3, radius * 0.35, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(${hr},${hg},${hb},0.5)`;
-        ctx.fill();
-
-        // Subtle glow
-        if (!pr) {
-          ctx.shadowColor = `rgba(${dr},${dg},${db},0.4)`;
-          ctx.shadowBlur = 8;
+        // Draw individual grains
+        for (const grain of state.grains) {
+          const [gr, gg, gb] = grain.shade > 0.5 ? palette.grainLight : palette.grain;
+          const alpha = 0.5 + grain.shade * 0.3;
           ctx.beginPath();
-          ctx.arc(x, y, radius * 0.5, 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(${dr},${dg},${db},0.3)`;
+          ctx.arc(grain.x, grain.y, grain.size, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(${gr},${gg},${gb},${alpha})`;
           ctx.fill();
-          ctx.shadowBlur = 0;
+        }
+
+        // Stream glow (Turrell: grains catch light)
+        if (!pr) {
+          const glowGrad = ctx.createRadialGradient(cx, neckY + 20, 0, cx, neckY + 20, 25);
+          glowGrad.addColorStop(0, `rgba(${sr},${sg},${sb},0.04)`);
+          glowGrad.addColorStop(1, 'rgba(0,0,0,0)');
+          ctx.fillStyle = glowGrad;
+          ctx.fillRect(cx - 30, neckY, 60, 40);
         }
       }
 
-      // ─── Ambient glow from water surface ───
-      if (!pr && waterLevel > 0.05) {
-        const glowIntensity = Math.min(0.08, waterLevel * 0.1);
-        const grad = ctx.createRadialGradient(
-          w * 0.5, surfaceBaseY, 0,
-          w * 0.5, surfaceBaseY, w * 0.5
-        );
-        const [sr, sg, sb] = palette.surfaceSheen;
-        grad.addColorStop(0, `rgba(${sr},${sg},${sb},${glowIntensity})`);
+      // === Paused: stream nearly stops, a few frozen grains ===
+      if (isPaused && state.grains.length > 5) {
+        // Slowly remove grains during pause
+        if (Math.random() < 0.02) state.grains.pop();
+      }
+
+      ctx.restore(); // unclip hourglass
+
+      // ─── Subtle warm glow around hourglass (ambient) ───
+      if (!pr && progress > 0.05) {
+        const glowI = Math.min(0.04, progress * 0.04);
+        const grad = ctx.createRadialGradient(cx, cy, glassH * 0.2, cx, cy, glassH * 0.6);
+        grad.addColorStop(0, `rgba(185,175,150,${glowI})`);
         grad.addColorStop(1, 'rgba(0,0,0,0)');
         ctx.fillStyle = grad;
         ctx.fillRect(0, 0, w, h);
@@ -340,7 +429,6 @@ export default function WaterHourglassCanvas({
 
   const displayMs = countdownTarget ? Math.max(0, countdownTarget * 60000 - elapsed) : elapsed;
   const isStopped = timerState === 'stopped';
-  // Toggle: numbers visible → art dim. Art visible → numbers gone.
   const timerOpacity = isStopped ? 0.9 : (numbersHidden ? 0 : (timerState === 'paused' ? 0.4 : 0.85));
 
   return (
@@ -358,7 +446,7 @@ export default function WaterHourglassCanvas({
         className="absolute inset-0 w-full h-full"
         style={{
           borderRadius: '20px',
-          opacity: numbersHidden ? 1 : 0.2,
+          opacity: numbersHidden ? 1 : 0.25,
           transition: 'opacity 1.2s ease',
         }}
         aria-hidden="true"
