@@ -1,8 +1,13 @@
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import {
   NOTES, NOTE_DISPLAY, SCALE_NAMES, INTENTS,
   getScaleNotes, getDiatonicChords, getCAGEDPositions,
 } from '../data/musicTheory';
+import {
+  getReadyPageState, saveReadyPageState, getFavorites, toggleFavorite,
+  incrementKeyHit, incrementSectionHit, getAdaptiveKeyOrder,
+  getAdaptiveDefaultSection,
+} from '../utils/storage';
 import ObliqueCard from './ObliqueCard';
 import ChordSection from './ChordSection';
 import ScaleSection from './ScaleSection';
@@ -52,9 +57,41 @@ function AccordionSection({ id, icon, label, isOpen, onToggle, children }) {
   );
 }
 
+// ─── Favorites Pill Row ───
+// Compact row of saved key+scale combos for instant recall
+function FavoritesPills({ favorites, currentRoot, currentScale, onLoad, onRemove }) {
+  if (!favorites.length) return null;
+
+  return (
+    <div className="flex gap-1.5 overflow-x-auto no-scrollbar pb-1 mt-1.5">
+      {favorites.map((fav, i) => {
+        const isActive = fav.root === currentRoot && fav.scale === currentScale;
+        return (
+          <button
+            key={`${fav.root}-${fav.scale}-${i}`}
+            onClick={() => onLoad(fav.root, fav.scale)}
+            onContextMenu={(e) => { e.preventDefault(); onRemove(fav.root, fav.scale); }}
+            className={`shrink-0 flex items-center gap-1 px-2.5 py-1.5 rounded-full text-[10px] font-semibold transition-all active:scale-95 ${
+              isActive
+                ? 'bg-water-2/25 text-water-5 ring-1 ring-water-3/30'
+                : 'card text-text-2 hover:text-text'
+            }`}
+          >
+            <span className="text-amber-400 text-[8px]">★</span>
+            {fav.root} {SCALE_NAMES[fav.scale]?.split(' ')[0] || fav.scale}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
 // ─── Sticky Root Lock Bar ───
 // Compact key/scale selector that stays visible while scrolling
-function StickyRootLock({ rootNote, scale, onRootChange, onScaleChange, expanded, onToggleExpand }) {
+function StickyRootLock({
+  rootNote, scale, onRootChange, onScaleChange, expanded, onToggleExpand,
+  isFav, onToggleFav, quickJumpKeys,
+}) {
   return (
     <div className="sticky top-0 z-30 -mx-4 px-4 pt-2 pb-2" style={{
       background: 'linear-gradient(to bottom, var(--color-bg) 80%, transparent)',
@@ -76,9 +113,20 @@ function StickyRootLock({ rootNote, scale, onRootChange, onScaleChange, expanded
           </svg>
         </button>
 
-        {/* Quick key jumps */}
+        {/* Star — toggle favorite */}
+        <button
+          onClick={onToggleFav}
+          className="shrink-0 w-7 h-7 rounded-full flex items-center justify-center active:scale-90 transition-all"
+          aria-label={isFav ? 'Remove from favorites' : 'Save as favorite'}
+        >
+          <span className={`text-sm transition-all ${isFav ? 'text-amber-400 scale-110' : 'text-text-3/40 hover:text-text-3'}`}>
+            {isFav ? '★' : '☆'}
+          </span>
+        </button>
+
+        {/* Quick key jumps — adaptive order from keyHits */}
         <div className="flex gap-1 overflow-x-auto no-scrollbar flex-1">
-          {['C', 'D', 'E', 'G', 'A'].map(note => (
+          {quickJumpKeys.map(note => (
             <button
               key={note}
               onClick={() => onRootChange(note)}
@@ -142,25 +190,80 @@ function StickyRootLock({ rootNote, scale, onRootChange, onScaleChange, expanded
   );
 }
 
-// ─── Smart Ready — Competition M Winner ───
-// Spool + Rams + Wroblewski synthesis: progressive disclosure, The Current as hero,
-// sticky Root Lock, accordion sections. Same content, better organization.
+// ─── The Living Ready Page — Competition R Winner ───
+// Ive's "Quiet Teacher" + Linus's counters + Oprah's UX
+// Layer 1: Persistent state (page remembers where you left it)
+// Layer 2: Favorites (star to save, pill row to recall)
+// Layer 3: Adaptive intelligence (keyHits, sectionHits, reordering)
 
 export default function ShedPage({ sessions = [], onNavigate }) {
-  const [rootNote, setRootNote] = useState('C');
-  const [scale, setScale] = useState('major');
-  const [showDegrees, setShowDegrees] = useState('notes'); // 'notes' | 'degrees' | 'both'
+  // ── Layer 1: Initialize from persistent state ──
+  const savedState = useRef(getReadyPageState());
+  const defaultSection = useRef(getAdaptiveDefaultSection(INTENTS.map(i => i.id)));
+
+  const [rootNote, setRootNote] = useState(savedState.current.root || 'C');
+  const [scale, setScale] = useState(savedState.current.scale || 'major');
+  const [showDegrees, setShowDegrees] = useState(savedState.current.showDegrees || 'notes');
   const [activePosition, setActivePosition] = useState(null);
   const [showBarre, setShowBarre] = useState(false);
   const [showIntervals, setShowIntervals] = useState(true);
   const [obliqueDismissed, setObliqueDismissed] = useState(false);
   const [rootLockExpanded, setRootLockExpanded] = useState(false);
 
-  // Accordion state — default: scale open (Max: scales first)
-  const [openSections, setOpenSections] = useState({ scale: true });
+  // Accordion state — restored from persistent state, or adaptive default
+  const [openSections, setOpenSections] = useState(() => {
+    const saved = savedState.current.openSections;
+    if (saved && Object.keys(saved).some(k => saved[k])) return saved;
+    return { [defaultSection.current]: true };
+  });
+
+  // ── Layer 2: Favorites ──
+  const [favorites, setFavorites] = useState(getFavorites);
+  const currentIsFav = favorites.some(f => f.root === rootNote && f.scale === scale);
+
+  const handleToggleFav = useCallback(() => {
+    const updated = toggleFavorite(rootNote, scale);
+    setFavorites(updated);
+  }, [rootNote, scale]);
+
+  const handleLoadFav = useCallback((root, s) => {
+    setRootNote(root);
+    setScale(s);
+  }, []);
+
+  const handleRemoveFav = useCallback((root, s) => {
+    const updated = toggleFavorite(root, s);
+    setFavorites(updated);
+  }, []);
+
+  // ── Layer 3: Adaptive quick-jump keys ──
+  const quickJumpKeys = useMemo(
+    () => getAdaptiveKeyOrder(['C', 'D', 'E', 'G', 'A']),
+    [] // only compute on mount
+  );
+
+  // ── Debounced persistence (Layer 1) ──
+  const saveTimerRef = useRef(null);
+  useEffect(() => {
+    if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
+    saveTimerRef.current = setTimeout(() => {
+      saveReadyPageState({ root: rootNote, scale, openSections, showDegrees });
+    }, 250);
+    return () => { if (saveTimerRef.current) clearTimeout(saveTimerRef.current); };
+  }, [rootNote, scale, openSections, showDegrees]);
+
+  // ── Layer 3: Increment counters ──
+  const handleRootChange = useCallback((note) => {
+    setRootNote(note);
+    incrementKeyHit(note);
+  }, []);
 
   const toggleSection = useCallback((id) => {
-    setOpenSections(prev => ({ ...prev, [id]: !prev[id] }));
+    setOpenSections(prev => {
+      const isOpening = !prev[id];
+      if (isOpening) incrementSectionHit(id);
+      return { ...prev, [id]: !prev[id] };
+    });
   }, []);
 
   const rootIdx = NOTES.indexOf(rootNote);
@@ -178,23 +281,35 @@ export default function ShedPage({ sessions = [], onNavigate }) {
   const handleSetIntent = useCallback((intent) => {
     setOpenSections(prev => {
       const next = {};
-      // Close all others, open the selected one
       for (const key of Object.keys(prev)) next[key] = false;
       next[intent] = true;
       return next;
     });
+    incrementSectionHit(intent);
   }, []);
 
   return (
     <div className="px-4 pt-3 pb-24">
-      {/* Sticky Root Lock bar — always accessible */}
+      {/* Sticky Root Lock bar — with star + adaptive quick-jump */}
       <StickyRootLock
         rootNote={rootNote}
         scale={scale}
-        onRootChange={setRootNote}
+        onRootChange={handleRootChange}
         onScaleChange={setScale}
         expanded={rootLockExpanded}
         onToggleExpand={() => setRootLockExpanded(e => !e)}
+        isFav={currentIsFav}
+        onToggleFav={handleToggleFav}
+        quickJumpKeys={quickJumpKeys}
+      />
+
+      {/* Favorites pill row — hidden when empty (progressive disclosure) */}
+      <FavoritesPills
+        favorites={favorites}
+        currentRoot={rootNote}
+        currentScale={scale}
+        onLoad={handleLoadFav}
+        onRemove={handleRemoveFav}
       />
 
       {/* Oblique Strategy Card */}
@@ -205,7 +320,7 @@ export default function ShedPage({ sessions = [], onNavigate }) {
       {/* The Current — HERO position (Spool: smart suggestion drives the page) */}
       <CurrentCard
         sessions={sessions}
-        onSetRoot={setRootNote}
+        onSetRoot={handleRootChange}
         onSetScale={setScale}
         onSetIntent={handleSetIntent}
       />
@@ -213,7 +328,7 @@ export default function ShedPage({ sessions = [], onNavigate }) {
       {/* Quick Start triptych */}
       <QuickStartCards
         sessions={sessions}
-        onSetRoot={setRootNote}
+        onSetRoot={handleRootChange}
         onSetScale={setScale}
       />
 
@@ -246,7 +361,7 @@ export default function ShedPage({ sessions = [], onNavigate }) {
               />
             )}
             {i.id === 'circle' && (
-              <CircleSection rootNote={rootNote} onSetRootNote={setRootNote} />
+              <CircleSection rootNote={rootNote} onSetRootNote={handleRootChange} />
             )}
             {i.id === 'ref' && (
               <QuickRefSection />

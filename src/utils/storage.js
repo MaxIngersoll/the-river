@@ -68,6 +68,12 @@ function loadData() {
     if (!data.source || typeof data.source !== 'object') {
       data.source = { answer: null, answered_at: null, margin_notes: [], readings_completed: [] };
     }
+    if (!data.readyPage || typeof data.readyPage !== 'object') {
+      data.readyPage = {
+        lastState: { root: 'C', scale: 'major', openSections: { scale: true }, showDegrees: 'notes' },
+        favorites: [], keyHits: {}, sectionHits: {},
+      };
+    }
 
     _dataCache = data;
     return data;
@@ -101,6 +107,12 @@ function getDefaultData() {
       answered_at: null,
       margin_notes: [],
       readings_completed: [],
+    },
+    readyPage: {
+      lastState: { root: 'C', scale: 'major', openSections: { scale: true }, showDegrees: 'notes' },
+      favorites: [],    // [{root, scale}] — max 5
+      keyHits: {},      // {C: 12, E: 8, ...}
+      sectionHits: {},  // {scale: 20, chords: 15, ...}
     },
   };
 }
@@ -464,4 +476,78 @@ export function mergeImport(newSessions) {
   }
   setData(data);
   return data;
+}
+
+// ─── Ready Page: Persistent State + Favorites + Adaptive Memory ───
+// Competition R synthesis: Ive's "Quiet Teacher" + Linus's counters
+
+const READY_PAGE_MAX_FAVORITES = 5;
+const ADAPTATION_THRESHOLD = 10;
+
+export function getReadyPageState() {
+  const data = getData();
+  return data.readyPage?.lastState || { root: 'C', scale: 'major', openSections: { scale: true }, showDegrees: 'notes' };
+}
+
+export function saveReadyPageState(state) {
+  const data = getData();
+  if (!data.readyPage) data.readyPage = { lastState: {}, favorites: [], keyHits: {}, sectionHits: {} };
+  data.readyPage.lastState = { ...data.readyPage.lastState, ...state };
+  setData(data);
+}
+
+export function getFavorites() {
+  return getData().readyPage?.favorites || [];
+}
+
+export function toggleFavorite(root, scale) {
+  const data = getData();
+  if (!data.readyPage) data.readyPage = { lastState: {}, favorites: [], keyHits: {}, sectionHits: {} };
+  const favs = data.readyPage.favorites;
+  const idx = favs.findIndex(f => f.root === root && f.scale === scale);
+  if (idx >= 0) {
+    favs.splice(idx, 1);
+  } else if (favs.length < READY_PAGE_MAX_FAVORITES) {
+    favs.push({ root, scale });
+  }
+  setData(data);
+  return data.readyPage.favorites;
+}
+
+export function isFavorite(root, scale) {
+  const favs = getFavorites();
+  return favs.some(f => f.root === root && f.scale === scale);
+}
+
+export function incrementKeyHit(root) {
+  const data = getData();
+  if (!data.readyPage) data.readyPage = { lastState: {}, favorites: [], keyHits: {}, sectionHits: {} };
+  data.readyPage.keyHits[root] = (data.readyPage.keyHits[root] || 0) + 1;
+  setData(data);
+}
+
+export function incrementSectionHit(sectionId) {
+  const data = getData();
+  if (!data.readyPage) data.readyPage = { lastState: {}, favorites: [], keyHits: {}, sectionHits: {} };
+  data.readyPage.sectionHits[sectionId] = (data.readyPage.sectionHits[sectionId] || 0) + 1;
+  setData(data);
+}
+
+export function getAdaptiveKeyOrder(allKeys) {
+  const hits = getData().readyPage?.keyHits || {};
+  const totalHits = Object.values(hits).reduce((s, v) => s + v, 0);
+  if (totalHits < ADAPTATION_THRESHOLD) return allKeys;
+  return [...allKeys].sort((a, b) => (hits[b] || 0) - (hits[a] || 0));
+}
+
+export function getAdaptiveDefaultSection(sectionIds) {
+  const hits = getData().readyPage?.sectionHits || {};
+  const totalHits = Object.values(hits).reduce((s, v) => s + v, 0);
+  if (totalHits < ADAPTATION_THRESHOLD) return 'scale'; // default
+  let best = sectionIds[0];
+  let bestCount = 0;
+  for (const id of sectionIds) {
+    if ((hits[id] || 0) > bestCount) { bestCount = hits[id] || 0; best = id; }
+  }
+  return best;
 }
