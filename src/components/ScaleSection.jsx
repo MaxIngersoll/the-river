@@ -1,11 +1,12 @@
-import { useMemo } from 'react';
+import { useMemo, useCallback } from 'react';
 import {
-  NOTES, SCALE_NAMES, STEP_PATTERNS, OPEN_STRINGS, STRING_LABELS,
+  NOTES, SCALE_NAMES, STEP_PATTERNS, OPEN_STRINGS, STRING_LABELS, STRING_FREQS,
 } from '../data/musicTheory';
+import { initAudio, playNote } from '../utils/audio';
 
 // ─── Fretboard Diagram ───
 
-function FretboardDiagram({ scaleNoteIndexes, rootIdx, showDegrees, highlightRange }) {
+function FretboardDiagram({ scaleNoteIndexes, rootIdx, showDegrees, highlightRange, onNoteTap }) {
   const FRETS = 15;
   const STRINGS = 6;
   const LEFT = 32;
@@ -153,9 +154,15 @@ function FretboardDiagram({ scaleNoteIndexes, rootIdx, showDegrees, highlightRan
             const dimmed = !inRange(f);
             const cx = fretX(f);
             const cy = stringY(s);
-            const label = showDegrees ? degreeLookup[noteIdx] : NOTES[noteIdx];
+            const noteName = NOTES[noteIdx];
+            const degree = degreeLookup[noteIdx];
+            const isBoth = showDegrees === 'both';
+            const isDegrees = showDegrees === 'degrees';
+            const label = isDegrees ? degree : isBoth ? degree : noteName;
             return (
-              <g key={`${s}-${f}`} opacity={dimmed ? 0.2 : 1}>
+              <g key={`${s}-${f}`} opacity={dimmed ? 0.2 : 1}
+                className={dimmed ? '' : 'cursor-pointer'}
+                onClick={dimmed ? undefined : () => onNoteTap?.(s, f)}>
                 {isRoot && !dimmed && (
                   <circle cx={cx} cy={cy} r={DOT_R + 2} fill="rgba(var(--accent-rgb),0.15)" />
                 )}
@@ -163,11 +170,26 @@ function FretboardDiagram({ scaleNoteIndexes, rootIdx, showDegrees, highlightRan
                   fill={isRoot ? 'var(--accent)' : 'rgba(var(--accent-rgb),0.15)'}
                   stroke={isRoot ? 'none' : 'rgba(var(--accent-rgb),0.4)'}
                   strokeWidth="1" />
-                <text x={cx} y={cy + 1} textAnchor="middle" dominantBaseline="central"
-                  fontSize="9" fontWeight="700"
-                  fill={isRoot ? 'white' : 'var(--accent)'}>
-                  {label}
-                </text>
+                {isBoth ? (
+                  <>
+                    <text x={cx} y={cy - 3.5} textAnchor="middle" dominantBaseline="central"
+                      fontSize="7.5" fontWeight="800"
+                      fill={isRoot ? 'white' : 'var(--accent)'}>
+                      {degree}
+                    </text>
+                    <text x={cx} y={cy + 4.5} textAnchor="middle" dominantBaseline="central"
+                      fontSize="6" fontWeight="600"
+                      fill={isRoot ? 'rgba(255,255,255,0.7)' : 'rgba(var(--accent-rgb),0.6)'}>
+                      {noteName}
+                    </text>
+                  </>
+                ) : (
+                  <text x={cx} y={cy + 1} textAnchor="middle" dominantBaseline="central"
+                    fontSize="9" fontWeight="700"
+                    fill={isRoot ? 'white' : 'var(--accent)'}>
+                    {label}
+                  </text>
+                )}
               </g>
             );
           })
@@ -241,6 +263,22 @@ export default function ScaleSection({
   showDegrees, setShowDegrees, activePosition, setActivePosition,
   highlightRange,
 }) {
+  const MODES = ['notes', 'degrees', 'both'];
+  const MODE_LABELS = { notes: 'A B C', degrees: '1 2 3', both: '1 / C' };
+
+  const cycleMode = useCallback(() => {
+    setShowDegrees(prev => {
+      const i = MODES.indexOf(prev);
+      return MODES[(i + 1) % MODES.length];
+    });
+  }, [setShowDegrees]);
+
+  const handleNoteTap = useCallback((stringIdx, fret) => {
+    initAudio();
+    const freq = STRING_FREQS[stringIdx].freq * Math.pow(2, fret / 12);
+    playNote(freq);
+  }, []);
+
   return (
     <div>
       {/* Header with step pattern */}
@@ -249,12 +287,12 @@ export default function ScaleSection({
           <span className="text-water-4 font-semibold">{rootNote} {SCALE_NAMES[scale]}</span> on the fretboard
         </p>
         <button
-          onClick={() => setShowDegrees(d => !d)}
+          onClick={cycleMode}
           className={`px-2.5 py-1 rounded-full text-[9px] font-semibold transition-all active:scale-95 ${
-            showDegrees ? 'bg-water-2/20 text-water-5' : 'card text-text-3'
+            showDegrees !== 'notes' ? 'bg-water-2/20 text-water-5' : 'card text-text-3'
           }`}
         >
-          {showDegrees ? '1 2 3' : 'A B C'}
+          {MODE_LABELS[showDegrees] || 'A B C'}
         </button>
       </div>
 
@@ -279,6 +317,7 @@ export default function ScaleSection({
           rootIdx={rootIdx}
           showDegrees={showDegrees}
           highlightRange={highlightRange}
+          onNoteTap={handleNoteTap}
         />
       </div>
 

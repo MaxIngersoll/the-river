@@ -10,8 +10,7 @@ import HourglassFoundry from './HourglassFoundry';
 import HourglassRefinery from './HourglassRefinery';
 import HourglassHearth from './HourglassHearth';
 
-// Competition Q: "The Lantern's Climb" — Gamma warmth + Sand's climbing
-// Three siloed teams. Max picks the winner.
+// Competition Q prototypes — Max judges Foundry vs Refinery vs Hearth
 const PROTOTYPES = [
   { key: 'foundry',  label: '1', Component: HourglassFoundry,  name: 'Foundry' },
   { key: 'refinery', label: '2', Component: HourglassRefinery, name: 'Refinery' },
@@ -476,7 +475,7 @@ export default function TimerFAB({ onSaveSession, onQuickLog, showTabBar = true 
                   timerDepthColor={timerDepthColor}
                   formatTimerParts={formatTimerParts}
                   formatTimer={formatTimer}
-                  {...(proto.vessel ? { vessel: proto.vessel } : {})}
+
                 />
               );
             })()}

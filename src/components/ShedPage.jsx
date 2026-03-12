@@ -149,7 +149,7 @@ function StickyRootLock({ rootNote, scale, onRootChange, onScaleChange, expanded
 export default function ShedPage({ sessions = [], onNavigate }) {
   const [rootNote, setRootNote] = useState('C');
   const [scale, setScale] = useState('major');
-  const [showDegrees, setShowDegrees] = useState(false);
+  const [showDegrees, setShowDegrees] = useState('notes'); // 'notes' | 'degrees' | 'both'
   const [activePosition, setActivePosition] = useState(null);
   const [showBarre, setShowBarre] = useState(false);
   const [showIntervals, setShowIntervals] = useState(true);

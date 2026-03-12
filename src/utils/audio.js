@@ -369,6 +369,61 @@ export function getRainState() {
   };
 }
 
+// ─── Note Playback (Fretboard Tap) ───
+// Plays a guitar-like pluck at the given frequency
+
+export function playNote(frequency, duration = 0.8) {
+  if (!ensureContext()) return;
+
+  const now = audioCtx.currentTime;
+
+  // Fundamental + harmonics for guitar-like timbre
+  const fund = audioCtx.createOscillator();
+  fund.type = 'triangle';
+  fund.frequency.value = frequency;
+
+  const h2 = audioCtx.createOscillator();
+  h2.type = 'sine';
+  h2.frequency.value = frequency * 2;
+
+  const h3 = audioCtx.createOscillator();
+  h3.type = 'sine';
+  h3.frequency.value = frequency * 3;
+
+  // Pluck envelope: fast attack, exponential decay
+  const env = audioCtx.createGain();
+  env.gain.setValueAtTime(0, now);
+  env.gain.linearRampToValueAtTime(0.25, now + 0.005);
+  env.gain.exponentialRampToValueAtTime(0.001, now + duration);
+
+  const h2Gain = audioCtx.createGain();
+  h2Gain.gain.value = 0.12;
+  const h3Gain = audioCtx.createGain();
+  h3Gain.gain.value = 0.05;
+
+  // Low-pass filter: guitar body resonance
+  const filter = audioCtx.createBiquadFilter();
+  filter.type = 'lowpass';
+  filter.frequency.setValueAtTime(3000, now);
+  filter.frequency.exponentialRampToValueAtTime(800, now + duration * 0.6);
+  filter.Q.value = 1;
+
+  fund.connect(env);
+  h2.connect(h2Gain);
+  h2Gain.connect(env);
+  h3.connect(h3Gain);
+  h3Gain.connect(env);
+  env.connect(filter);
+  filter.connect(masterGain);
+
+  fund.start(now);
+  h2.start(now);
+  h3.start(now);
+  fund.stop(now + duration + 0.05);
+  h2.stop(now + duration + 0.05);
+  h3.stop(now + duration + 0.05);
+}
+
 // ─── Master Controls ───
 
 export function setMasterVolume(volume) {
